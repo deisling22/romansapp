@@ -81,4 +81,12 @@ Erst nach Aufhebung der Minimal-Use-Case-Anweisung implementieren:
 - Plan-Erstellung und Planverwaltung.
 - Gerichtskatalog im Feed-Stil mit Suche, Filtern, Bildergalerie, Zubereitungsdaten,
   Zubereitungsschritten und Schritt-Timern.
-- Einkaufslisten, Plan-Kopien, Benutzerprofile, PWA-Offline-Faehigkeit und Deployment.
+- Einkaufslisten, Plan-Kopien, Benutzerprofile und PWA-Offline-Faehigkeit.
+
+## Aktive Bereitstellung
+
+Der aktive Minimal-Use-Case wird jetzt uebers Internet bereitgestellt:
+
+- Frontend auf GitHub Pages
+- Backend auf Render
+- Commits loesen automatisch neue Deployments aus

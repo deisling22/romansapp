@@ -1,33 +1,43 @@
-# KI-Anweisung: Deployment (derzeit gesperrt)
+# KI-Anweisung: Deployment (GitHub Pages + Render)
 
-> Lies zuerst `00-projekt-uebersicht.md`. Bis zur ausdruecklichen Aufhebung der
-> Minimal-Use-Case-Anweisung wird kein Cloud-Deployment, keine GitHub Action und
-> keine produktive Bildspeicherung eingerichtet.
+> Lies zuerst `00-projekt-uebersicht.md`. Diese Datei beschreibt jetzt die aktive
+> Deployment-Strecke fuer den Minimal-Use-Case.
 
-## Aktive Ausfuehrung
+## Ziel
 
-Der Minimal-Use-Case wird lokal ausgefuehrt:
+Der Minimal-Use-Case soll nach jedem Commit automatisch aktualisiert werden:
 
-1. PostgreSQL mit `docker compose up -d` im Backend-Repository starten.
-2. Spring Boot mit Profil `dev` auf Port 8080 starten.
-3. Angular mit `npm run start` auf Port 4200 starten.
-4. Die Anwendung im Browser oder ueber ein Smartphone im selben lokalen Netzwerk testen.
+- Frontend: GitHub Pages
+- Backend: Render Free
 
-Fuer einen Test vom Smartphone muss der Angular-Dev-Server auf einer erreichbaren Adresse
-laufen und das Backend CORS fuer die konkrete lokale Frontend-Origin erlauben. Das ist ein
-Entwicklungszugang, kein Deployment.
+## Frontend
 
-## Nach Aufhebung der Sperre
+1. GitHub Pages wird ueber `.github/workflows/deploy-frontend.yml` deployed.
+2. Die Angular-Prod-Builds verwenden `src/environments/environment.prod.ts`.
+3. Das Projekt liegt als GitHub-Pages-Site unter `https://deisling22.github.io/romansapp/`.
+4. SPA-Routing funktioniert ueber `404.html` als Fallback.
 
-Dann erst entscheiden und einrichten:
+## Backend
 
-- Angular/PWA auf GitHub Pages mit korrekt gesetztem `base-href` und SPA-Fallback.
-- Spring Boot auf Railway (kostenpflichtig nach Trial) oder Render Free.
-- PostgreSQL auf Railway oder Neon.
-- Objekt-Storage fuer hochgeladene Bilder (nicht lokales Dateisystem auf einem ephemeren Host).
-- Produktive Umgebungsvariablen, CORS, HTTPS und Deployment-Smoketests.
+1. Render importiert `render.yaml` aus dem Repository.
+2. Der Backend-Service baut per Dockerfile im `backend/`-Verzeichnis.
+3. `autoDeploy: true` sorgt dafür, dass jeder Commit automatisch neu deployed wird.
+4. CORS ist fuer die GitHub-Pages-Origin freigeschaltet.
 
-## Aktuelles Akzeptanzkriterium
+## Wichtige Umgebungswerte
 
-- [ ] Der lokale Durchstich funktioniert, ohne dass ein Cloud-Konto oder Deployment-Dateien
-  angelegt werden muessen.
+- Frontend-API-URL: `https://speiseplan-backend.onrender.com/api`
+- Backend-Origin fuer CORS: `https://deisling22.github.io/romansapp`
+- Upload-Verzeichnis im Render-Container: `/opt/render/project/src/uploads`
+
+## Manuelle Einrichtungs-Schritte ausserhalb des Repos
+
+1. In GitHub Pages die Quelle auf GitHub Actions setzen.
+2. In Render das Repository verbinden und das Blueprint aus `render.yaml` importieren.
+3. Das erste Deploy einmal ausfuehren; danach laufen Commits automatisch durch.
+
+## Akzeptanzkriterien
+
+- [ ] Commit auf `master` oder `main` aktualisiert das Frontend automatisch auf GitHub Pages.
+- [ ] Commit auf `master` oder `main` aktualisiert das Backend automatisch auf Render.
+- [ ] Die App ist von aussen unter einer stabilen HTTPS-URL erreichbar.
