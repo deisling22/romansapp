@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
@@ -14,6 +15,13 @@ public class ApiExceptionHandler {
         HttpStatus status = HttpStatus.valueOf(exception.getStatusCode().value());
         return ResponseEntity.status(status)
                 .body(new ApiError(status.value(), exception.getReason(), Instant.now()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiError> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+        HttpStatus status = HttpStatus.PAYLOAD_TOO_LARGE;
+        return ResponseEntity.status(status)
+                .body(new ApiError(status.value(), "Das Bild ist zu groß. Bitte wähle eine kleinere Datei.", Instant.now()));
     }
 
     public record ApiError(int status, String message, Instant timestamp) {
