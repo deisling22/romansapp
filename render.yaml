@@ -1,11 +1,13 @@
 services:
   - type: web
     name: speiseplan-backend
-    env: docker
-    rootDir: backend
-    dockerfilePath: ./Dockerfile
+    runtime: docker
+    repo: https://github.com/deisling22/romansapp.git
+    branch: master
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
     plan: free
-    autoDeploy: true
+    autoDeployTrigger: commit
     healthCheckPath: /api/plans
     envVars:
       - key: CORS_ORIGINS
