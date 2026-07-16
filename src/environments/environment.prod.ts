@@ -1,3 +1,3 @@
 export const environment = {
-	apiUrl: 'https://speiseplan-backend.onrender.com/api',
+	apiUrl: 'https://speiseplan-backend-ye17.onrender.com/api',
 };
