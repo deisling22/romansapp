@@ -1,0 +1,20 @@
+CREATE TABLE meal_plan (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(120) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE dish (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(120) NOT NULL,
+    image_url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE plan_entry (
+    id BIGSERIAL PRIMARY KEY,
+    plan_id BIGINT NOT NULL REFERENCES meal_plan(id) ON DELETE CASCADE,
+    dish_id BIGINT NOT NULL REFERENCES dish(id),
+    sort_order INTEGER NOT NULL,
+    CONSTRAINT uk_plan_entry_sort_order UNIQUE (plan_id, sort_order)
+);

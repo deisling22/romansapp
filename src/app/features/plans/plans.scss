@@ -1,0 +1,166 @@
+:host {
+  display: block;
+}
+
+.screen {
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: 760px;
+  min-height: 100vh;
+  padding: 32px 20px 112px;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-header.compact {
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #26736f;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 10px;
+  color: #16342f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.4rem;
+  line-height: 1.05;
+}
+
+.intro {
+  color: #54716d;
+  line-height: 1.55;
+}
+
+.plan-list,
+.dish-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.plan-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #d7e5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: inherit;
+  min-height: 76px;
+  padding: 12px;
+  text-decoration: none;
+}
+
+.plan-row:focus-visible,
+.plan-row:hover {
+  border-color: #26736f;
+}
+
+.plan-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #e4f0d4;
+  color: #204e43;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.4rem;
+}
+
+.plan-copy {
+  display: grid;
+  gap: 3px;
+  flex: 1;
+}
+
+.plan-copy small {
+  color: #6b827d;
+}
+
+.chevron {
+  color: #26736f;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.status {
+  border-left: 3px solid #94b8a5;
+  color: #4e6661;
+  padding: 12px 14px;
+}
+
+.error {
+  border-color: #b54636;
+  color: #8d2d21;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #26736f;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dish-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dish-card {
+  overflow: hidden;
+  border: 1px solid #d7e5dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.dish-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 0.78;
+  object-fit: cover;
+  background: #e9eee9;
+}
+
+.dish-card h2 {
+  margin: 0;
+  padding: 12px;
+  color: #16342f;
+  font-size: 1rem;
+}
+
+.primary-action {
+  position: fixed;
+  right: max(20px, calc((100vw - 720px) / 2));
+  bottom: 24px;
+  display: block;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #e06c47;
+  color: #ffffff;
+  min-height: 52px;
+  padding: 16px 20px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+@media (min-width: 640px) {
+  .dish-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

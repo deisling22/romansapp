@@ -1,0 +1,24 @@
+<main class="screen">
+  <a class="back-link" [routerLink]="['/plans', planId]">‹ Zurück zum Plan</a>
+  <header class="page-header">
+    <p class="eyebrow">Neuer Eintrag</p>
+    <h1>Gericht hinzufügen</h1>
+    <p>Fotografiere das Gericht oder wähle ein Bild aus deiner Galerie.</p>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label for="name">Name des Gerichts</label>
+    <input id="name" type="text" formControlName="name" maxlength="120" autocomplete="off" placeholder="z. B. Pasta mit Gemüse" />
+    <p *ngIf="form.controls.name.touched && form.controls.name.invalid" class="field-error">Bitte gib einen Namen ein.</p>
+
+    <label class="photo-input" for="image">
+      <input id="image" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" (change)="onImageChange($event)" />
+      <span>Foto aufnehmen oder auswählen</span>
+    </label>
+
+    <img *ngIf="previewUrl" class="preview" [src]="previewUrl" alt="Vorschau des gewählten Gerichts" />
+    <p *ngIf="errorMessage" class="field-error" role="alert">{{ errorMessage }}</p>
+
+    <button type="submit" [disabled]="submitting">{{ submitting ? 'Wird gespeichert ...' : 'Gericht speichern' }}</button>
+  </form>
+</main>

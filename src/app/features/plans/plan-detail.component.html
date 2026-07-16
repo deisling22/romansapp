@@ -1,0 +1,20 @@
+<main class="screen">
+  <a class="back-link" routerLink="/plans">‹ Alle Pläne</a>
+  <header class="page-header compact">
+    <p class="eyebrow">Dein Plan</p>
+    <h1>Gerichte</h1>
+  </header>
+
+  <p *ngIf="loading" class="status">Gerichte werden geladen ...</p>
+  <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
+
+  <section *ngIf="!loading && !errorMessage" class="dish-grid" aria-label="Gerichte im Plan">
+    <article *ngFor="let dish of dishes" class="dish-card">
+      <img [src]="mealPlanApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
+      <h2>{{ dish.name }}</h2>
+    </article>
+    <p *ngIf="dishes.length === 0" class="status">Dieser Plan enthält noch keine Gerichte.</p>
+  </section>
+
+  <a class="primary-action" [routerLink]="['/plans', planId, 'dishes', 'new']">Gericht hinzufügen</a>
+</main>

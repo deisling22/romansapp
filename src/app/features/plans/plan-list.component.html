@@ -1,0 +1,22 @@
+<main class="screen">
+  <header class="page-header">
+    <p class="eyebrow">Mein Kochalltag</p>
+    <h1>Speisepläne</h1>
+    <p class="intro">Wähle einen Plan und ergänze dein nächstes Gericht direkt mit einem Foto.</p>
+  </header>
+
+  <p *ngIf="loading" class="status">Pläne werden geladen ...</p>
+  <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
+
+  <section *ngIf="!loading && !errorMessage" class="plan-list" aria-label="Vorhandene Speisepläne">
+    <a *ngFor="let plan of plans" class="plan-row" [routerLink]="['/plans', plan.id]">
+      <span class="plan-mark">{{ plan.name.charAt(0) }}</span>
+      <span class="plan-copy">
+        <strong>{{ plan.name }}</strong>
+        <small>{{ plan.dishCount }} {{ plan.dishCount === 1 ? 'Gericht' : 'Gerichte' }}</small>
+      </span>
+      <span class="chevron" aria-hidden="true">›</span>
+    </a>
+    <p *ngIf="plans.length === 0" class="status">Noch keine Pläne vorhanden.</p>
+  </section>
+</main>
