@@ -14,6 +14,28 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+## Native iOS app
+
+Prerequisites:
+
+- Install Xcode from the Mac App Store and open it once.
+- Select Xcode with `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`.
+- Connect the iPhone by cable and enable Developer Mode on the device.
+
+Build and open the native project:
+
+```bash
+npm run build:ios
+npm run ios:open
+```
+
+In Xcode, select the `App` target, choose a personal Apple Developer team under
+Signing & Capabilities, select the connected iPhone, and press Run. The bundle
+identifier is `de.roman.speiseplan`.
+
+After frontend changes, run `npm run build:ios` again before starting the app
+from Xcode.
+
 ## Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
