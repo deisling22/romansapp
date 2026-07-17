@@ -1,13 +1,16 @@
-# KI-Anweisung: Backend (Spring Boot, Minimal-Use-Case)
+# KI-Anweisung: Backend (Spring Boot)
 
-> Lies zuerst `00-projekt-uebersicht.md`. Die Minimal-Use-Case-Sperre ist
-> verbindlich. Implementiere nur den dort beschriebenen Durchstich.
+> Lies zuerst `00-projekt-uebersicht.md`. Die Sperre wurde aufgehoben; das
+> Backend deckt den vollen dort beschriebenen API-Vertrag und das komplette
+> Domaenenmodell ab (Plaene, Gerichte, Zutaten/Naehrwerte, Bildergalerie,
+> Zubereitungsschritte, Dashboard, Einkaufsliste, Profil).
 
 ## Ziel
 
-Erstelle ein separates Spring-Boot-Backend in `speiseplan-backend`. Es muss Plaene
-laden, die Gerichte eines Plans laden und ein Gericht mit Name und Bild hochladen
-sowie dem Plan zuordnen koennen.
+Das Spring-Boot-Backend `speiseplan-backend` verwaltet Plaene inklusive Erstellen,
+Kopieren und Loeschen, Gerichte mit Zutaten/Naehrwerten/Bildergalerie/Zubereitungs-
+schritten, eine Einkaufsliste je Plan, ein Dashboard mit Tageswerten sowie ein
+globales Nutzerprofil mit Portionsgroesse, Koerpergewicht und Koerpergroesse.
 
 ## Rahmenbedingungen
 
@@ -70,4 +73,5 @@ Stelle `uploads/` unter `GET /uploads/**` als statische Ressource bereit. Das Fe
 - [ ] `GET /api/plans` sowie `GET /api/plans/{id}/dishes` geben Seed-Daten zurueck.
 - [ ] Ein `curl -F name=... -F image=@...` erzeugt ein Gericht und liefert dessen Bild-URL.
 - [ ] Das gespeicherte Bild ist anschliessend ueber `/uploads/...` abrufbar.
-- [ ] Kein Code ausserhalb dieses Minimal-Use-Cases wird eingefuehrt.
+- [ ] Dashboard-, Profil-, Zutaten-, Einkaufslisten- und Katalog-Endpunkte aus
+  `00-projekt-uebersicht.md` sind implementiert und getestet.

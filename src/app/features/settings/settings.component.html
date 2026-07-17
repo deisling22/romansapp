@@ -1,0 +1,25 @@
+<main class="screen">
+  <header class="page-header">
+    <p class="eyebrow">Dein Profil</p>
+    <h1>Einstellungen</h1>
+    <p>Diese Angaben werden für dein Kalorien- und Proteinziel verwendet.</p>
+  </header>
+
+  <p *ngIf="loading" class="status">Profil wird geladen ...</p>
+
+  <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label for="defaultPortionSize">Standard-Portionsgröße</label>
+    <input id="defaultPortionSize" type="number" min="1" formControlName="defaultPortionSize" />
+
+    <label for="bodyWeightKg">Körpergewicht (kg)</label>
+    <input id="bodyWeightKg" type="number" min="0" formControlName="bodyWeightKg" />
+
+    <label for="bodyHeightCm">Körpergröße (cm)</label>
+    <input id="bodyHeightCm" type="number" min="0" formControlName="bodyHeightCm" />
+
+    <p *ngIf="errorMessage" class="field-error" role="alert">{{ errorMessage }}</p>
+    <p *ngIf="savedMessage" class="field-success">{{ savedMessage }}</p>
+
+    <button type="submit" [disabled]="saving">{{ saving ? 'Wird gespeichert ...' : 'Speichern' }}</button>
+  </form>
+</main>

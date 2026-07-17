@@ -1,0 +1,164 @@
+:host {
+  display: block;
+}
+
+.screen {
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: 760px;
+  min-height: 100vh;
+  padding: 32px 20px 40px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #26736f;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.status {
+  border-left: 3px solid #94b8a5;
+  color: #4e6661;
+  padding: 12px 14px;
+}
+
+.error {
+  border-color: #b54636;
+  color: #8d2d21;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  color: #16342f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.2rem;
+  line-height: 1.05;
+}
+
+.page-header p {
+  margin: 0 0 12px;
+  color: #54716d;
+  line-height: 1.5;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #26736f;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.tags span {
+  border-radius: 999px;
+  background: #e4f0d4;
+  color: #204e43;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.gallery img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #e9eee9;
+}
+
+h2 {
+  margin: 0 0 12px;
+  color: #16342f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.4rem;
+}
+
+.steps {
+  margin-bottom: 28px;
+}
+
+.steps ol {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.steps li p {
+  margin: 0 0 6px;
+  color: #16342f;
+}
+
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #26736f;
+  font-weight: 700;
+}
+
+.ingredients ul {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 20px;
+  padding-left: 20px;
+  color: #16342f;
+}
+
+form {
+  display: grid;
+  gap: 10px;
+  max-width: 320px;
+}
+
+label {
+  color: #244b43;
+  font-weight: 700;
+}
+
+input,
+select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #aac9ba;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px 12px;
+  color: #16342f;
+  font: inherit;
+}
+
+button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: #e06c47;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}

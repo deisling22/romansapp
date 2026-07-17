@@ -1,0 +1,40 @@
+<main class="screen">
+  <header class="page-header">
+    <p class="eyebrow">Heute</p>
+    <h1>Übersicht</h1>
+  </header>
+
+  <p *ngIf="loading" class="status">Übersicht wird geladen ...</p>
+  <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
+
+  <section *ngIf="!loading && !errorMessage && dashboard" class="dashboard">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-label">Kalorien heute</span>
+        <span class="stat-value">{{ dashboard.caloriesToday }} kcal</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Protein heute</span>
+        <span class="stat-value">{{ dashboard.proteinToday }} g</span>
+        <span *ngIf="dashboard.proteinGoal" class="stat-sub">
+          von {{ dashboard.proteinGoal }} g ({{ dashboard.proteinPercent }}%)
+        </span>
+      </div>
+    </div>
+
+    <article *ngIf="dashboard.nextDish" class="next-dish">
+      <p class="eyebrow">Nächstes Gericht</p>
+      <div class="next-dish-row">
+        <img [src]="imageUrl(dashboard.nextDish.imageUrl)" [alt]="dashboard.nextDish.name" />
+        <div class="next-dish-copy">
+          <h2>{{ dashboard.nextDish.name }}</h2>
+          <a [routerLink]="['/plans', dashboard.nextDish.planId]">Zum Plan</a>
+        </div>
+      </div>
+      <button type="button" [disabled]="cooking" (click)="markCooked()">
+        {{ cooking ? 'Wird gespeichert ...' : 'Als gekocht markieren' }}
+      </button>
+    </article>
+    <p *ngIf="!dashboard.nextDish" class="status">Kein offenes Gericht in deinen Plänen.</p>
+  </section>
+</main>

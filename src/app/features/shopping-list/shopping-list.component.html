@@ -1,0 +1,28 @@
+<main class="screen">
+  <a class="back-link" [routerLink]="['/plans', planId]">‹ Zurück zum Plan</a>
+  <header class="page-header">
+    <p class="eyebrow">Einkaufsliste</p>
+    <h1>Einkaufsliste</h1>
+  </header>
+
+  <button type="button" class="generate" [disabled]="generating" (click)="generate()">
+    {{ generating ? 'Wird erstellt ...' : 'Aus Plan neu erstellen' }}
+  </button>
+
+  <p *ngIf="(connectivity.online$ | async) === false" class="status offline">
+    Offline – Änderungen werden gespeichert, sobald du wieder online bist.
+  </p>
+
+  <p *ngIf="loading" class="status">Einkaufsliste wird geladen ...</p>
+  <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
+
+  <ul *ngIf="!loading" class="item-list">
+    <li *ngFor="let item of items" [class.checked]="item.checked">
+      <label>
+        <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
+        <span>{{ item.ingredientName }} – {{ item.quantity }} {{ item.unit }}</span>
+      </label>
+    </li>
+    <li *ngIf="items.length === 0" class="status">Noch keine Einkaufsliste erstellt.</li>
+  </ul>
+</main>

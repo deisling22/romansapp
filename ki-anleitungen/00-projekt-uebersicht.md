@@ -1,91 +1,114 @@
 # Projekt-Uebersicht: Ewiger Speiseplan (KI-Kontextdatei)
 
-> **Verbindliche Arbeitsregel:** Bis der Nutzer ausdruecklich sagt
-> **"Anweisung fuer den Minimal-Use-Case entfernen"**, darf ausschliesslich der
-> folgende Minimal-Use-Case umgesetzt werden. Alle Anforderungen unter
-> "Folgephase" sind Kontext, aber gesperrt und duerfen weder implementiert noch
-> als Voraussetzung eingefuehrt werden.
+> Die Minimal-Use-Case-Sperre wurde aufgehoben. Alle in dieser Datei
+> beschriebenen Funktionen sind aktiv umzusetzen bzw. bereits umgesetzt.
 
-## Aktive Phase: Minimal-Use-Case
+## Ueberblick
 
-Ziel ist ein sichtbarer, mobiler End-to-End-Durchstich:
+Ziel ist eine mobile-first Web-App fuer wiederkehrende Speiseplaene:
 
-1. Die Angular-App zeigt eine Liste vorhandener Plaene.
-2. Beim Oeffnen eines Plans zeigt sie dessen Gerichtsliste.
-3. Auf einem Smartphone kann ein Gericht mit einem Textnamen und einem Foto neu
-   erstellt und direkt dem gewaehlten Plan hinzugefuegt werden.
-4. Die Daten fliessen durch Angular -> Spring Boot -> PostgreSQL und erscheinen
-   nach dem Speichern in der Gerichtsliste.
+1. Die Angular-App zeigt ein Dashboard mit Tageskalorien, Eiweissfortschritt und
+   dem naechsten zu kochenden Gericht.
+2. Plaene koennen erstellt, kopiert, geloescht und geoeffnet werden; jeder Plan
+   zeigt seine Gerichtsliste.
+3. Auf einem Smartphone kann ein Gericht mit Textnamen und Foto neu erstellt und
+   einem Plan hinzugefuegt werden.
+4. Ein Gerichtskatalog erlaubt Suche und Filter ueber alle Gerichte inklusive
+   Bildergalerie, Zutaten mit Naehrwerten und Zubereitungsschritten mit Timern.
+5. Aus einem Plan laesst sich eine Einkaufsliste generieren und abhaken.
+6. Einstellungen speichern Standard-Portionsgroesse, Koerpergewicht und
+   Koerpergroesse.
+7. Die App ist als PWA installierbar und funktioniert fuer bereits geladene
+   Daten sowie fuer das Abhaken der Einkaufsliste offline.
+8. Die Daten fliessen durch Angular -> Spring Boot -> PostgreSQL.
 
-Der Minimal-Use-Case enthaelt bewusst **keine** Benutzerkonten, Authentifizierung,
-Suche, Filter, Zutaten, Kalorien, Tracking, Einkaufslisten, Timer, PWA-Offline-Sync,
-Plan-Kopien oder Deployment-Automatisierung.
+Die App enthaelt weiterhin **keine** Benutzerkonten oder Authentifizierung; die
+Einstellungen gelten global fuer die eine Instanz der App (kein Mehrbenutzer-Login).
 
 ## Tech-Stack
 
 | Schicht | Technologie |
 |---|---|
-| Frontend | Bestehendes Angular-16-Projekt `romansapp`, Tailwind CSS |
+| Frontend | Bestehendes Angular-16-Projekt `romansapp`, Tailwind CSS, Angular Service Worker (PWA) |
 | Backend | Spring Boot 3.x, Java 21, REST-API |
 | Datenbank | PostgreSQL, lokal via Docker Compose |
-| Bildspeicher (Minimal-Use-Case) | Lokales Dateisystem des Backends, nur Entwicklung |
-| Spaetere Bereitstellung | GitHub Pages, Railway oder Render |
+| Bildspeicher | Lokales Dateisystem des Backends |
+| Offline-Speicher (Frontend) | IndexedDB via Dexie, Outbox-Pattern fuer Einkaufsliste |
+| Bereitstellung | GitHub Pages (Frontend), Render (Backend) |
 
-## Aktives Domänenmodell
+## Domaenenmodell
 
 ```
 MealPlan 1---n PlanEntry n---1 Dish
-Dish     hat name, imageUrl und createdAt
+Dish     1---n DishIngredient n---1 Ingredient
+Dish     1---n DishImage
+Dish     1---n PrepStep
+MealPlan 1---n ShoppingListItem
+UserProfile (Singleton)
 ```
 
 | Entity | Felder |
 |---|---|
 | `MealPlan` | id, name, createdAt |
-| `Dish` | id, name, imageUrl, createdAt |
-| `PlanEntry` | id, plan, dish, sortOrder |
+| `Dish` | id, name, imageUrl, description, prepMinutes, servings, tags, createdAt |
+| `PlanEntry` | id, plan, dish, sortOrder, cooked, cookedAt |
+| `Ingredient` | id, name, kcalPer100, proteinPer100, unit |
+| `DishIngredient` | id, dish, ingredient, quantityGrams |
+| `DishImage` | id, dish, imageUrl, sortOrder |
+| `PrepStep` | id, dish, stepOrder, text, timerSeconds |
+| `ShoppingListItem` | id, plan, ingredientName, quantity, unit, checked |
+| `UserProfile` | id (immer 1), defaultPortionSize, bodyWeightKg, bodyHeightCm |
 
-`Dish` gehoert im Minimal-Use-Case immer genau zu dem Plan, dem es beim Erstellen
-hinzugefuegt wird. Die `PlanEntry`-Tabelle bleibt trotzdem bestehen, damit die
-spaetere geordnete Planlogik ohne Datenmodellbruch erweitert werden kann.
+Naehrwerte pro Portion eines Gerichts ergeben sich aus der Summe der
+`DishIngredient`-Mengen multipliziert mit den `Ingredient`-Werten pro 100 g,
+geteilt durch `Dish.servings`. Beim Abhaken eines Gerichts als "gekocht" wird
+`caloriesPerServing`/`proteinPerServing` multipliziert mit
+`UserProfile.defaultPortionSize` den Tageswerten zugerechnet. Das Eiweissziel
+betraegt $2\,g \times \text{Koerpergewicht in kg}$ pro Tag.
 
-## Aktiver API-Vertrag
+## API-Vertrag
 
 ```
-GET  /api/plans
-GET  /api/plans/{planId}/dishes
-POST /api/plans/{planId}/dishes  multipart/form-data: name, image
-GET  /uploads/{filename}
+GET    /api/plans
+POST   /api/plans
+DELETE /api/plans/{planId}
+POST   /api/plans/{planId}/copy
+GET    /api/plans/{planId}/dishes
+POST   /api/plans/{planId}/dishes            multipart/form-data: name, image
+PATCH  /api/plan-entries/{entryId}/cook
+
+GET    /api/dishes?search=&tag=
+GET    /api/dishes/{dishId}
+POST   /api/dishes/{dishId}/images           multipart/form-data: image
+POST   /api/dishes/{dishId}/steps
+POST   /api/dishes/{dishId}/ingredients
+
+GET    /api/ingredients
+POST   /api/ingredients
+
+GET    /api/dashboard
+
+GET    /api/profile
+PUT    /api/profile
+
+GET    /api/plans/{planId}/shopping-list
+POST   /api/plans/{planId}/shopping-list/generate
+PATCH  /api/shopping-list/{itemId}
+
+GET    /uploads/{filename}
 ```
 
-Die POST-Antwort liefert das gespeicherte Gericht als DTO mit einer vom Frontend
-direkt nutzbaren `imageUrl`.
+Die POST-Antworten fuer Gerichte liefern DTOs mit einer vom Frontend direkt
+nutzbaren `imageUrl`.
 
 ## Konventionen fuer alle KI-Sessions
 
 - Code, Klassen, Variablen und Endpoints auf Englisch; sichtbare UI-Texte auf Deutsch.
-- Keine Authentifizierung und kein Mocking fuer den aktiven Durchstich.
-- Keine Entities direkt serialisieren; DTOs verwenden.
+- Keine Authentifizierung; keine Entities direkt serialisieren, DTOs verwenden.
 - Bilder im Browser ueber `accept="image/*"` und `capture="environment"` aufnehmen;
   das Ergebnis als `multipart/form-data` senden.
-- Secrets und produktive Bildspeicher sind erst in der Folgephase relevant.
 
-## Folgephase: Gesperrte Produktanforderungen
-
-Erst nach Aufhebung der Minimal-Use-Case-Anweisung implementieren:
-
-- Einstellungen fuer Standard-Portionsgroesse sowie Koerpergewicht und Koerpergroesse.
-- Zutaten mit Naehrwerten; Tageskalorien und Eiweiss auf dem Dashboard. Das Eiweissziel
-  betraegt $2\,g \times \text{Koerpergewicht in kg}$ pro Tag und wird prozentual angezeigt.
-- Dashboard mit Kalorien-Card, Eiweiss-Card/Diagramm und naechstem zu kochenden Gericht;
-  Gericht kann als gekocht abgehakt oder zur Zubereitung geoeffnet werden.
-- Plan-Erstellung und Planverwaltung.
-- Gerichtskatalog im Feed-Stil mit Suche, Filtern, Bildergalerie, Zubereitungsdaten,
-  Zubereitungsschritten und Schritt-Timern.
-- Einkaufslisten, Plan-Kopien, Benutzerprofile und PWA-Offline-Faehigkeit.
-
-## Aktive Bereitstellung
-
-Der aktive Minimal-Use-Case wird jetzt uebers Internet bereitgestellt:
+## Bereitstellung
 
 - Frontend auf GitHub Pages
 - Backend auf Render

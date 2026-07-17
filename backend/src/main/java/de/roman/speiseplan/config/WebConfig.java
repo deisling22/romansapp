@@ -32,6 +32,9 @@ public class WebConfig implements WebMvcConfigurer {
         configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
         configuration.addAllowedMethod("GET");
         configuration.addAllowedMethod("POST");
+        configuration.addAllowedMethod("PUT");
+        configuration.addAllowedMethod("PATCH");
+        configuration.addAllowedMethod("DELETE");
         configuration.addAllowedMethod("OPTIONS");
         configuration.addAllowedHeader("*");
 
