@@ -1664,3 +1664,93 @@
 2026-07-17T12:28:26.313Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
 2026-07-17T12:28:26.313Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
 2026-07-17T12:28:26.313Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+2026-07-17T12:29:16.277Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:29:16.277Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "details": {
+    "commitId": "2bedc8f",
+    "stepNumber": 6,
+    "stepTitle": "Final Validation"
+  },
+  "event": "upgradeValidationCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:29:16.277Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:29:16.277Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:29:16.278Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:29:16.336Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:29:16.336Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "details": {
+    "commitId": "2bedc8f",
+    "stepNumber": 6,
+    "stepTitle": "Final Validation"
+  },
+  "event": "upgradeValidationCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:29:16.336Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:29:16.336Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'upgradeValidationCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:29:16.336Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:29:18.930Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:29:18.930Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "event": "planExecutionCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:29:18.930Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:29:18.930Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:29:18.930Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:29:18.981Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:29:18.981Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "event": "planExecutionCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:29:18.981Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:29:18.982Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'planExecutionCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:29:18.983Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:30:24.338Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:30:24.338Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "event": "summaryGenerated",
+  "message": "Successfully upgraded speiseplan-backend from Java 21 to Java 25 LTS. Updated java.version in pom.xml and both Docker base images. BUILD SUCCESS with JDK 25.0.2, no CVEs found, no test regressions.",
+  "phase": "summarize",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:30:24.338Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:30:24.338Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:30:24.338Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:30:24.385Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:30:24.385Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "event": "summaryGenerated",
+  "message": "Successfully upgraded speiseplan-backend from Java 21 to Java 25 LTS. Updated java.version in pom.xml and both Docker base images. BUILD SUCCESS with JDK 25.0.2, no CVEs found, no test regressions.",
+  "phase": "summarize",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:30:24.385Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:30:24.386Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'summaryGenerated' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:30:24.386Z [INFO] ----------------------invoked appmod-report-event----------------------
