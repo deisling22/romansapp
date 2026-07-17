@@ -11,6 +11,6 @@ services:
     healthCheckPath: /api/plans
     envVars:
       - key: CORS_ORIGINS
-        value: https://deisling22.github.io/romansapp
+        value: https://deisling22.github.io
       - key: UPLOAD_DIR
         value: /opt/render/project/src/uploads
