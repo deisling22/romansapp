@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.Instant;
 
 @Entity
 @Table(name = "plan_entry")
@@ -28,6 +29,12 @@ public class PlanEntry {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 
+    @Column(nullable = false)
+    private boolean cooked = false;
+
+    @Column(name = "cooked_at")
+    private Instant cookedAt;
+
     protected PlanEntry() {
     }
 
@@ -37,11 +44,32 @@ public class PlanEntry {
         this.sortOrder = sortOrder;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public MealPlan getPlan() {
+        return plan;
+    }
+
     public Dish getDish() {
         return dish;
     }
 
     public int getSortOrder() {
         return sortOrder;
+    }
+
+    public boolean isCooked() {
+        return cooked;
+    }
+
+    public Instant getCookedAt() {
+        return cookedAt;
+    }
+
+    public void markCooked(Instant when) {
+        this.cooked = true;
+        this.cookedAt = when;
     }
 }

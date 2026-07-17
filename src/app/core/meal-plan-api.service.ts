@@ -3,16 +3,28 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Dish, MealPlan } from './models';
+import { toAbsoluteImageUrl } from './image-url';
 
 @Injectable({ providedIn: 'root' })
 export class MealPlanApiService {
   private readonly apiUrl = environment.apiUrl;
-  private readonly backendUrl = this.apiUrl.replace(/\/api$/, '');
 
   constructor(private readonly http: HttpClient) {}
 
   getPlans(): Observable<MealPlan[]> {
     return this.http.get<MealPlan[]>(`${this.apiUrl}/plans`);
+  }
+
+  createPlan(name: string): Observable<MealPlan> {
+    return this.http.post<MealPlan>(`${this.apiUrl}/plans`, { name });
+  }
+
+  deletePlan(planId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/plans/${planId}`);
+  }
+
+  copyPlan(planId: number): Observable<MealPlan> {
+    return this.http.post<MealPlan>(`${this.apiUrl}/plans/${planId}/copy`, {});
   }
 
   getDishes(planId: number): Observable<Dish[]> {
@@ -28,6 +40,6 @@ export class MealPlanApiService {
   }
 
   imageUrl(path: string): string {
-    return path.startsWith('http') ? path : `${this.backendUrl}${path}`;
+    return toAbsoluteImageUrl(path);
   }
 }

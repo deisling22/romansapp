@@ -52,6 +52,59 @@ h1 {
   gap: 12px;
 }
 
+.new-plan {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.new-plan input {
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 48px;
+  border: 1px solid #aac9ba;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px 12px;
+  color: #16342f;
+  font: inherit;
+}
+
+.new-plan button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 8px;
+  background: #e06c47;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0 16px;
+  white-space: nowrap;
+}
+
+.new-plan button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.plan-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.plan-actions button {
+  min-width: 36px;
+  min-height: 36px;
+  border: 1px solid #d7e5dd;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #26736f;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+
 .plan-row {
   display: flex;
   align-items: center;
@@ -143,6 +196,31 @@ h1 {
   font-size: 1rem;
 }
 
+.dish-card.cooked {
+  opacity: 0.7;
+}
+
+.cook-button {
+  display: block;
+  box-sizing: border-box;
+  width: calc(100% - 24px);
+  margin: 0 12px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: #26736f;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  min-height: 36px;
+}
+
+.cook-button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
 .primary-action {
   position: fixed;
   right: max(20px, calc((100vw - 720px) / 2));
@@ -158,6 +236,24 @@ h1 {
   text-align: center;
   text-decoration: none;
 }
+
+.secondary-action {
+  position: fixed;
+  left: max(20px, calc((100vw - 720px) / 2));
+  bottom: 24px;
+  display: block;
+  box-sizing: border-box;
+  border: 1px solid #26736f;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #26736f;
+  min-height: 52px;
+  padding: 16px 20px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
 
 @media (min-width: 640px) {
   .dish-grid {

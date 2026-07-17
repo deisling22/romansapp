@@ -40,8 +40,31 @@ public class MealPlanService {
     public List<DishDto> getDishes(Long planId) {
         requirePlan(planId);
         return planEntryRepository.findByPlanIdOrderBySortOrderAsc(planId).stream()
-                .map(entry -> toDto(entry.getDish(), entry.getSortOrder()))
+                .map(this::toDto)
                 .toList();
+    }
+
+    @Transactional
+    public PlanSummaryDto createPlan(String name) {
+        MealPlan plan = mealPlanRepository.save(new MealPlan(name.trim()));
+        return new PlanSummaryDto(plan.getId(), plan.getName(), 0);
+    }
+
+    @Transactional
+    public void deletePlan(Long planId) {
+        MealPlan plan = requirePlan(planId);
+        mealPlanRepository.delete(plan);
+    }
+
+    @Transactional
+    public PlanSummaryDto copyPlan(Long planId) {
+        MealPlan source = requirePlan(planId);
+        MealPlan copy = mealPlanRepository.save(new MealPlan(source.getName() + " (Kopie)"));
+        List<PlanEntry> entries = planEntryRepository.findByPlanIdOrderBySortOrderAsc(planId);
+        for (PlanEntry entry : entries) {
+            planEntryRepository.save(new PlanEntry(copy, entry.getDish(), entry.getSortOrder()));
+        }
+        return new PlanSummaryDto(copy.getId(), copy.getName(), entries.size());
     }
 
     @Transactional
@@ -53,7 +76,7 @@ public class MealPlanService {
                 .map(entry -> entry.getSortOrder() + 1)
                 .orElse(0);
         PlanEntry entry = planEntryRepository.save(new PlanEntry(plan, dish, nextSortOrder));
-        return toDto(dish, entry.getSortOrder());
+        return toDto(entry);
     }
 
     private MealPlan requirePlan(Long planId) {
@@ -61,7 +84,8 @@ public class MealPlanService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan wurde nicht gefunden."));
     }
 
-    private DishDto toDto(Dish dish, int sortOrder) {
-        return new DishDto(dish.getId(), dish.getName(), dish.getImageUrl(), sortOrder);
+    private DishDto toDto(PlanEntry entry) {
+        Dish dish = entry.getDish();
+        return new DishDto(dish.getId(), dish.getName(), dish.getImageUrl(), entry.getSortOrder(), entry.getId(), entry.isCooked());
     }
 }

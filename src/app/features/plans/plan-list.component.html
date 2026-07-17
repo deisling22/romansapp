@@ -5,6 +5,17 @@
     <p class="intro">Wähle einen Plan und ergänze dein nächstes Gericht direkt mit einem Foto.</p>
   </header>
 
+  <form class="new-plan" (ngSubmit)="createPlan()" novalidate>
+    <input
+      type="text"
+      name="newPlanName"
+      placeholder="Name des neuen Plans"
+      maxlength="120"
+      [(ngModel)]="newPlanName"
+    />
+    <button type="submit" [disabled]="creating">{{ creating ? 'Wird erstellt ...' : 'Plan anlegen' }}</button>
+  </form>
+
   <p *ngIf="loading" class="status">Pläne werden geladen ...</p>
   <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
 
@@ -14,6 +25,10 @@
       <span class="plan-copy">
         <strong>{{ plan.name }}</strong>
         <small>{{ plan.dishCount }} {{ plan.dishCount === 1 ? 'Gericht' : 'Gerichte' }}</small>
+      </span>
+      <span class="plan-actions">
+        <button type="button" (click)="copyPlan(plan, $event)" title="Plan kopieren">⧉</button>
+        <button type="button" (click)="deletePlan(plan, $event)" title="Plan löschen">✕</button>
       </span>
       <span class="chevron" aria-hidden="true">›</span>
     </a>

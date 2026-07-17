@@ -1,0 +1,40 @@
+<main class="screen">
+  <header class="page-header">
+    <p class="eyebrow">Alle Gerichte</p>
+    <h1>Gerichte</h1>
+  </header>
+
+  <div class="filter-row">
+    <input
+      type="text"
+      placeholder="Suche nach Name ..."
+      [(ngModel)]="search"
+      (ngModelChange)="onFilterChange()"
+      aria-label="Suche nach Name"
+    />
+    <input
+      type="text"
+      placeholder="Tag filtern ..."
+      [(ngModel)]="tag"
+      (ngModelChange)="onFilterChange()"
+      aria-label="Tag filtern"
+    />
+  </div>
+
+  <p *ngIf="loading" class="status">Gerichte werden geladen ...</p>
+  <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
+
+  <section *ngIf="!loading && !errorMessage" class="dish-grid" aria-label="Gerichtkatalog">
+    <a *ngFor="let dish of dishes" class="dish-card" [routerLink]="['/dishes', dish.id]">
+      <img [src]="dishApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
+      <div class="dish-copy">
+        <h2>{{ dish.name }}</h2>
+        <p *ngIf="dish.prepMinutes">{{ dish.prepMinutes }} Min.</p>
+        <div class="tags" *ngIf="dish.tags.length">
+          <span *ngFor="let tag of dish.tags">{{ tag }}</span>
+        </div>
+      </div>
+    </a>
+    <p *ngIf="dishes.length === 0" class="status">Keine Gerichte gefunden.</p>
+  </section>
+</main>

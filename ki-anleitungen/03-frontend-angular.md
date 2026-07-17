@@ -1,26 +1,31 @@
-# KI-Anweisung: Frontend (Angular, Minimal-Use-Case)
+# KI-Anweisung: Frontend (Angular)
 
-> Lies zuerst `00-projekt-uebersicht.md`. Baue im bestehenden Angular-Projekt
-> `romansapp` nur den aktiven Minimal-Use-Case. Spaetere Ansichten und Funktionen
-> bleiben unberuehrt.
+> Lies zuerst `00-projekt-uebersicht.md`. Die Sperre wurde aufgehoben; das
+> Frontend deckt Dashboard, Planverwaltung, Gerichtskatalog, Einkaufsliste,
+> Einstellungen und PWA-Offline ab.
 
 ## Ziel
 
-Mobile-first UI fuer den kompletten Durchstich: Planliste laden, Plan oeffnen,
-Gerichte des Plans laden, neues Gericht mit Text und Smartphone-Foto erstellen.
+Mobile-first UI fuer den kompletten Funktionsumfang: Dashboard, Planliste (inkl.
+Erstellen/Kopieren/Loeschen), Plan-Detail mit Gerichtsliste und "gekocht"-Status,
+Gerichtskatalog mit Suche/Filter/Galerie/Zutaten/Zubereitungsschritten mit Timer,
+Einkaufsliste je Plan und Einstellungen.
 
 ## Struktur
 
-Lege nur die notwendigen Bereiche unter `src/app/` an:
+Bereiche unter `src/app/`:
 
 ```
-core/             # API-Basis-URL und TypeScript-Models
-features/plans/   # Planliste und Plan-Detail mit Gerichtsliste
-features/dishes/  # Formular zum Anlegen eines Gerichts
+core/                  # API-Basis-URL, TypeScript-Models, API-Services
+features/dashboard/    # Tageswerte, naechstes Gericht
+features/plans/        # Planliste, Plan-Detail mit Gerichtsliste
+features/dishes/       # Anlegen, Katalog, Detail mit Galerie/Zutaten/Schritten
+features/shopping-list/# Einkaufsliste je Plan
+features/settings/     # Profil-Einstellungen
 ```
 
-Keine Auth-Guard-, Dashboard-, Einkaufslisten-, Profil- oder Offline-Features erstellen.
-Die vorhandenen Auth-Dateien muessen nicht entfernt oder umgebaut werden.
+Keine Auth-Guard-Features erstellen; die vorhandenen leeren Auth-Dateien bleiben
+unveraendert.
 
 ## Routen und API
 
@@ -45,12 +50,13 @@ in HTML verwenden.
 - Lade-, Leer- und Fehlerzustand fuer Plan- und Gerichtsliste darstellen.
 - Waehrend Upload: Submit deaktivieren und Fortschritts-/Ladetext zeigen.
 - Fehlermeldungen des Backends nahe am Formular anzeigen, ohne die Eingabe zu verlieren.
-- Kein Instagram-Feed, Suche, Filter, Galerie, Zubereitung, Timer oder Dashboard in dieser Phase.
-
 ## Akzeptanzkriterien
 
-- [ ] `npm run start` zeigt unter `/plans` die Daten des Backends.
-- [ ] Ein Plan oeffnet seine Gerichtsliste samt Bildern.
+- [ ] `npm run start` zeigt das Dashboard sowie unter `/plans` die Daten des Backends.
+- [ ] Ein Plan oeffnet seine Gerichtsliste samt Bildern und kann Gerichte als gekocht markieren.
 - [ ] Auf einem Smartphone kann ein Foto aufgenommen, mit Namen abgesendet und danach
   in der Gerichtsliste gesehen werden.
+- [ ] Der Gerichtskatalog unterstuetzt Suche/Filter und zeigt Galerie, Zutaten und
+  Zubereitungsschritte mit Timer.
+- [ ] Die Einkaufsliste eines Plans laesst sich generieren und abhaken.
 - [ ] `ng build` laeuft fehlerfrei.
