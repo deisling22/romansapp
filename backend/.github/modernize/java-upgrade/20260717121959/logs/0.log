@@ -1,0 +1,1666 @@
+2026-07-17T12:19:59.712Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:19:59.712Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "event": "precheckCompleted",
+  "phase": "precheck",
+  "status": "succeeded",
+  "details": {
+    "components": [
+      {
+        "name": "jdk",
+        "baseVersion": "21",
+        "targetVersion": "25"
+      }
+    ]
+  }
+}}).
+2026-07-17T12:19:59.712Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:19:59.713Z [INFO] Project /Users/romandeisling/Downloads/dev/romansapp/backend is a maven project, try to get java version from pom.xml
+2026-07-17T12:19:59.714Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'precheckCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:19:59.714Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:19:59.715Z [INFO] Project java version: 21
+2026-07-17T12:19:59.715Z [INFO] Maven project detected.
+2026-07-17T12:19:59.715Z [INFO] Build tool type: mvnw
+2026-07-17T12:19:59.753Z [INFO] JDK: {
+  "name": "java",
+  "path": "/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin",
+  "version": "21"
+}
+2026-07-17T12:19:59.753Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-07-17T12:19:59.753Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin",
+    "name": "java",
+    "version": "21"
+  },
+  "name": "backend",
+  "dir": "/Users/romandeisling/Downloads/dev/romansapp/backend"
+}
+2026-07-17T12:20:09.400Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:20:09.400Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "sessionId": "20260717121959",
+  "event": "planGenerationStarted",
+  "phase": "plan",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "status": "succeeded"
+}}).
+2026-07-17T12:20:09.400Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:20:09.400Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:20:09.400Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:20:09.441Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:20:09.441Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "sessionId": "20260717121959",
+  "event": "planGenerationStarted",
+  "phase": "plan",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "status": "succeeded"
+}}).
+2026-07-17T12:20:09.441Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:20:09.442Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'planGenerationStarted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:20:09.442Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:20:13.243Z [INFO] ---------------------prepare appmod-list-jdks----------------------
+2026-07-17T12:20:13.243Z [INFO] [Tool.prepareInvocation]({name: appmod-list-jdks, input: {
+  "sessionId": "20260717121959"
+}}).
+2026-07-17T12:20:13.243Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:20:13.243Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "List jdks"
+}}).
+2026-07-17T12:20:13.243Z [INFO] ----------------------prepared appmod-list-jdks----------------------
+2026-07-17T12:20:13.273Z [INFO] ----------------------invoke appmod-list-jdks----------------------
+2026-07-17T12:20:13.274Z [INFO] [Tool.invoke]({name: appmod-list-jdks, modelId: claude-sonnet-4.6, input: {
+  "sessionId": "20260717121959"
+}}).
+2026-07-17T12:20:13.274Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:20:13.290Z [INFO] [Tool.invoke]({result: {
+  "message": "We found following jdks in your system:\n\n1. Java 17.0.5\n   📁 Path: /Library/Java/JavaVirtualMachines/microsoft-17.jdk/Contents/Home/bin\n   🏷️ Source: others\n\n2. Java 21.0.2\n   📁 Path: /Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin\n   🏷️ Source: others\n\n3. Java 22.0.2\n   📁 Path: /Library/Java/JavaVirtualMachines/jdk-22.jdk/Contents/Home/bin\n   🏷️ Source: others\n\nTotal: 3 JDK installation(s) found"
+}}).
+2026-07-17T12:20:13.290Z [INFO] ----------------------invoked appmod-list-jdks----------------------
+2026-07-17T12:20:13.313Z [INFO] ---------------------prepare appmod-list-mavens----------------------
+2026-07-17T12:20:13.314Z [INFO] [Tool.prepareInvocation]({name: appmod-list-mavens, input: {
+  "includeVersion": true,
+  "sessionId": "20260717121959"
+}}).
+2026-07-17T12:20:13.314Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:20:13.314Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "List mavens"
+}}).
+2026-07-17T12:20:13.314Z [INFO] ----------------------prepared appmod-list-mavens----------------------
+2026-07-17T12:20:13.364Z [INFO] ----------------------invoke appmod-list-mavens----------------------
+2026-07-17T12:20:13.364Z [INFO] [Tool.invoke]({name: appmod-list-mavens, modelId: claude-sonnet-4.6, input: {
+  "includeVersion": true,
+  "sessionId": "20260717121959"
+}}).
+2026-07-17T12:20:13.364Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:20:13.366Z [INFO] [Tool.invoke]({result: {
+  "message": "No Maven installations found."
+}}).
+2026-07-17T12:20:13.366Z [INFO] ----------------------invoked appmod-list-mavens----------------------
+2026-07-17T12:21:45.651Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:21:45.652Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "event": "planReviewed",
+  "phase": "plan",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:21:45.652Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:21:45.652Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:21:45.652Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:21:45.683Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:21:45.683Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "event": "planReviewed",
+  "phase": "plan",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:21:45.684Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:21:45.684Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'planReviewed' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:21:45.684Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:21:48.273Z [INFO] ---------------------prepare appmod-confirm-upgrade-plan----------------------
+2026-07-17T12:21:48.274Z [INFO] [Tool.prepareInvocation]({name: appmod-confirm-upgrade-plan, input: {
+  "autoExecute": true,
+  "sessionId": "20260717121959"
+}}).
+2026-07-17T12:21:48.274Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:21:48.274Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Auto-executing [upgrade plan](/Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959/plan.md)"
+}}).
+2026-07-17T12:21:48.274Z [INFO] ----------------------prepared appmod-confirm-upgrade-plan----------------------
+2026-07-17T12:21:48.306Z [INFO] ----------------------invoke appmod-confirm-upgrade-plan----------------------
+2026-07-17T12:21:48.306Z [INFO] [Tool.invoke]({name: appmod-confirm-upgrade-plan, modelId: claude-sonnet-4.6, input: {
+  "autoExecute": true,
+  "sessionId": "20260717121959"
+}}).
+2026-07-17T12:21:48.306Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:21:48.307Z [INFO] Upgrade plan confirmed successfully.
+2026-07-17T12:21:48.307Z [INFO] [Tool.invoke]({result: {
+  "message": "Generated plan is reviewed and confirmed by the user! the upgrade process will start now."
+}}).
+2026-07-17T12:21:48.307Z [INFO] ----------------------invoked appmod-confirm-upgrade-plan----------------------
+2026-07-17T12:22:08.218Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:22:08.219Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "event": "planExecutionStarted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:22:08.219Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:22:08.219Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:22:08.219Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:22:08.255Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:22:08.255Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "event": "planExecutionStarted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:22:08.255Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:22:08.266Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'planExecutionStarted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:22:08.266Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:22:15.217Z [INFO] ---------------------prepare appmod-install-jdk----------------------
+2026-07-17T12:22:15.217Z [INFO] [Tool.prepareInvocation]({name: appmod-install-jdk, input: {
+  "sessionId": "20260717121959",
+  "version": "25"
+}}).
+2026-07-17T12:22:15.218Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:22:15.895Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Download and install JDK"
+}}).
+2026-07-17T12:22:15.896Z [INFO] ----------------------prepared appmod-install-jdk----------------------
+2026-07-17T12:22:15.968Z [INFO] ----------------------invoke appmod-install-jdk----------------------
+2026-07-17T12:22:15.968Z [INFO] [Tool.invoke]({name: appmod-install-jdk, modelId: claude-sonnet-4.6, input: {
+  "sessionId": "20260717121959",
+  "version": "25"
+}}).
+2026-07-17T12:22:15.969Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:23:45.618Z [INFO] [Tool.invoke]({result: {
+  "result": {
+    "name": "java",
+    "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+    "version": "25.0.2"
+  },
+  "message": "JDK 25 is installed at /Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+  "telemetry": {
+    "tool": "JDK",
+    "version": "25"
+  }
+}}).
+2026-07-17T12:23:45.619Z [INFO] ----------------------invoked appmod-install-jdk----------------------
+2026-07-17T12:23:50.203Z [INFO] ---------------------prepare appmod-list-jdks----------------------
+2026-07-17T12:23:50.203Z [INFO] [Tool.prepareInvocation]({name: appmod-list-jdks, input: {
+  "sessionId": "20260717121959",
+  "version": "25"
+}}).
+2026-07-17T12:23:50.203Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:23:50.204Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "List jdks"
+}}).
+2026-07-17T12:23:50.204Z [INFO] ----------------------prepared appmod-list-jdks----------------------
+2026-07-17T12:23:50.251Z [INFO] ----------------------invoke appmod-list-jdks----------------------
+2026-07-17T12:23:50.251Z [INFO] [Tool.invoke]({name: appmod-list-jdks, modelId: claude-sonnet-4.6, input: {
+  "sessionId": "20260717121959",
+  "version": "25"
+}}).
+2026-07-17T12:23:50.251Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:23:50.296Z [INFO] [Tool.invoke]({result: {
+  "message": "We found following jdks in your system:\n\n1. Java 25.0.2\n   📁 Path: /Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin\n   🏷️ Source: install\n\nTotal: 1 JDK installation(s) found"
+}}).
+2026-07-17T12:23:50.297Z [INFO] ----------------------invoked appmod-list-jdks----------------------
+2026-07-17T12:24:00.240Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:24:00.240Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "details": {
+    "jdkPath": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home",
+    "buildToolPath": "."
+  },
+  "event": "environmentSetup",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:24:00.240Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:24:00.240Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:24:00.240Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:24:00.288Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:24:00.289Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "details": {
+    "jdkPath": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home",
+    "buildToolPath": "."
+  },
+  "event": "environmentSetup",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:24:00.289Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:24:00.289Z [INFO] Project /Users/romandeisling/Downloads/dev/romansapp/backend is a maven project, try to get java version from pom.xml
+2026-07-17T12:24:00.290Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'environmentSetup' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:24:00.290Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:24:00.309Z [INFO] Project java version: 21
+2026-07-17T12:24:00.310Z [INFO] Maven project detected.
+2026-07-17T12:24:00.310Z [INFO] Build tool type: mvnw
+2026-07-17T12:24:00.310Z [INFO] JDK: {
+  "name": "java",
+  "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+  "version": "21"
+}
+2026-07-17T12:24:00.310Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-07-17T12:24:00.310Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+    "name": "java",
+    "version": "21"
+  },
+  "name": "backend",
+  "dir": "/Users/romandeisling/Downloads/dev/romansapp/backend"
+}
+2026-07-17T12:25:51.178Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:25:51.178Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "event": "baselineSetup",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:25:51.178Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:25:51.179Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:25:51.179Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:25:51.215Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:25:51.216Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "event": "baselineSetup",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:25:51.216Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:25:51.216Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'baselineSetup' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:25:51.217Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:25:55.968Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:25:55.968Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "details": {
+    "stepNumber": 3,
+    "stepTitle": "Upgrade Java Source Level to 25"
+  },
+  "event": "upgradeStepStarted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:25:55.968Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:25:55.969Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:25:55.969Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:25:56.014Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:25:56.014Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "details": {
+    "stepNumber": 3,
+    "stepTitle": "Upgrade Java Source Level to 25"
+  },
+  "event": "upgradeStepStarted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:25:56.014Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:25:56.014Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'upgradeStepStarted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:25:56.014Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:26:16.726Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:26:16.727Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "event": "buildCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:26:16.727Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:26:16.727Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:26:16.727Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:26:16.780Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:26:16.780Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "event": "buildCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:26:16.780Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:26:16.780Z [INFO] Project /Users/romandeisling/Downloads/dev/romansapp/backend is a maven project, try to get java version from pom.xml
+2026-07-17T12:26:16.781Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'buildCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:26:16.781Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:26:16.781Z [INFO] Project java version: 25
+2026-07-17T12:26:16.781Z [INFO] Maven project detected.
+2026-07-17T12:26:16.781Z [INFO] Build tool type: mvnw
+2026-07-17T12:26:16.830Z [INFO] JDK: {
+  "name": "java",
+  "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+  "version": "25"
+}
+2026-07-17T12:26:16.830Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-07-17T12:26:16.830Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+    "name": "java",
+    "version": "25"
+  },
+  "name": "backend",
+  "dir": "/Users/romandeisling/Downloads/dev/romansapp/backend"
+}
+2026-07-17T12:26:16.830Z [INFO] [MavenBuildTool] Getting all module coordinates of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:16.830Z [INFO] [MavenBuildTool] Getting effective POMs of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:16.830Z [INFO] [Environment] Running command (Java undefined): mvnw help:effective-pom -Doutput=effective-pom-681e915f-b41a-46a9-bd6e-e64dff310c1d.log
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- help:3.5.1:effective-pom (default-cli) @ speiseplan-backend ---
+[INFO] Effective-POM written to: /Users/romandeisling/Downloads/dev/romansapp/backend/effective-pom-681e915f-b41a-46a9-bd6e-e64dff310c1d.log
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.594 s
+[INFO] Finished at: 2026-07-17T14:26:18+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:26:18.850Z [INFO] [BaseBuildTool] Found 1 modules: .
+2026-07-17T12:26:18.861Z [INFO] [BaseBuildTool] Finish counting Java and class files
+2026-07-17T12:26:18.861Z [INFO] [MavenBuildTool] Cleaning /Users/romandeisling/Downloads/dev/romansapp/backend using Maven
+2026-07-17T12:26:18.861Z [INFO] [Environment] Running command (Java undefined): mvnw clean -q -B -fn
+2026-07-17T12:26:20.441Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:26:20.441Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:20.441Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:26:20.442Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+2026-07-17T12:26:31.693Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:26:31.693Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "details": {
+    "commitId": "1707ac24bca57df7ffdab2f394bbba985a83915b",
+    "stepNumber": 3,
+    "stepTitle": "Upgrade Java Source Level to 25"
+  },
+  "event": "upgradeStepCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:26:31.693Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:26:31.693Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:26:31.693Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:26:31.788Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:26:31.788Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "details": {
+    "commitId": "1707ac24bca57df7ffdab2f394bbba985a83915b",
+    "stepNumber": 3,
+    "stepTitle": "Upgrade Java Source Level to 25"
+  },
+  "event": "upgradeStepCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:26:31.789Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:26:31.789Z [INFO] Project /Users/romandeisling/Downloads/dev/romansapp/backend is a maven project, try to get java version from pom.xml
+2026-07-17T12:26:31.790Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'upgradeStepCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:26:31.790Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:26:31.790Z [INFO] Project java version: 25
+2026-07-17T12:26:31.790Z [INFO] Maven project detected.
+2026-07-17T12:26:31.790Z [INFO] Build tool type: mvnw
+2026-07-17T12:26:31.844Z [INFO] JDK: {
+  "name": "java",
+  "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+  "version": "25"
+}
+2026-07-17T12:26:31.845Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-07-17T12:26:31.845Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+    "name": "java",
+    "version": "25"
+  },
+  "name": "backend",
+  "dir": "/Users/romandeisling/Downloads/dev/romansapp/backend"
+}
+2026-07-17T12:26:31.845Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:26:31.845Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:31.845Z [INFO] [MavenBuildTool] Getting all module coordinates of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:31.845Z [INFO] [MavenBuildTool] Getting effective POMs of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:31.845Z [INFO] [Environment] Running command (Java undefined): mvnw help:effective-pom -Doutput=effective-pom-23370652-2321-4924-bea7-f5add73c2f9c.log
+2026-07-17T12:26:31.846Z [INFO] [Environment] Running command (Java undefined): mvnw dependency:tree -B
+[INFO] Scanning for projects...
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- help:3.5.1:effective-pom (default-cli) @ speiseplan-backend ---
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Effective-POM written to: /Users/romandeisling/Downloads/dev/romansapp/backend/effective-pom-23370652-2321-4924-bea7-f5add73c2f9c.log
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.697 s
+[INFO] Finished at: 2026-07-17T14:26:33+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:26:34.030Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:26:34.031Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+[INFO] 
+[INFO] --- dependency:3.10.0:tree (default-cli) @ speiseplan-backend ---
+[INFO] de.roman:speiseplan-backend:jar:0.0.1-SNAPSHOT
+[INFO] +- org.springframework.boot:spring-boot-starter-data-jpa:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-logging:jar:4.1.0:compile
+[INFO] |  |  |  +- ch.qos.logback:logback-classic:jar:1.5.34:compile
+[INFO] |  |  |  |  \- ch.qos.logback:logback-core:jar:1.5.34:compile
+[INFO] |  |  |  +- org.apache.logging.log4j:log4j-to-slf4j:jar:2.25.4:compile
+[INFO] |  |  |  |  \- org.apache.logging.log4j:log4j-api:jar:2.25.4:compile
+[INFO] |  |  |  \- org.slf4j:jul-to-slf4j:jar:2.0.18:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-autoconfigure:jar:4.1.0:compile
+[INFO] |  |  +- jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile
+[INFO] |  |  \- org.yaml:snakeyaml:jar:2.6:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jdbc:jar:4.1.0:compile
+[INFO] |  |  \- com.zaxxer:HikariCP:jar:7.0.2:compile
+[INFO] |  |     \- org.slf4j:slf4j-api:jar:2.0.18:compile
+[INFO] |  +- org.springframework.boot:spring-boot-data-jpa:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-data-commons:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-persistence:jar:4.1.0:compile
+[INFO] |  |  |  \- org.springframework.data:spring-data-commons:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-hibernate:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-jpa:jar:4.1.0:compile
+[INFO] |  |  |  |  \- jakarta.persistence:jakarta.persistence-api:jar:3.2.0:compile
+[INFO] |  |  |  +- org.hibernate.orm:hibernate-core:jar:7.4.1.Final:compile
+[INFO] |  |  |  |  +- jakarta.transaction:jakarta.transaction-api:jar:2.0.1:compile
+[INFO] |  |  |  |  +- org.hibernate.models:hibernate-models:jar:1.1.1:runtime
+[INFO] |  |  |  |  +- org.glassfish.jaxb:jaxb-runtime:jar:4.0.9:runtime
+[INFO] |  |  |  |  |  \- org.glassfish.jaxb:jaxb-core:jar:4.0.9:runtime
+[INFO] |  |  |  |  |     +- org.eclipse.angus:angus-activation:jar:2.0.3:runtime
+[INFO] |  |  |  |  |     +- org.glassfish.jaxb:txw2:jar:4.0.9:runtime
+[INFO] |  |  |  |  |     \- com.sun.istack:istack-commons-runtime:jar:4.1.2:runtime
+[INFO] |  |  |  |  \- jakarta.inject:jakarta.inject-api:jar:2.0.1:runtime
+[INFO] |  |  |  \- org.springframework:spring-orm:jar:7.0.8:compile
+[INFO] |  |  +- org.springframework.data:spring-data-jpa:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework:spring-context:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-aop:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-tx:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-beans:jar:7.0.8:compile
+[INFO] |  |  |  \- org.antlr:antlr4-runtime:jar:4.13.2:compile
+[INFO] |  |  \- org.springframework:spring-aspects:jar:7.0.8:compile
+[INFO] |  |     \- org.aspectj:aspectjweaver:jar:1.9.25.1:compile
+[INFO] |  \- org.springframework.boot:spring-boot-jdbc:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-sql:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-transaction:jar:4.1.0:compile
+[INFO] |     \- org.springframework:spring-jdbc:jar:7.0.8:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-flyway:jar:4.1.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-flyway:jar:4.1.0:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-validation:jar:4.1.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-validation:jar:4.1.0:compile
+[INFO] |     +- org.apache.tomcat.embed:tomcat-embed-el:jar:11.0.22:compile
+[INFO] |     \- org.hibernate.validator:hibernate-validator:jar:9.1.0.Final:compile
+[INFO] |        +- jakarta.validation:jakarta.validation-api:jar:3.1.1:compile
+[INFO] |        +- org.jboss.logging:jboss-logging:jar:3.6.3.Final:compile
+[INFO] |        \- com.fasterxml:classmate:jar:1.7.3:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-webmvc:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jackson:jar:4.1.0:compile
+[INFO] |  |  \- org.springframework.boot:spring-boot-jackson:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-tomcat-runtime:jar:4.1.0:compile
+[INFO] |  |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:11.0.22:compile
+[INFO] |  |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:11.0.22:compile
+[INFO] |  |  \- org.springframework.boot:spring-boot-tomcat:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-http-converter:jar:4.1.0:compile
+[INFO] |  |  \- org.springframework:spring-web:jar:7.0.8:compile
+[INFO] |  |     \- io.micrometer:micrometer-observation:jar:1.17.0:compile
+[INFO] |  |        \- io.micrometer:micrometer-commons:jar:1.17.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-webmvc:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-servlet:jar:4.1.0:compile
+[INFO] |     \- org.springframework:spring-webmvc:jar:7.0.8:compile
+[INFO] |        \- org.springframework:spring-expression:jar:7.0.8:compile
+[INFO] +- org.flywaydb:flyway-database-postgresql:jar:12.4.0:compile
+[INFO] |  \- org.flywaydb:flyway-core:jar:12.4.0:compile
+[INFO] |     \- tools.jackson.core:jackson-databind:jar:3.1.4:compile
+[INFO] |        +- com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile
+[INFO] |        \- tools.jackson.core:jackson-core:jar:3.1.4:compile
+[INFO] +- org.postgresql:postgresql:jar:42.7.11:runtime
+[INFO] +- com.h2database:h2:jar:2.4.240:runtime
+[INFO] +- org.springframework.boot:spring-boot-starter-data-jpa-test:jar:4.1.0:test
+[INFO] |  +- org.springframework.boot:spring-boot-starter-test:jar:4.1.0:test
+[INFO] |  |  +- org.springframework.boot:spring-boot-test:jar:4.1.0:test
+[INFO] |  |  +- org.springframework.boot:spring-boot-test-autoconfigure:jar:4.1.0:test
+[INFO] |  |  +- com.jayway.jsonpath:json-path:jar:2.10.0:test
+[INFO] |  |  +- jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.5:runtime
+[INFO] |  |  |  \- jakarta.activation:jakarta.activation-api:jar:2.1.4:runtime
+[INFO] |  |  +- net.minidev:json-smart:jar:2.6.0:test
+[INFO] |  |  |  \- net.minidev:accessors-smart:jar:2.6.0:test
+[INFO] |  |  |     \- org.ow2.asm:asm:jar:9.7.1:test
+[INFO] |  |  +- org.assertj:assertj-core:jar:3.27.7:test
+[INFO] |  |  |  \- net.bytebuddy:byte-buddy:jar:1.18.10:runtime
+[INFO] |  |  +- org.awaitility:awaitility:jar:4.3.0:test
+[INFO] |  |  +- org.hamcrest:hamcrest:jar:3.0:test
+[INFO] |  |  +- org.junit.jupiter:junit-jupiter:jar:6.0.3:test
+[INFO] |  |  |  +- org.junit.jupiter:junit-jupiter-api:jar:6.0.3:test
+[INFO] |  |  |  |  +- org.opentest4j:opentest4j:jar:1.3.0:test
+[INFO] |  |  |  |  +- org.junit.platform:junit-platform-commons:jar:6.0.3:test
+[INFO] |  |  |  |  \- org.apiguardian:apiguardian-api:jar:1.1.2:test
+[INFO] |  |  |  +- org.junit.jupiter:junit-jupiter-params:jar:6.0.3:test
+[INFO] |  |  |  \- org.junit.jupiter:junit-jupiter-engine:jar:6.0.3:test
+[INFO] |  |  |     \- org.junit.platform:junit-platform-engine:jar:6.0.3:test
+[INFO] |  |  +- org.mockito:mockito-core:jar:5.23.0:test
+[INFO] |  |  |  +- net.bytebuddy:byte-buddy-agent:jar:1.18.10:test
+[INFO] |  |  |  \- org.objenesis:objenesis:jar:3.3:test
+[INFO] |  |  +- org.mockito:mockito-junit-jupiter:jar:5.23.0:test
+[INFO] |  |  +- org.skyscreamer:jsonassert:jar:1.5.3:test
+[INFO] |  |  |  \- com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test
+[INFO] |  |  +- org.springframework:spring-core:jar:7.0.8:compile
+[INFO] |  |  |  +- commons-logging:commons-logging:jar:1.3.6:compile
+[INFO] |  |  |  \- org.jspecify:jspecify:jar:1.0.0:compile
+[INFO] |  |  +- org.springframework:spring-test:jar:7.0.8:test
+[INFO] |  |  \- org.xmlunit:xmlunit-core:jar:2.11.0:test
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jdbc-test:jar:4.1.0:test
+[INFO] |  |  \- org.springframework.boot:spring-boot-jdbc-test:jar:4.1.0:test
+[INFO] |  \- org.springframework.boot:spring-boot-data-jpa-test:jar:4.1.0:test
+[INFO] |     \- org.springframework.boot:spring-boot-jpa-test:jar:4.1.0:test
+[INFO] +- org.springframework.boot:spring-boot-starter-flyway-test:jar:4.1.0:test
+[INFO] +- org.springframework.boot:spring-boot-starter-validation-test:jar:4.1.0:test
+[INFO] \- org.springframework.boot:spring-boot-starter-webmvc-test:jar:4.1.0:test
+[INFO]    +- org.springframework.boot:spring-boot-starter-jackson-test:jar:4.1.0:test
+[INFO]    +- org.springframework.boot:spring-boot-webmvc-test:jar:4.1.0:test
+[INFO]    |  \- org.springframework.boot:spring-boot-web-server:jar:4.1.0:compile
+[INFO]    \- org.springframework.boot:spring-boot-resttestclient:jar:4.1.0:test
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.164 s
+[INFO] Finished at: 2026-07-17T14:26:34+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:26:34.621Z [INFO] [MavenBuildTool] Successfully got dependency tree of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:34.621Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:26:34.621Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:34.621Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:26:34.622Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+2026-07-17T12:26:36.252Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:26:36.252Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "details": {
+    "stepNumber": 4,
+    "stepTitle": "Update Dockerfile to Java 25"
+  },
+  "event": "upgradeStepStarted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:26:36.252Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:26:36.252Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:26:36.252Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:26:36.290Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:26:36.290Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "details": {
+    "stepNumber": 4,
+    "stepTitle": "Update Dockerfile to Java 25"
+  },
+  "event": "upgradeStepStarted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:26:36.290Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:26:36.290Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'upgradeStepStarted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:26:36.291Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:26:50.938Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:26:50.938Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "event": "buildCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:26:50.938Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:26:50.938Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:26:50.938Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:26:50.998Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:26:50.998Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "event": "buildCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:26:50.998Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:26:50.998Z [INFO] Project /Users/romandeisling/Downloads/dev/romansapp/backend is a maven project, try to get java version from pom.xml
+2026-07-17T12:26:50.999Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'buildCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:26:50.999Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:26:51.000Z [INFO] Project java version: 25
+2026-07-17T12:26:51.000Z [INFO] Maven project detected.
+2026-07-17T12:26:51.000Z [INFO] Build tool type: mvnw
+2026-07-17T12:26:51.052Z [INFO] JDK: {
+  "name": "java",
+  "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+  "version": "25"
+}
+2026-07-17T12:26:51.052Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-07-17T12:26:51.052Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+    "name": "java",
+    "version": "25"
+  },
+  "name": "backend",
+  "dir": "/Users/romandeisling/Downloads/dev/romansapp/backend"
+}
+2026-07-17T12:26:51.052Z [INFO] [MavenBuildTool] Getting all module coordinates of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:51.052Z [INFO] [MavenBuildTool] Getting effective POMs of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:51.052Z [INFO] [Environment] Running command (Java undefined): mvnw help:effective-pom -Doutput=effective-pom-47596861-58c4-4d94-87cb-01e463d4efa3.log
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- help:3.5.1:effective-pom (default-cli) @ speiseplan-backend ---
+[INFO] Effective-POM written to: /Users/romandeisling/Downloads/dev/romansapp/backend/effective-pom-47596861-58c4-4d94-87cb-01e463d4efa3.log
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.537 s
+[INFO] Finished at: 2026-07-17T14:26:52+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:26:52.912Z [INFO] [BaseBuildTool] Found 1 modules: .
+2026-07-17T12:26:52.925Z [INFO] [BaseBuildTool] Finish counting Java and class files
+2026-07-17T12:26:52.925Z [INFO] [MavenBuildTool] Cleaning /Users/romandeisling/Downloads/dev/romansapp/backend using Maven
+2026-07-17T12:26:52.925Z [INFO] [Environment] Running command (Java undefined): mvnw clean -q -B -fn
+2026-07-17T12:26:54.541Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:26:54.541Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:26:54.541Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:26:54.541Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+2026-07-17T12:27:05.469Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:27:05.469Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "details": {
+    "commitId": "cfebc40ad946a8948f748daea66e34909bc9420b",
+    "stepNumber": 4,
+    "stepTitle": "Update Dockerfile to Java 25"
+  },
+  "event": "upgradeStepCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:27:05.469Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:27:05.469Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:27:05.469Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:27:05.511Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:27:05.511Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "details": {
+    "commitId": "cfebc40ad946a8948f748daea66e34909bc9420b",
+    "stepNumber": 4,
+    "stepTitle": "Update Dockerfile to Java 25"
+  },
+  "event": "upgradeStepCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:27:05.511Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:27:05.511Z [INFO] Project /Users/romandeisling/Downloads/dev/romansapp/backend is a maven project, try to get java version from pom.xml
+2026-07-17T12:27:05.512Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'upgradeStepCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:27:05.512Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:27:05.512Z [INFO] Project java version: 25
+2026-07-17T12:27:05.512Z [INFO] Maven project detected.
+2026-07-17T12:27:05.512Z [INFO] Build tool type: mvnw
+2026-07-17T12:27:05.568Z [INFO] JDK: {
+  "name": "java",
+  "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+  "version": "25"
+}
+2026-07-17T12:27:05.568Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-07-17T12:27:05.568Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+    "name": "java",
+    "version": "25"
+  },
+  "name": "backend",
+  "dir": "/Users/romandeisling/Downloads/dev/romansapp/backend"
+}
+2026-07-17T12:27:05.568Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:27:05.568Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:05.568Z [INFO] [MavenBuildTool] Getting all module coordinates of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:05.568Z [INFO] [MavenBuildTool] Getting effective POMs of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:05.568Z [INFO] [Environment] Running command (Java undefined): mvnw help:effective-pom -Doutput=effective-pom-8b3161aa-76a1-4935-b3eb-6a868d55e542.log
+2026-07-17T12:27:05.569Z [INFO] [Environment] Running command (Java undefined): mvnw dependency:tree -B
+[INFO] Scanning for projects...
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- help:3.5.1:effective-pom (default-cli) @ speiseplan-backend ---
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Effective-POM written to: /Users/romandeisling/Downloads/dev/romansapp/backend/effective-pom-8b3161aa-76a1-4935-b3eb-6a868d55e542.log
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.659 s
+[INFO] Finished at: 2026-07-17T14:27:07+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:27:07.562Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:27:07.563Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+[INFO] 
+[INFO] --- dependency:3.10.0:tree (default-cli) @ speiseplan-backend ---
+[INFO] de.roman:speiseplan-backend:jar:0.0.1-SNAPSHOT
+[INFO] +- org.springframework.boot:spring-boot-starter-data-jpa:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-logging:jar:4.1.0:compile
+[INFO] |  |  |  +- ch.qos.logback:logback-classic:jar:1.5.34:compile
+[INFO] |  |  |  |  \- ch.qos.logback:logback-core:jar:1.5.34:compile
+[INFO] |  |  |  +- org.apache.logging.log4j:log4j-to-slf4j:jar:2.25.4:compile
+[INFO] |  |  |  |  \- org.apache.logging.log4j:log4j-api:jar:2.25.4:compile
+[INFO] |  |  |  \- org.slf4j:jul-to-slf4j:jar:2.0.18:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-autoconfigure:jar:4.1.0:compile
+[INFO] |  |  +- jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile
+[INFO] |  |  \- org.yaml:snakeyaml:jar:2.6:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jdbc:jar:4.1.0:compile
+[INFO] |  |  \- com.zaxxer:HikariCP:jar:7.0.2:compile
+[INFO] |  |     \- org.slf4j:slf4j-api:jar:2.0.18:compile
+[INFO] |  +- org.springframework.boot:spring-boot-data-jpa:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-data-commons:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-persistence:jar:4.1.0:compile
+[INFO] |  |  |  \- org.springframework.data:spring-data-commons:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-hibernate:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-jpa:jar:4.1.0:compile
+[INFO] |  |  |  |  \- jakarta.persistence:jakarta.persistence-api:jar:3.2.0:compile
+[INFO] |  |  |  +- org.hibernate.orm:hibernate-core:jar:7.4.1.Final:compile
+[INFO] |  |  |  |  +- jakarta.transaction:jakarta.transaction-api:jar:2.0.1:compile
+[INFO] |  |  |  |  +- org.hibernate.models:hibernate-models:jar:1.1.1:runtime
+[INFO] |  |  |  |  +- org.glassfish.jaxb:jaxb-runtime:jar:4.0.9:runtime
+[INFO] |  |  |  |  |  \- org.glassfish.jaxb:jaxb-core:jar:4.0.9:runtime
+[INFO] |  |  |  |  |     +- org.eclipse.angus:angus-activation:jar:2.0.3:runtime
+[INFO] |  |  |  |  |     +- org.glassfish.jaxb:txw2:jar:4.0.9:runtime
+[INFO] |  |  |  |  |     \- com.sun.istack:istack-commons-runtime:jar:4.1.2:runtime
+[INFO] |  |  |  |  \- jakarta.inject:jakarta.inject-api:jar:2.0.1:runtime
+[INFO] |  |  |  \- org.springframework:spring-orm:jar:7.0.8:compile
+[INFO] |  |  +- org.springframework.data:spring-data-jpa:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework:spring-context:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-aop:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-tx:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-beans:jar:7.0.8:compile
+[INFO] |  |  |  \- org.antlr:antlr4-runtime:jar:4.13.2:compile
+[INFO] |  |  \- org.springframework:spring-aspects:jar:7.0.8:compile
+[INFO] |  |     \- org.aspectj:aspectjweaver:jar:1.9.25.1:compile
+[INFO] |  \- org.springframework.boot:spring-boot-jdbc:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-sql:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-transaction:jar:4.1.0:compile
+[INFO] |     \- org.springframework:spring-jdbc:jar:7.0.8:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-flyway:jar:4.1.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-flyway:jar:4.1.0:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-validation:jar:4.1.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-validation:jar:4.1.0:compile
+[INFO] |     +- org.apache.tomcat.embed:tomcat-embed-el:jar:11.0.22:compile
+[INFO] |     \- org.hibernate.validator:hibernate-validator:jar:9.1.0.Final:compile
+[INFO] |        +- jakarta.validation:jakarta.validation-api:jar:3.1.1:compile
+[INFO] |        +- org.jboss.logging:jboss-logging:jar:3.6.3.Final:compile
+[INFO] |        \- com.fasterxml:classmate:jar:1.7.3:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-webmvc:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jackson:jar:4.1.0:compile
+[INFO] |  |  \- org.springframework.boot:spring-boot-jackson:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-tomcat-runtime:jar:4.1.0:compile
+[INFO] |  |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:11.0.22:compile
+[INFO] |  |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:11.0.22:compile
+[INFO] |  |  \- org.springframework.boot:spring-boot-tomcat:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-http-converter:jar:4.1.0:compile
+[INFO] |  |  \- org.springframework:spring-web:jar:7.0.8:compile
+[INFO] |  |     \- io.micrometer:micrometer-observation:jar:1.17.0:compile
+[INFO] |  |        \- io.micrometer:micrometer-commons:jar:1.17.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-webmvc:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-servlet:jar:4.1.0:compile
+[INFO] |     \- org.springframework:spring-webmvc:jar:7.0.8:compile
+[INFO] |        \- org.springframework:spring-expression:jar:7.0.8:compile
+[INFO] +- org.flywaydb:flyway-database-postgresql:jar:12.4.0:compile
+[INFO] |  \- org.flywaydb:flyway-core:jar:12.4.0:compile
+[INFO] |     \- tools.jackson.core:jackson-databind:jar:3.1.4:compile
+[INFO] |        +- com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile
+[INFO] |        \- tools.jackson.core:jackson-core:jar:3.1.4:compile
+[INFO] +- org.postgresql:postgresql:jar:42.7.11:runtime
+[INFO] +- com.h2database:h2:jar:2.4.240:runtime
+[INFO] +- org.springframework.boot:spring-boot-starter-data-jpa-test:jar:4.1.0:test
+[INFO] |  +- org.springframework.boot:spring-boot-starter-test:jar:4.1.0:test
+[INFO] |  |  +- org.springframework.boot:spring-boot-test:jar:4.1.0:test
+[INFO] |  |  +- org.springframework.boot:spring-boot-test-autoconfigure:jar:4.1.0:test
+[INFO] |  |  +- com.jayway.jsonpath:json-path:jar:2.10.0:test
+[INFO] |  |  +- jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.5:runtime
+[INFO] |  |  |  \- jakarta.activation:jakarta.activation-api:jar:2.1.4:runtime
+[INFO] |  |  +- net.minidev:json-smart:jar:2.6.0:test
+[INFO] |  |  |  \- net.minidev:accessors-smart:jar:2.6.0:test
+[INFO] |  |  |     \- org.ow2.asm:asm:jar:9.7.1:test
+[INFO] |  |  +- org.assertj:assertj-core:jar:3.27.7:test
+[INFO] |  |  |  \- net.bytebuddy:byte-buddy:jar:1.18.10:runtime
+[INFO] |  |  +- org.awaitility:awaitility:jar:4.3.0:test
+[INFO] |  |  +- org.hamcrest:hamcrest:jar:3.0:test
+[INFO] |  |  +- org.junit.jupiter:junit-jupiter:jar:6.0.3:test
+[INFO] |  |  |  +- org.junit.jupiter:junit-jupiter-api:jar:6.0.3:test
+[INFO] |  |  |  |  +- org.opentest4j:opentest4j:jar:1.3.0:test
+[INFO] |  |  |  |  +- org.junit.platform:junit-platform-commons:jar:6.0.3:test
+[INFO] |  |  |  |  \- org.apiguardian:apiguardian-api:jar:1.1.2:test
+[INFO] |  |  |  +- org.junit.jupiter:junit-jupiter-params:jar:6.0.3:test
+[INFO] |  |  |  \- org.junit.jupiter:junit-jupiter-engine:jar:6.0.3:test
+[INFO] |  |  |     \- org.junit.platform:junit-platform-engine:jar:6.0.3:test
+[INFO] |  |  +- org.mockito:mockito-core:jar:5.23.0:test
+[INFO] |  |  |  +- net.bytebuddy:byte-buddy-agent:jar:1.18.10:test
+[INFO] |  |  |  \- org.objenesis:objenesis:jar:3.3:test
+[INFO] |  |  +- org.mockito:mockito-junit-jupiter:jar:5.23.0:test
+[INFO] |  |  +- org.skyscreamer:jsonassert:jar:1.5.3:test
+[INFO] |  |  |  \- com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test
+[INFO] |  |  +- org.springframework:spring-core:jar:7.0.8:compile
+[INFO] |  |  |  +- commons-logging:commons-logging:jar:1.3.6:compile
+[INFO] |  |  |  \- org.jspecify:jspecify:jar:1.0.0:compile
+[INFO] |  |  +- org.springframework:spring-test:jar:7.0.8:test
+[INFO] |  |  \- org.xmlunit:xmlunit-core:jar:2.11.0:test
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jdbc-test:jar:4.1.0:test
+[INFO] |  |  \- org.springframework.boot:spring-boot-jdbc-test:jar:4.1.0:test
+[INFO] |  \- org.springframework.boot:spring-boot-data-jpa-test:jar:4.1.0:test
+[INFO] |     \- org.springframework.boot:spring-boot-jpa-test:jar:4.1.0:test
+[INFO] +- org.springframework.boot:spring-boot-starter-flyway-test:jar:4.1.0:test
+[INFO] +- org.springframework.boot:spring-boot-starter-validation-test:jar:4.1.0:test
+[INFO] \- org.springframework.boot:spring-boot-starter-webmvc-test:jar:4.1.0:test
+[INFO]    +- org.springframework.boot:spring-boot-starter-jackson-test:jar:4.1.0:test
+[INFO]    +- org.springframework.boot:spring-boot-webmvc-test:jar:4.1.0:test
+[INFO]    |  \- org.springframework.boot:spring-boot-web-server:jar:4.1.0:compile
+[INFO]    \- org.springframework.boot:spring-boot-resttestclient:jar:4.1.0:test
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.314 s
+[INFO] Finished at: 2026-07-17T14:27:08+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:27:08.414Z [INFO] [MavenBuildTool] Successfully got dependency tree of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:08.415Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:27:08.415Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:08.415Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:27:08.415Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+2026-07-17T12:27:10.466Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:27:10.466Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "details": {
+    "stepNumber": 5,
+    "stepTitle": "CVE Validation & Fix"
+  },
+  "event": "upgradeStepStarted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:27:10.466Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:27:10.466Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:27:10.466Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:27:10.509Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:27:10.510Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "details": {
+    "stepNumber": 5,
+    "stepTitle": "CVE Validation & Fix"
+  },
+  "event": "upgradeStepStarted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:27:10.510Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:27:10.510Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'upgradeStepStarted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:27:10.510Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:27:36.439Z [INFO] ---------------------prepare appmod-validate-cves-for-java----------------------
+2026-07-17T12:27:36.440Z [INFO] [Tool.prepareInvocation]({name: appmod-validate-cves-for-java, input: {
+  "dependencies": [
+    "org.springframework.boot:spring-boot-starter-data-jpa:4.1.0",
+    "org.springframework.boot:spring-boot-starter-flyway:4.1.0",
+    "org.springframework.boot:spring-boot-starter-validation:4.1.0",
+    "org.springframework.boot:spring-boot-starter-webmvc:4.1.0",
+    "org.flywaydb:flyway-database-postgresql:12.4.0",
+    "org.postgresql:postgresql:42.7.11",
+    "com.h2database:h2:2.4.240",
+    "org.springframework.boot:spring-boot-starter-data-jpa-test:4.1.0",
+    "org.springframework.boot:spring-boot-starter-flyway-test:4.1.0",
+    "org.springframework.boot:spring-boot-starter-validation-test:4.1.0",
+    "org.springframework.boot:spring-boot-starter-webmvc-test:4.1.0"
+  ],
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959"
+}}).
+2026-07-17T12:27:36.440Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:27:36.440Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Validate CVEs"
+}}).
+2026-07-17T12:27:36.440Z [INFO] ----------------------prepared appmod-validate-cves-for-java----------------------
+2026-07-17T12:27:36.509Z [INFO] ----------------------invoke appmod-validate-cves-for-java----------------------
+2026-07-17T12:27:36.509Z [INFO] [Tool.invoke]({name: appmod-validate-cves-for-java, modelId: claude-sonnet-4.6, input: {
+  "dependencies": [
+    "org.springframework.boot:spring-boot-starter-data-jpa:4.1.0",
+    "org.springframework.boot:spring-boot-starter-flyway:4.1.0",
+    "org.springframework.boot:spring-boot-starter-validation:4.1.0",
+    "org.springframework.boot:spring-boot-starter-webmvc:4.1.0",
+    "org.flywaydb:flyway-database-postgresql:12.4.0",
+    "org.postgresql:postgresql:42.7.11",
+    "com.h2database:h2:2.4.240",
+    "org.springframework.boot:spring-boot-starter-data-jpa-test:4.1.0",
+    "org.springframework.boot:spring-boot-starter-flyway-test:4.1.0",
+    "org.springframework.boot:spring-boot-starter-validation-test:4.1.0",
+    "org.springframework.boot:spring-boot-starter-webmvc-test:4.1.0"
+  ],
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959"
+}}).
+2026-07-17T12:27:36.510Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:27:36.510Z [INFO] Project /Users/romandeisling/Downloads/dev/romansapp/backend is a maven project, try to get java version from pom.xml
+2026-07-17T12:27:36.510Z [INFO] Getting CVEs for dependencies: org.springframework.boot:spring-boot-starter-data-jpa:4.1.0,org.springframework.boot:spring-boot-starter-flyway:4.1.0,org.springframework.boot:spring-boot-starter-validation:4.1.0,org.springframework.boot:spring-boot-starter-webmvc:4.1.0,org.flywaydb:flyway-database-postgresql:12.4.0,org.postgresql:postgresql:42.7.11,com.h2database:h2:2.4.240,org.springframework.boot:spring-boot-starter-data-jpa-test:4.1.0,org.springframework.boot:spring-boot-starter-flyway-test:4.1.0,org.springframework.boot:spring-boot-starter-validation-test:4.1.0,org.springframework.boot:spring-boot-starter-webmvc-test:4.1.0
+2026-07-17T12:27:36.510Z [INFO] getting CVEs for dependencies:
+ - org.springframework.boot:spring-boot-starter-data-jpa:4.1.0
+  - org.springframework.boot:spring-boot-starter-flyway:4.1.0
+  - org.springframework.boot:spring-boot-starter-validation:4.1.0
+  - org.springframework.boot:spring-boot-starter-webmvc:4.1.0
+  - org.flywaydb:flyway-database-postgresql:12.4.0
+  - org.postgresql:postgresql:42.7.11
+  - com.h2database:h2:2.4.240
+  - org.springframework.boot:spring-boot-starter-data-jpa-test:4.1.0
+  - org.springframework.boot:spring-boot-starter-flyway-test:4.1.0
+  - org.springframework.boot:spring-boot-starter-validation-test:4.1.0
+  - org.springframework.boot:spring-boot-starter-webmvc-test:4.1.0...
+2026-07-17T12:27:36.510Z [INFO] getting gitHub access token...
+2026-07-17T12:27:36.511Z [INFO] Project java version: 25
+2026-07-17T12:27:36.512Z [INFO] Maven project detected.
+2026-07-17T12:27:36.512Z [INFO] Build tool type: mvnw
+2026-07-17T12:27:36.543Z [INFO] JDK: {
+  "name": "java",
+  "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+  "version": "25"
+}
+2026-07-17T12:27:36.543Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-07-17T12:27:36.543Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+    "name": "java",
+    "version": "25"
+  },
+  "name": "backend",
+  "dir": "/Users/romandeisling/Downloads/dev/romansapp/backend"
+}
+2026-07-17T12:27:36.543Z [INFO] [MavenBuildTool] Getting all module coordinates of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:36.543Z [INFO] [MavenBuildTool] Getting effective POMs of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:36.544Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:27:36.544Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:36.544Z [INFO] [MavenBuildTool] Getting all module coordinates of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:36.544Z [INFO] [MavenBuildTool] Getting effective POMs of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:36.544Z [INFO] [Environment] Running command (Java undefined): mvnw dependency:tree -B
+2026-07-17T12:27:36.545Z [INFO] [Environment] Running command (Java undefined): mvnw help:effective-pom -Doutput=effective-pom-78ce55de-60d7-467e-9317-9e8cd82b5e1d.log
+2026-07-17T12:27:36.546Z [INFO] [Environment] Running command (Java undefined): mvnw help:effective-pom -Doutput=effective-pom-aeb246a0-5fff-4d96-8884-65765e4c08fb.log
+[INFO] Scanning for projects...
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- help:3.5.1:effective-pom (default-cli) @ speiseplan-backend ---
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Effective-POM written to: /Users/romandeisling/Downloads/dev/romansapp/backend/effective-pom-aeb246a0-5fff-4d96-8884-65765e4c08fb.log
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.756 s
+[INFO] Finished at: 2026-07-17T14:27:38+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:27:39.002Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:27:39.002Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- help:3.5.1:effective-pom (default-cli) @ speiseplan-backend ---
+[INFO] 
+[INFO] --- dependency:3.10.0:tree (default-cli) @ speiseplan-backend ---
+[INFO] Effective-POM written to: /Users/romandeisling/Downloads/dev/romansapp/backend/effective-pom-78ce55de-60d7-467e-9317-9e8cd82b5e1d.log
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.817 s
+[INFO] Finished at: 2026-07-17T14:27:39+02:00
+[INFO] ------------------------------------------------------------------------
+[INFO] de.roman:speiseplan-backend:jar:0.0.1-SNAPSHOT
+[INFO] +- org.springframework.boot:spring-boot-starter-data-jpa:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-logging:jar:4.1.0:compile
+[INFO] |  |  |  +- ch.qos.logback:logback-classic:jar:1.5.34:compile
+[INFO] |  |  |  |  \- ch.qos.logback:logback-core:jar:1.5.34:compile
+[INFO] |  |  |  +- org.apache.logging.log4j:log4j-to-slf4j:jar:2.25.4:compile
+[INFO] |  |  |  |  \- org.apache.logging.log4j:log4j-api:jar:2.25.4:compile
+[INFO] |  |  |  \- org.slf4j:jul-to-slf4j:jar:2.0.18:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-autoconfigure:jar:4.1.0:compile
+[INFO] |  |  +- jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile
+[INFO] |  |  \- org.yaml:snakeyaml:jar:2.6:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jdbc:jar:4.1.0:compile
+[INFO] |  |  \- com.zaxxer:HikariCP:jar:7.0.2:compile
+[INFO] |  |     \- org.slf4j:slf4j-api:jar:2.0.18:compile
+[INFO] |  +- org.springframework.boot:spring-boot-data-jpa:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-data-commons:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-persistence:jar:4.1.0:compile
+[INFO] |  |  |  \- org.springframework.data:spring-data-commons:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-hibernate:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-jpa:jar:4.1.0:compile
+[INFO] |  |  |  |  \- jakarta.persistence:jakarta.persistence-api:jar:3.2.0:compile
+[INFO] |  |  |  +- org.hibernate.orm:hibernate-core:jar:7.4.1.Final:compile
+[INFO] |  |  |  |  +- jakarta.transaction:jakarta.transaction-api:jar:2.0.1:compile
+[INFO] |  |  |  |  +- org.hibernate.models:hibernate-models:jar:1.1.1:runtime
+[INFO] |  |  |  |  +- org.glassfish.jaxb:jaxb-runtime:jar:4.0.9:runtime
+[INFO] |  |  |  |  |  \- org.glassfish.jaxb:jaxb-core:jar:4.0.9:runtime
+[INFO] |  |  |  |  |     +- org.eclipse.angus:angus-activation:jar:2.0.3:runtime
+[INFO] |  |  |  |  |     +- org.glassfish.jaxb:txw2:jar:4.0.9:runtime
+[INFO] |  |  |  |  |     \- com.sun.istack:istack-commons-runtime:jar:4.1.2:runtime
+[INFO] |  |  |  |  \- jakarta.inject:jakarta.inject-api:jar:2.0.1:runtime
+[INFO] |  |  |  \- org.springframework:spring-orm:jar:7.0.8:compile
+[INFO] |  |  +- org.springframework.data:spring-data-jpa:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework:spring-context:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-aop:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-tx:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-beans:jar:7.0.8:compile
+[INFO] |  |  |  \- org.antlr:antlr4-runtime:jar:4.13.2:compile
+[INFO] |  |  \- org.springframework:spring-aspects:jar:7.0.8:compile
+[INFO] |  |     \- org.aspectj:aspectjweaver:jar:1.9.25.1:compile
+[INFO] |  \- org.springframework.boot:spring-boot-jdbc:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-sql:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-transaction:jar:4.1.0:compile
+[INFO] |     \- org.springframework:spring-jdbc:jar:7.0.8:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-flyway:jar:4.1.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-flyway:jar:4.1.0:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-validation:jar:4.1.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-validation:jar:4.1.0:compile
+[INFO] |     +- org.apache.tomcat.embed:tomcat-embed-el:jar:11.0.22:compile
+[INFO] |     \- org.hibernate.validator:hibernate-validator:jar:9.1.0.Final:compile
+[INFO] |        +- jakarta.validation:jakarta.validation-api:jar:3.1.1:compile
+[INFO] |        +- org.jboss.logging:jboss-logging:jar:3.6.3.Final:compile
+[INFO] |        \- com.fasterxml:classmate:jar:1.7.3:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-webmvc:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jackson:jar:4.1.0:compile
+[INFO] |  |  \- org.springframework.boot:spring-boot-jackson:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-tomcat-runtime:jar:4.1.0:compile
+[INFO] |  |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:11.0.22:compile
+[INFO] |  |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:11.0.22:compile
+[INFO] |  |  \- org.springframework.boot:spring-boot-tomcat:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-http-converter:jar:4.1.0:compile
+[INFO] |  |  \- org.springframework:spring-web:jar:7.0.8:compile
+[INFO] |  |     \- io.micrometer:micrometer-observation:jar:1.17.0:compile
+[INFO] |  |        \- io.micrometer:micrometer-commons:jar:1.17.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-webmvc:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-servlet:jar:4.1.0:compile
+[INFO] |     \- org.springframework:spring-webmvc:jar:7.0.8:compile
+[INFO] |        \- org.springframework:spring-expression:jar:7.0.8:compile
+[INFO] +- org.flywaydb:flyway-database-postgresql:jar:12.4.0:compile
+[INFO] |  \- org.flywaydb:flyway-core:jar:12.4.0:compile
+[INFO] |     \- tools.jackson.core:jackson-databind:jar:3.1.4:compile
+[INFO] |        +- com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile
+[INFO] |        \- tools.jackson.core:jackson-core:jar:3.1.4:compile
+[INFO] +- org.postgresql:postgresql:jar:42.7.11:runtime
+[INFO] +- com.h2database:h2:jar:2.4.240:runtime
+[INFO] +- org.springframework.boot:spring-boot-starter-data-jpa-test:jar:4.1.0:test
+[INFO] |  +- org.springframework.boot:spring-boot-starter-test:jar:4.1.0:test
+[INFO] |  |  +- org.springframework.boot:spring-boot-test:jar:4.1.0:test
+[INFO] |  |  +- org.springframework.boot:spring-boot-test-autoconfigure:jar:4.1.0:test
+[INFO] |  |  +- com.jayway.jsonpath:json-path:jar:2.10.0:test
+[INFO] |  |  +- jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.5:runtime
+[INFO] |  |  |  \- jakarta.activation:jakarta.activation-api:jar:2.1.4:runtime
+[INFO] |  |  +- net.minidev:json-smart:jar:2.6.0:test
+[INFO] |  |  |  \- net.minidev:accessors-smart:jar:2.6.0:test
+[INFO] |  |  |     \- org.ow2.asm:asm:jar:9.7.1:test
+[INFO] |  |  +- org.assertj:assertj-core:jar:3.27.7:test
+[INFO] |  |  |  \- net.bytebuddy:byte-buddy:jar:1.18.10:runtime
+[INFO] |  |  +- org.awaitility:awaitility:jar:4.3.0:test
+[INFO] |  |  +- org.hamcrest:hamcrest:jar:3.0:test
+[INFO] |  |  +- org.junit.jupiter:junit-jupiter:jar:6.0.3:test
+[INFO] |  |  |  +- org.junit.jupiter:junit-jupiter-api:jar:6.0.3:test
+[INFO] |  |  |  |  +- org.opentest4j:opentest4j:jar:1.3.0:test
+[INFO] |  |  |  |  +- org.junit.platform:junit-platform-commons:jar:6.0.3:test
+[INFO] |  |  |  |  \- org.apiguardian:apiguardian-api:jar:1.1.2:test
+[INFO] |  |  |  +- org.junit.jupiter:junit-jupiter-params:jar:6.0.3:test
+[INFO] |  |  |  \- org.junit.jupiter:junit-jupiter-engine:jar:6.0.3:test
+[INFO] |  |  |     \- org.junit.platform:junit-platform-engine:jar:6.0.3:test
+[INFO] |  |  +- org.mockito:mockito-core:jar:5.23.0:test
+[INFO] |  |  |  +- net.bytebuddy:byte-buddy-agent:jar:1.18.10:test
+[INFO] |  |  |  \- org.objenesis:objenesis:jar:3.3:test
+[INFO] |  |  +- org.mockito:mockito-junit-jupiter:jar:5.23.0:test
+[INFO] |  |  +- org.skyscreamer:jsonassert:jar:1.5.3:test
+[INFO] |  |  |  \- com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test
+[INFO] |  |  +- org.springframework:spring-core:jar:7.0.8:compile
+[INFO] |  |  |  +- commons-logging:commons-logging:jar:1.3.6:compile
+[INFO] |  |  |  \- org.jspecify:jspecify:jar:1.0.0:compile
+[INFO] |  |  +- org.springframework:spring-test:jar:7.0.8:test
+[INFO] |  |  \- org.xmlunit:xmlunit-core:jar:2.11.0:test
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jdbc-test:jar:4.1.0:test
+[INFO] |  |  \- org.springframework.boot:spring-boot-jdbc-test:jar:4.1.0:test
+[INFO] |  \- org.springframework.boot:spring-boot-data-jpa-test:jar:4.1.0:test
+[INFO] |     \- org.springframework.boot:spring-boot-jpa-test:jar:4.1.0:test
+[INFO] +- org.springframework.boot:spring-boot-starter-flyway-test:jar:4.1.0:test
+[INFO] +- org.springframework.boot:spring-boot-starter-validation-test:jar:4.1.0:test
+[INFO] \- org.springframework.boot:spring-boot-starter-webmvc-test:jar:4.1.0:test
+[INFO]    +- org.springframework.boot:spring-boot-starter-jackson-test:jar:4.1.0:test
+[INFO]    +- org.springframework.boot:spring-boot-webmvc-test:jar:4.1.0:test
+[INFO]    |  \- org.springframework.boot:spring-boot-web-server:jar:4.1.0:compile
+[INFO]    \- org.springframework.boot:spring-boot-resttestclient:jar:4.1.0:test
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.398 s
+[INFO] Finished at: 2026-07-17T14:27:39+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:27:39.818Z [INFO] [MavenBuildTool] Successfully got dependency tree of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:39.819Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:27:39.819Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:27:39.819Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:27:39.820Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+2026-07-17T12:27:53.389Z [INFO] Processing batch 1/1, size: 11
+2026-07-17T12:27:53.389Z [INFO] Proxy configuration: HTTPS_PROXY=(not set), HTTP_PROXY=(not set), NO_PROXY=(not set), NODE_EXTRA_CA_CERTS=(not set), vscode http.proxy=(not set), hasProxy=false
+2026-07-17T12:27:53.389Z [INFO] No proxy detected, using direct connection.
+2026-07-17T12:27:53.390Z [INFO] listing CVEs from GitHub for dependencies [
+  "org.springframework.boot:spring-boot-starter-data-jpa:4.1.0",
+  "org.springframework.boot:spring-boot-starter-flyway:4.1.0",
+  "org.springframework.boot:spring-boot-starter-validation:4.1.0",
+  "org.springframework.boot:spring-boot-starter-webmvc:4.1.0",
+  "org.flywaydb:flyway-database-postgresql:12.4.0",
+  "org.postgresql:postgresql:42.7.11",
+  "com.h2database:h2:2.4.240",
+  "org.springframework.boot:spring-boot-starter-data-jpa-test:4.1.0",
+  "org.springframework.boot:spring-boot-starter-flyway-test:4.1.0",
+  "org.springframework.boot:spring-boot-starter-validation-test:4.1.0",
+  "org.springframework.boot:spring-boot-starter-webmvc-test:4.1.0"
+]
+2026-07-17T12:27:53.390Z [INFO] GitHub Advisory API affects parameter: ["org.springframework.boot:spring-boot-starter-data-jpa@4.1.0","org.springframework.boot:spring-boot-starter-flyway@4.1.0","org.springframework.boot:spring-boot-starter-validation@4.1.0","org.springframework.boot:spring-boot-starter-webmvc@4.1.0","org.flywaydb:flyway-database-postgresql@12.4.0","org.postgresql:postgresql@42.7.11","com.h2database:h2@2.4.240","org.springframework.boot:spring-boot-starter-data-jpa-test@4.1.0","org.springframework.boot:spring-boot-starter-flyway-test@4.1.0","org.springframework.boot:spring-boot-starter-validation-test@4.1.0","org.springframework.boot:spring-boot-starter-webmvc-test@4.1.0"]
+2026-07-17T12:27:53.911Z [INFO] Fetched 0 total advisories across all pages
+2026-07-17T12:27:53.912Z [INFO] Advisory IDs returned: 
+2026-07-17T12:27:53.912Z [INFO] grouping CVEs and finding max patched version by dep...
+2026-07-17T12:27:53.912Z [INFO] done getting 0 CVEs for 11 dependencies
+2026-07-17T12:27:53.912Z [INFO] calculating patched version by dep...
+2026-07-17T12:27:53.912Z [INFO] finished getting CVEs for dependencies.
+2026-07-17T12:27:53.912Z [INFO] Found 0 dependencies with known CVEs
+2026-07-17T12:27:53.912Z [INFO] No known CVEs that need to be fixed are found for dependencies: org.springframework.boot:spring-boot-starter-data-jpa:4.1.0,org.springframework.boot:spring-boot-starter-flyway:4.1.0,org.springframework.boot:spring-boot-starter-validation:4.1.0,org.springframework.boot:spring-boot-starter-webmvc:4.1.0,org.flywaydb:flyway-database-postgresql:12.4.0,org.postgresql:postgresql:42.7.11,com.h2database:h2:2.4.240,org.springframework.boot:spring-boot-starter-data-jpa-test:4.1.0,org.springframework.boot:spring-boot-starter-flyway-test:4.1.0,org.springframework.boot:spring-boot-starter-validation-test:4.1.0,org.springframework.boot:spring-boot-starter-webmvc-test:4.1.0
+2026-07-17T12:27:53.912Z [INFO] [Tool.invoke]({result: {
+  "message": "No known CVEs that need to be fixed are found for the given dependencies."
+}}).
+2026-07-17T12:27:53.912Z [INFO] ----------------------invoked appmod-validate-cves-for-java----------------------
+2026-07-17T12:28:06.356Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:28:06.356Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "details": {
+    "commitId": "N/A",
+    "stepNumber": 5,
+    "stepTitle": "CVE Validation & Fix"
+  },
+  "event": "upgradeStepCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:28:06.356Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:28:06.356Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:28:06.356Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:28:06.397Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:28:06.398Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "details": {
+    "commitId": "N/A",
+    "stepNumber": 5,
+    "stepTitle": "CVE Validation & Fix"
+  },
+  "event": "upgradeStepCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:28:06.398Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:28:06.398Z [INFO] Project /Users/romandeisling/Downloads/dev/romansapp/backend is a maven project, try to get java version from pom.xml
+2026-07-17T12:28:06.398Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'upgradeStepCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:28:06.398Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:28:06.400Z [INFO] Project java version: 25
+2026-07-17T12:28:06.400Z [INFO] Maven project detected.
+2026-07-17T12:28:06.400Z [INFO] Build tool type: mvnw
+2026-07-17T12:28:06.472Z [INFO] JDK: {
+  "name": "java",
+  "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+  "version": "25"
+}
+2026-07-17T12:28:06.472Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-07-17T12:28:06.472Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+    "name": "java",
+    "version": "25"
+  },
+  "name": "backend",
+  "dir": "/Users/romandeisling/Downloads/dev/romansapp/backend"
+}
+2026-07-17T12:28:06.472Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:28:06.472Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:28:06.472Z [INFO] [MavenBuildTool] Getting all module coordinates of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:28:06.472Z [INFO] [MavenBuildTool] Getting effective POMs of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:28:06.472Z [INFO] [Environment] Running command (Java undefined): mvnw help:effective-pom -Doutput=effective-pom-2a0dcc69-4c8b-437b-9876-ded3393ccf14.log
+2026-07-17T12:28:06.473Z [INFO] [Environment] Running command (Java undefined): mvnw dependency:tree -B
+[INFO] Scanning for projects...
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- help:3.5.1:effective-pom (default-cli) @ speiseplan-backend ---
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Effective-POM written to: /Users/romandeisling/Downloads/dev/romansapp/backend/effective-pom-2a0dcc69-4c8b-437b-9876-ded3393ccf14.log
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.878 s
+[INFO] Finished at: 2026-07-17T14:28:09+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:28:09.224Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:28:09.224Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+[INFO] 
+[INFO] --- dependency:3.10.0:tree (default-cli) @ speiseplan-backend ---
+[INFO] de.roman:speiseplan-backend:jar:0.0.1-SNAPSHOT
+[INFO] +- org.springframework.boot:spring-boot-starter-data-jpa:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-logging:jar:4.1.0:compile
+[INFO] |  |  |  +- ch.qos.logback:logback-classic:jar:1.5.34:compile
+[INFO] |  |  |  |  \- ch.qos.logback:logback-core:jar:1.5.34:compile
+[INFO] |  |  |  +- org.apache.logging.log4j:log4j-to-slf4j:jar:2.25.4:compile
+[INFO] |  |  |  |  \- org.apache.logging.log4j:log4j-api:jar:2.25.4:compile
+[INFO] |  |  |  \- org.slf4j:jul-to-slf4j:jar:2.0.18:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-autoconfigure:jar:4.1.0:compile
+[INFO] |  |  +- jakarta.annotation:jakarta.annotation-api:jar:3.0.0:compile
+[INFO] |  |  \- org.yaml:snakeyaml:jar:2.6:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jdbc:jar:4.1.0:compile
+[INFO] |  |  \- com.zaxxer:HikariCP:jar:7.0.2:compile
+[INFO] |  |     \- org.slf4j:slf4j-api:jar:2.0.18:compile
+[INFO] |  +- org.springframework.boot:spring-boot-data-jpa:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-data-commons:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-persistence:jar:4.1.0:compile
+[INFO] |  |  |  \- org.springframework.data:spring-data-commons:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-hibernate:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework.boot:spring-boot-jpa:jar:4.1.0:compile
+[INFO] |  |  |  |  \- jakarta.persistence:jakarta.persistence-api:jar:3.2.0:compile
+[INFO] |  |  |  +- org.hibernate.orm:hibernate-core:jar:7.4.1.Final:compile
+[INFO] |  |  |  |  +- jakarta.transaction:jakarta.transaction-api:jar:2.0.1:compile
+[INFO] |  |  |  |  +- org.hibernate.models:hibernate-models:jar:1.1.1:runtime
+[INFO] |  |  |  |  +- org.glassfish.jaxb:jaxb-runtime:jar:4.0.9:runtime
+[INFO] |  |  |  |  |  \- org.glassfish.jaxb:jaxb-core:jar:4.0.9:runtime
+[INFO] |  |  |  |  |     +- org.eclipse.angus:angus-activation:jar:2.0.3:runtime
+[INFO] |  |  |  |  |     +- org.glassfish.jaxb:txw2:jar:4.0.9:runtime
+[INFO] |  |  |  |  |     \- com.sun.istack:istack-commons-runtime:jar:4.1.2:runtime
+[INFO] |  |  |  |  \- jakarta.inject:jakarta.inject-api:jar:2.0.1:runtime
+[INFO] |  |  |  \- org.springframework:spring-orm:jar:7.0.8:compile
+[INFO] |  |  +- org.springframework.data:spring-data-jpa:jar:4.1.0:compile
+[INFO] |  |  |  +- org.springframework:spring-context:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-aop:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-tx:jar:7.0.8:compile
+[INFO] |  |  |  +- org.springframework:spring-beans:jar:7.0.8:compile
+[INFO] |  |  |  \- org.antlr:antlr4-runtime:jar:4.13.2:compile
+[INFO] |  |  \- org.springframework:spring-aspects:jar:7.0.8:compile
+[INFO] |  |     \- org.aspectj:aspectjweaver:jar:1.9.25.1:compile
+[INFO] |  \- org.springframework.boot:spring-boot-jdbc:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-sql:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-transaction:jar:4.1.0:compile
+[INFO] |     \- org.springframework:spring-jdbc:jar:7.0.8:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-flyway:jar:4.1.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-flyway:jar:4.1.0:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-validation:jar:4.1.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-validation:jar:4.1.0:compile
+[INFO] |     +- org.apache.tomcat.embed:tomcat-embed-el:jar:11.0.22:compile
+[INFO] |     \- org.hibernate.validator:hibernate-validator:jar:9.1.0.Final:compile
+[INFO] |        +- jakarta.validation:jakarta.validation-api:jar:3.1.1:compile
+[INFO] |        +- org.jboss.logging:jboss-logging:jar:3.6.3.Final:compile
+[INFO] |        \- com.fasterxml:classmate:jar:1.7.3:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-webmvc:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jackson:jar:4.1.0:compile
+[INFO] |  |  \- org.springframework.boot:spring-boot-jackson:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:4.1.0:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-tomcat-runtime:jar:4.1.0:compile
+[INFO] |  |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:11.0.22:compile
+[INFO] |  |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:11.0.22:compile
+[INFO] |  |  \- org.springframework.boot:spring-boot-tomcat:jar:4.1.0:compile
+[INFO] |  +- org.springframework.boot:spring-boot-http-converter:jar:4.1.0:compile
+[INFO] |  |  \- org.springframework:spring-web:jar:7.0.8:compile
+[INFO] |  |     \- io.micrometer:micrometer-observation:jar:1.17.0:compile
+[INFO] |  |        \- io.micrometer:micrometer-commons:jar:1.17.0:compile
+[INFO] |  \- org.springframework.boot:spring-boot-webmvc:jar:4.1.0:compile
+[INFO] |     +- org.springframework.boot:spring-boot-servlet:jar:4.1.0:compile
+[INFO] |     \- org.springframework:spring-webmvc:jar:7.0.8:compile
+[INFO] |        \- org.springframework:spring-expression:jar:7.0.8:compile
+[INFO] +- org.flywaydb:flyway-database-postgresql:jar:12.4.0:compile
+[INFO] |  \- org.flywaydb:flyway-core:jar:12.4.0:compile
+[INFO] |     \- tools.jackson.core:jackson-databind:jar:3.1.4:compile
+[INFO] |        +- com.fasterxml.jackson.core:jackson-annotations:jar:2.21:compile
+[INFO] |        \- tools.jackson.core:jackson-core:jar:3.1.4:compile
+[INFO] +- org.postgresql:postgresql:jar:42.7.11:runtime
+[INFO] +- com.h2database:h2:jar:2.4.240:runtime
+[INFO] +- org.springframework.boot:spring-boot-starter-data-jpa-test:jar:4.1.0:test
+[INFO] |  +- org.springframework.boot:spring-boot-starter-test:jar:4.1.0:test
+[INFO] |  |  +- org.springframework.boot:spring-boot-test:jar:4.1.0:test
+[INFO] |  |  +- org.springframework.boot:spring-boot-test-autoconfigure:jar:4.1.0:test
+[INFO] |  |  +- com.jayway.jsonpath:json-path:jar:2.10.0:test
+[INFO] |  |  +- jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.5:runtime
+[INFO] |  |  |  \- jakarta.activation:jakarta.activation-api:jar:2.1.4:runtime
+[INFO] |  |  +- net.minidev:json-smart:jar:2.6.0:test
+[INFO] |  |  |  \- net.minidev:accessors-smart:jar:2.6.0:test
+[INFO] |  |  |     \- org.ow2.asm:asm:jar:9.7.1:test
+[INFO] |  |  +- org.assertj:assertj-core:jar:3.27.7:test
+[INFO] |  |  |  \- net.bytebuddy:byte-buddy:jar:1.18.10:runtime
+[INFO] |  |  +- org.awaitility:awaitility:jar:4.3.0:test
+[INFO] |  |  +- org.hamcrest:hamcrest:jar:3.0:test
+[INFO] |  |  +- org.junit.jupiter:junit-jupiter:jar:6.0.3:test
+[INFO] |  |  |  +- org.junit.jupiter:junit-jupiter-api:jar:6.0.3:test
+[INFO] |  |  |  |  +- org.opentest4j:opentest4j:jar:1.3.0:test
+[INFO] |  |  |  |  +- org.junit.platform:junit-platform-commons:jar:6.0.3:test
+[INFO] |  |  |  |  \- org.apiguardian:apiguardian-api:jar:1.1.2:test
+[INFO] |  |  |  +- org.junit.jupiter:junit-jupiter-params:jar:6.0.3:test
+[INFO] |  |  |  \- org.junit.jupiter:junit-jupiter-engine:jar:6.0.3:test
+[INFO] |  |  |     \- org.junit.platform:junit-platform-engine:jar:6.0.3:test
+[INFO] |  |  +- org.mockito:mockito-core:jar:5.23.0:test
+[INFO] |  |  |  +- net.bytebuddy:byte-buddy-agent:jar:1.18.10:test
+[INFO] |  |  |  \- org.objenesis:objenesis:jar:3.3:test
+[INFO] |  |  +- org.mockito:mockito-junit-jupiter:jar:5.23.0:test
+[INFO] |  |  +- org.skyscreamer:jsonassert:jar:1.5.3:test
+[INFO] |  |  |  \- com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test
+[INFO] |  |  +- org.springframework:spring-core:jar:7.0.8:compile
+[INFO] |  |  |  +- commons-logging:commons-logging:jar:1.3.6:compile
+[INFO] |  |  |  \- org.jspecify:jspecify:jar:1.0.0:compile
+[INFO] |  |  +- org.springframework:spring-test:jar:7.0.8:test
+[INFO] |  |  \- org.xmlunit:xmlunit-core:jar:2.11.0:test
+[INFO] |  +- org.springframework.boot:spring-boot-starter-jdbc-test:jar:4.1.0:test
+[INFO] |  |  \- org.springframework.boot:spring-boot-jdbc-test:jar:4.1.0:test
+[INFO] |  \- org.springframework.boot:spring-boot-data-jpa-test:jar:4.1.0:test
+[INFO] |     \- org.springframework.boot:spring-boot-jpa-test:jar:4.1.0:test
+[INFO] +- org.springframework.boot:spring-boot-starter-flyway-test:jar:4.1.0:test
+[INFO] +- org.springframework.boot:spring-boot-starter-validation-test:jar:4.1.0:test
+[INFO] \- org.springframework.boot:spring-boot-starter-webmvc-test:jar:4.1.0:test
+[INFO]    +- org.springframework.boot:spring-boot-starter-jackson-test:jar:4.1.0:test
+[INFO]    +- org.springframework.boot:spring-boot-webmvc-test:jar:4.1.0:test
+[INFO]    |  \- org.springframework.boot:spring-boot-web-server:jar:4.1.0:compile
+[INFO]    \- org.springframework.boot:spring-boot-resttestclient:jar:4.1.0:test
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.458 s
+[INFO] Finished at: 2026-07-17T14:28:09+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:28:09.860Z [INFO] [MavenBuildTool] Successfully got dependency tree of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:28:09.862Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:28:09.862Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:28:09.862Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:28:09.868Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
+2026-07-17T12:28:22.854Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:28:22.854Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "event": "buildCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:28:22.854Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:28:22.854Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:28:22.854Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:28:22.897Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:28:22.898Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "event": "buildCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:28:22.898Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:28:22.898Z [INFO] Project /Users/romandeisling/Downloads/dev/romansapp/backend is a maven project, try to get java version from pom.xml
+2026-07-17T12:28:22.898Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'buildCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:28:22.898Z [INFO] ----------------------invoked appmod-report-event----------------------
+2026-07-17T12:28:22.902Z [INFO] Project java version: 25
+2026-07-17T12:28:22.902Z [INFO] Maven project detected.
+2026-07-17T12:28:22.902Z [INFO] Build tool type: mvnw
+2026-07-17T12:28:22.911Z [INFO] ---------------------prepare appmod-report-event----------------------
+2026-07-17T12:28:22.912Z [INFO] [Tool.prepareInvocation]({name: appmod-report-event, input: {
+  "event": "testCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:28:22.912Z [INFO] [Tool.prepareInvocation] do prepare invocation.
+2026-07-17T12:28:22.912Z [INFO] [Tool.prepareInvocation]({result: {
+  "invocationMessage": "Report upgrade event"
+}}).
+2026-07-17T12:28:22.912Z [INFO] ----------------------prepared appmod-report-event----------------------
+2026-07-17T12:28:22.949Z [INFO] JDK: {
+  "name": "java",
+  "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+  "version": "25"
+}
+2026-07-17T12:28:22.949Z [INFO] Build tool: {
+  "name": "mvnw",
+  "path": ".",
+  "version": ""
+}
+2026-07-17T12:28:22.949Z [INFO] Project config: {
+  "buildTool": {
+    "path": ".",
+    "name": "mvnw",
+    "version": ""
+  },
+  "jdk": {
+    "path": "/Users/romandeisling/.jdk/jdk-25.0.2/jdk-25.0.2+10/Contents/Home/bin",
+    "name": "java",
+    "version": "25"
+  },
+  "name": "backend",
+  "dir": "/Users/romandeisling/Downloads/dev/romansapp/backend"
+}
+2026-07-17T12:28:22.949Z [INFO] [MavenBuildTool] Getting all module coordinates of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:28:22.949Z [INFO] [MavenBuildTool] Getting effective POMs of /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:28:22.949Z [INFO] [Environment] Running command (Java undefined): mvnw help:effective-pom -Doutput=effective-pom-35373701-b6d5-4149-ac66-dee006fb6ae5.log
+2026-07-17T12:28:22.981Z [INFO] ----------------------invoke appmod-report-event----------------------
+2026-07-17T12:28:22.981Z [INFO] [Tool.invoke]({name: appmod-report-event, modelId: claude-sonnet-4.6, input: {
+  "event": "testCompleted",
+  "phase": "execute",
+  "projectPath": "/Users/romandeisling/Downloads/dev/romansapp/backend",
+  "sessionId": "20260717121959",
+  "status": "succeeded"
+}}).
+2026-07-17T12:28:22.982Z [INFO] [Tool.invoke] do invoke.
+2026-07-17T12:28:22.982Z [INFO] [Tool.invoke]({result: {
+  "message": "Event 'testCompleted' reported!\nSession ID: 20260717121959,\nSession Dir: /Users/romandeisling/Downloads/dev/romansapp/backend/.github/modernize/java-upgrade/20260717121959"
+}}).
+2026-07-17T12:28:22.982Z [INFO] ----------------------invoked appmod-report-event----------------------
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< de.roman:speiseplan-backend >---------------------
+[INFO] Building speiseplan-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- help:3.5.1:effective-pom (default-cli) @ speiseplan-backend ---
+[INFO] Effective-POM written to: /Users/romandeisling/Downloads/dev/romansapp/backend/effective-pom-35373701-b6d5-4149-ac66-dee006fb6ae5.log
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.483 s
+[INFO] Finished at: 2026-07-17T14:28:24+02:00
+[INFO] ------------------------------------------------------------------------
+2026-07-17T12:28:24.742Z [INFO] [BaseBuildTool] Found 1 modules: .
+2026-07-17T12:28:24.746Z [INFO] [BaseBuildTool] Finish counting Java and class files
+2026-07-17T12:28:24.746Z [INFO] [MavenBuildTool] Cleaning /Users/romandeisling/Downloads/dev/romansapp/backend using Maven
+2026-07-17T12:28:24.746Z [INFO] [Environment] Running command (Java undefined): mvnw clean -q -B -fn
+2026-07-17T12:28:26.313Z [INFO] [MavenBuildTool] Getting Java version of /Users/romandeisling/Downloads/dev/romansapp/backend from pom.xml
+2026-07-17T12:28:26.313Z [INFO] [MavenBuildTool] Searching for pom.xml files in /Users/romandeisling/Downloads/dev/romansapp/backend
+2026-07-17T12:28:26.313Z [INFO] [MavenBuildTool] Found pom.xml files: /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml
+2026-07-17T12:28:26.313Z [INFO] [MavenBuildTool] Java version found in /Users/romandeisling/Downloads/dev/romansapp/backend/pom.xml: 25
