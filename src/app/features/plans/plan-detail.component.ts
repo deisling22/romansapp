@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { DashboardApiService } from '../../core/dashboard-api.service';
@@ -8,6 +8,7 @@ import { Dish } from '../../core/models';
     selector: 'app-plan-detail',
     templateUrl: './plan-detail.component.html',
     styleUrls: ['./plans.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PlanDetailComponent implements OnInit {

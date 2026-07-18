@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DishApiService } from '../../core/dish-api.service';
 import { DishCatalogEntry } from '../../core/models';
 
@@ -6,6 +6,7 @@ import { DishCatalogEntry } from '../../core/models';
     selector: 'app-dish-catalog',
     templateUrl: './dish-catalog.component.html',
     styleUrls: ['./dish-catalog.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DishCatalogComponent implements OnInit {

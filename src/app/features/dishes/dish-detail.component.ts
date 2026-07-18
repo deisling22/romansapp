@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { DishApiService } from '../../core/dish-api.service';
@@ -8,6 +8,7 @@ import { DishDetail, Ingredient } from '../../core/models';
     selector: 'app-dish-detail',
     templateUrl: './dish-detail.component.html',
     styleUrls: ['./dish-detail.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DishDetailComponent implements OnInit {

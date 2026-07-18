@@ -1,12 +1,12 @@
 {
-  "planHash": "6f0daca7ad38234f9d53db3cbf658d4ab754f0d347130ab40c220ddb30a752ce",
+  "planHash": "40798c33437c96395158d07e66181d9db6519a2f6b30e9b395baf43a230bf28d",
   "phase": "baseline",
-  "recordedAtUtc": "2026-07-18T15:18:52.7442160Z",
+  "recordedAtUtc": "2026-07-18T16:00:08.3244450Z",
   "retryCount": 0,
   "resetBaseline": true,
   "result": {
     "setupSucceeded": true,
-    "setupDurationMs": 3697,
+    "setupDurationMs": 1272,
     "setupFailureOutput": null,
     "assertions": [
       {
@@ -18,8 +18,8 @@
         "skipped": false,
         "skippedReason": null,
         "exitCode": 0,
-        "outputSample": "\n\u003E romansapp@0.0.0 build\n\u003E ng build\n\n- Generating browser application bundles (phase: setup)...\n\u2714 Browser application bundle generation complete.\n\u2714 Browser application bundle generation complete.\n- Copying assets...\n\u2714 Copying assets complete.\n- Generating index html...\n\u2714 Index html generation complete.\n- Generating service worker...\n\u2714 Service worker generation complete.\n\nInitial Chunk Files           | Names         |  Raw Size | Estimated Transfer Size\nmain.4241984d0700c18b.js      | main          | 434.42 kB |               109.52 kB\npolyfills.40d12b305f454cea.js | polyfills     |  33.03 kB |                10.65 kB\nstyles.1eba337d6f35ca8a.css   | styles        |   4.85 kB |                 1.21 kB\nruntime.2dfb6d13a60bb430.js   | runtime       | 911 bytes |               516 bytes\n\n| Initial Total | 473.18 kB |               121.88 kB\n\nBuild at: 2026-07-18T15:18:36.662Z - Hash: b08168588a8ff535 - Time: 4420ms\n",
-        "durationMs": 7267
+        "outputSample": "\u276F Building...\n\u2714 Building...\nInitial chunk files   | Names         |  Raw size | Estimated transfer size\nmain-ZVGQSRJV.js      | main          | 490.48 kB |               124.42 kB\npolyfills-5CFQRCPP.js | polyfills     |  34.59 kB |                11.33 kB\nstyles-27XWVSXM.css   | styles        |   4.93 kB |                 1.24 kB\n\n                      | Initial total | 530.00 kB |               137.00 kB\n\nApplication bundle generation complete. [2.582 seconds] - 2026-07-18T15:59:58.794Z\n\n\u25B2 [WARNING] bundle initial exceeded maximum budget. Budget 500.00 kB was not met by 30.00 kB with a total of 530.00 kB.\n\n\nOutput location: /Users/romandeisling/Downloads/dev/romansapp/dist/romansapp\n\n",
+        "durationMs": 3166
       },
       {
         "name": "dev-server-serves-home",
@@ -30,8 +30,8 @@
         "skipped": false,
         "skippedReason": null,
         "exitCode": null,
-        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\n\u003Chtml lang=\u0022de\u0022\u003E\n\u003Chead\u003E\n  \u003Cmeta charset=\u0022utf-8\u0022\u003E\n  \u003Ctitle\u003ERomansapp\u003C/title\u003E\n  \u003Cbase href=\u0022/\u0022\u003E\n  \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1\u0022\u003E\n  \u003Clink rel=\u0022icon\u0022 type=\u0022image/x-icon\u0022 href=\u0022favicon.ico\u0022\u003E\n  \u003Clink rel=\u0022manifest\u0022 href=\u0022manifest.webmanifest\u0022\u003E\n  \u003Cmeta name=\u0022theme-color\u0022 content=\u0022#1976d2\u0022\u003E\n\u003Clink rel=\u0022stylesheet\u0022 href=\u0022styles.css\u0022\u003E\u003C/head\u003E\n\u003Cbody\u003E\n  \u003Capp-root\u003E\u003C/app-root\u003E\n  \u003Cnoscript\u003EPlease enable JavaScript to continue using this application.\u003C/noscript\u003E\n\u003Cscript src=\u0022runtime.js\u0022 type=\u0022module\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022polyfills.js\u0022 type=\u0022module\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022styles.js\u0022 defer\u003E\u003C/script\u003E\u003Cscript src=\u0022vendor.js\u0022 type=\u0022module\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022main.js\u0022 type=\u0022module\u0022\u003E\u003C/script\u003E\u003C/body\u003E\n\u003C/html\u003E\n",
-        "durationMs": 69
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\n\u003Chtml lang=\u0022de\u0022\u003E\n\u003Chead\u003E\n  \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\n  \u003Cmeta charset=\u0022utf-8\u0022\u003E\n  \u003Ctitle\u003ERomansapp\u003C/title\u003E\n  \u003Cbase href=\u0022/\u0022\u003E\n  \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1\u0022\u003E\n  \u003Clink rel=\u0022icon\u0022 type=\u0022image/x-icon\u0022 href=\u0022favicon.ico\u0022\u003E\n  \u003Clink rel=\u0022manifest\u0022 href=\u0022manifest.webmanifest\u0022\u003E\n  \u003Cmeta name=\u0022theme-color\u0022 content=\u0022#1976d2\u0022\u003E\n\u003Clink rel=\u0022stylesheet\u0022 href=\u0022styles.css\u0022\u003E\u003C/head\u003E\n\u003Cbody\u003E\n  \u003Capp-root\u003E\u003C/app-root\u003E\n  \u003Cnoscript\u003EPlease enable JavaScript to continue using this application.\u003C/noscript\u003E\n\u003Cscript src=\u0022polyfills.js\u0022 type=\u0022module\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022main.js\u0022 type=\u0022module\u0022\u003E\u003C/script\u003E\u003C/body\u003E\n\u003C/html\u003E\n",
+        "durationMs": 32
       },
       {
         "name": "home-navigation",
@@ -42,8 +42,8 @@
         "skipped": false,
         "skippedReason": null,
         "exitCode": 0,
-        "outputSample": "\nRunning 1 test using 1 worker\n\n  \u2713  1 .tsupgrader/runtime-validation/playwright-scripts/home-navigation.spec.ts:6:5 \u203A home-navigation (407ms)\n\n  1 passed (1.5s)\n",
-        "durationMs": 2093
+        "outputSample": "\nRunning 1 test using 1 worker\n\n  \u2713  1 .tsupgrader/runtime-validation/playwright-scripts/home-navigation.spec.ts:6:5 \u203A home-navigation (307ms)\n\n  1 passed (1.1s)\n",
+        "durationMs": 1483
       },
       {
         "name": "tests-pass",
@@ -54,8 +54,8 @@
         "skipped": false,
         "skippedReason": null,
         "exitCode": 0,
-        "outputSample": "\n\u003E romansapp@0.0.0 test\n\u003E ng test --watch=false --browsers=ChromeHeadless\n\n- Generating browser application bundles (phase: setup)...\n\u2714 Browser application bundle generation complete.\n18 07 2026 17:18:43.806:INFO [karma-server]: Karma v6.4.3 server started at http://localhost:9876/\n18 07 2026 17:18:43.808:INFO [launcher]: Launching browsers ChromeHeadless with concurrency unlimited\n18 07 2026 17:18:43.812:INFO [launcher]: Starting browser ChromeHeadless\n18 07 2026 17:18:51.196:INFO [Chrome Headless 150.0.0.0 (Mac OS 10.15.7)]: Connected on socket a6U4qyaYA2ghfhuSAAAB with id 20324119\nChrome Headless 150.0.0.0 (Mac OS 10.15.7): Executed 0 of 1 SUCCESS (0 secs / 0 secs)\n\u001B[1A\u001B[2KChrome Headless 150.0.0.0 (Mac OS 10.15.7): Executed 1 of 1 SUCCESS (0 secs / 0.039 secs)\n\u001B[1A\u001B[2KChrome Headless 150.0.0.0 (Mac OS 10.15.7): Executed 1 of 1 SUCCESS (0.105 secs / 0.039 secs)\nTOTAL: 1 SUCCESS\n\u2714 Browser application bundle generation complete.\n\u001B[1A\u001B[2KChrome Headless 150.0.0.0 (Mac OS 10.15.7) ERROR\n  Some of your tests did a full page reload!\nChrome Headless 150.0.0.0 (Mac OS 10.15.7): Executed 1 of 1 ERROR (0.105 secs / 0.039 secs)\nChrome Headless 150.0.0.0 (Mac OS 10.15.7) ERROR\n  Some of your tests did a full page reload!\n\u001B[1A\u001B[2KChrome Headless 150.0.0.0 (Mac OS 10.15.7): Executed 1 of 1 ERROR (0.113 secs / 0.039 secs)\n\u2714 Browser application bundle generation complete.\n\u2714 Browser application bundle generation complete.\n",
-        "durationMs": 13739,
+        "outputSample": "\u276F Building...\n\u2714 Building...\nInitial chunk files            | Names                       |  Raw size\nchunk-CXCFKUMM.js              | -                           |   2.33 MB | \npolyfills.js                   | polyfills                   |   1.04 MB | \nspec-app-app.component.spec.js | spec-app-app.component.spec | 593.63 kB | \njasmine-cleanup-1.js           | jasmine-cleanup-1           |  67.12 kB | \nchunk-2DTCRXT2.js              | -                           |   8.08 kB | \nstyles.css                     | styles                      |   6.04 kB | \ntest_main.js                   | test_main                   |   4.17 kB | \njasmine-cleanup-0.js           | jasmine-cleanup-0           | 397 bytes | \n\n                               | Initial total               |   4.05 MB\n\nApplication bundle generation complete. [1.304 seconds] - 2026-07-18T16:00:02.409Z\n\n18 07 2026 18:00:02.466:INFO [karma-server]: Karma v6.4.3 server started at http://localhost:9876/\n18 07 2026 18:00:02.467:INFO [launcher]: Launching browsers ChromeHeadless with concurrency unlimited\n18 07 2026 18:00:02.471:INFO [launcher]: Starting browser ChromeHeadless\n18 07 2026 18:00:07.604:INFO [Chrome Headless 150.0.0.0 (Mac OS 10.15.7)]: Connected on socket _yRXsj_a9GSc3hG5AAAB with id 58378119\nChrome Headless 150.0.0.0 (Mac OS 10.15.7): Executed 0 of 1 SUCCESS (0 secs / 0 secs)\n\u001B[1A\u001B[2KChrome Headless 150.0.0.0 (Mac OS 10.15.7): Executed 1 of 1 SUCCESS (0 secs / 0.026 secs)\n\u001B[1A\u001B[2KChrome Headless 150.0.0.0 (Mac OS 10.15.7): Executed 1 of 1 SUCCESS (0.105 secs / 0.026 secs)\nTOTAL: 1 SUCCESS\n",
+        "durationMs": 7907,
         "testResults": {
           "testFramework": "jasmine",
           "runnerDetectedFrom": "package_json",

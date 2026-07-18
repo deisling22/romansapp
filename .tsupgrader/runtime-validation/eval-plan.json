@@ -3,15 +3,15 @@
   "generatedOnPlatform": "darwin",
   "projectType": "webapp",
   "devServer": {
-    "command": "npm",
-    "args": ["start", "--", "--port", "4300"],
+    "command": "/Users/romandeisling/.local/opt/node-v24.15.0/bin/node",
+    "args": ["node_modules/@angular/cli/bin/ng.js", "serve", "--port", "4300"],
     "url": "http://localhost:4300/",
     "readyTimeoutSeconds": 180
   },
   "setup": [
     {
-      "command": "npm",
-      "args": ["install"],
+      "command": "/Users/romandeisling/.local/opt/node-v24.15.0/bin/node",
+      "args": ["/Users/romandeisling/.local/opt/node-v24.15.0/lib/node_modules/npm/bin/npm-cli.js", "install"],
       "timeoutSeconds": 600
     }
   ],
@@ -19,8 +19,8 @@
     {
       "name": "angular-builds",
       "kind": "process",
-      "command": "npm",
-      "args": ["run", "build"],
+      "command": "/Users/romandeisling/.local/opt/node-v24.15.0/bin/node",
+      "args": ["node_modules/@angular/cli/bin/ng.js", "build"],
       "verificationMethod": "exit-code",
       "expected": "0",
       "timeoutSeconds": 300
@@ -28,8 +28,8 @@
     {
       "name": "dev-server-serves-home",
       "kind": "http-probe",
-      "startCommand": "npm",
-      "startArgs": ["start", "--", "--port", "4300"],
+      "startCommand": "/Users/romandeisling/.local/opt/node-v24.15.0/bin/node",
+      "startArgs": ["node_modules/@angular/cli/bin/ng.js", "serve", "--port", "4300"],
       "url": "http://localhost:4300/",
       "verificationMethod": "http-status",
       "expected": "200",
@@ -46,8 +46,8 @@
     {
       "name": "tests-pass",
       "kind": "process",
-      "command": "npm",
-      "args": ["test", "--", "--watch=false", "--browsers=ChromeHeadless"],
+      "command": "/Users/romandeisling/.local/opt/node-v24.15.0/bin/node",
+      "args": ["node_modules/@angular/cli/bin/ng.js", "test", "--watch=false", "--browsers=ChromeHeadless"],
       "verificationMethod": "test-results",
       "expected": "0",
       "timeoutSeconds": 300

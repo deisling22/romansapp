@@ -12,26 +12,36 @@
       placeholder="Name des neuen Plans"
       maxlength="120"
       [(ngModel)]="newPlanName"
-    />
+      />
     <button type="submit" [disabled]="creating">{{ creating ? 'Wird erstellt ...' : 'Plan anlegen' }}</button>
   </form>
 
-  <p *ngIf="loading" class="status">Pläne werden geladen ...</p>
-  <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
+  @if (loading) {
+    <p class="status">Pläne werden geladen ...</p>
+  }
+  @if (errorMessage) {
+    <p class="status error" role="alert">{{ errorMessage }}</p>
+  }
 
-  <section *ngIf="!loading && !errorMessage" class="plan-list" aria-label="Vorhandene Speisepläne">
-    <a *ngFor="let plan of plans" class="plan-row" [routerLink]="['/plans', plan.id]">
-      <span class="plan-mark">{{ plan.name.charAt(0) }}</span>
-      <span class="plan-copy">
-        <strong>{{ plan.name }}</strong>
-        <small>{{ plan.dishCount }} {{ plan.dishCount === 1 ? 'Gericht' : 'Gerichte' }}</small>
-      </span>
-      <span class="plan-actions">
-        <button type="button" (click)="copyPlan(plan, $event)" title="Plan kopieren">⧉</button>
-        <button type="button" (click)="deletePlan(plan, $event)" title="Plan löschen">✕</button>
-      </span>
-      <span class="chevron" aria-hidden="true">›</span>
-    </a>
-    <p *ngIf="plans.length === 0" class="status">Noch keine Pläne vorhanden.</p>
-  </section>
+  @if (!loading && !errorMessage) {
+    <section class="plan-list" aria-label="Vorhandene Speisepläne">
+      @for (plan of plans; track plan) {
+        <a class="plan-row" [routerLink]="['/plans', plan.id]">
+          <span class="plan-mark">{{ plan.name.charAt(0) }}</span>
+          <span class="plan-copy">
+            <strong>{{ plan.name }}</strong>
+            <small>{{ plan.dishCount }} {{ plan.dishCount === 1 ? 'Gericht' : 'Gerichte' }}</small>
+          </span>
+          <span class="plan-actions">
+            <button type="button" (click)="copyPlan(plan, $event)" title="Plan kopieren">⧉</button>
+            <button type="button" (click)="deletePlan(plan, $event)" title="Plan löschen">✕</button>
+          </span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </a>
+      }
+      @if (plans.length === 0) {
+        <p class="status">Noch keine Pläne vorhanden.</p>
+      }
+    </section>
+  }
 </main>

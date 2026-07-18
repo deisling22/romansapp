@@ -9,20 +9,32 @@
     {{ generating ? 'Wird erstellt ...' : 'Aus Plan neu erstellen' }}
   </button>
 
-  <p *ngIf="(connectivity.online$ | async) === false" class="status offline">
-    Offline – Änderungen werden gespeichert, sobald du wieder online bist.
-  </p>
+  @if ((connectivity.online$ | async) === false) {
+    <p class="status offline">
+      Offline – Änderungen werden gespeichert, sobald du wieder online bist.
+    </p>
+  }
 
-  <p *ngIf="loading" class="status">Einkaufsliste wird geladen ...</p>
-  <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
+  @if (loading) {
+    <p class="status">Einkaufsliste wird geladen ...</p>
+  }
+  @if (errorMessage) {
+    <p class="status error" role="alert">{{ errorMessage }}</p>
+  }
 
-  <ul *ngIf="!loading" class="item-list">
-    <li *ngFor="let item of items" [class.checked]="item.checked">
-      <label>
-        <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
-        <span>{{ item.ingredientName }} – {{ item.quantity }} {{ item.unit }}</span>
-      </label>
-    </li>
-    <li *ngIf="items.length === 0" class="status">Noch keine Einkaufsliste erstellt.</li>
-  </ul>
+  @if (!loading) {
+    <ul class="item-list">
+      @for (item of items; track item) {
+        <li [class.checked]="item.checked">
+          <label>
+            <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
+            <span>{{ item.ingredientName }} – {{ item.quantity }} {{ item.unit }}</span>
+          </label>
+        </li>
+      }
+      @if (items.length === 0) {
+        <li class="status">Noch keine Einkaufsliste erstellt.</li>
+      }
+    </ul>
+  }
 </main>
