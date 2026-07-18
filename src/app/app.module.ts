@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HttpClientModule, HttpClientXsrfModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXsrfConfiguration } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DishCreateComponent } from './features/dishes/dish-create.component';
 import { DishCatalogComponent } from './features/dishes/dish-catalog.component';
@@ -15,37 +15,29 @@ import { SettingsComponent } from './features/settings/settings.component';
 import { ShoppingListComponent } from './features/shopping-list/shopping-list.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    PlanListComponent,
-    PlanDetailComponent,
-    DishCreateComponent,
-    DishCatalogComponent,
-    DishDetailComponent,
-    DashboardComponent,
-    SettingsComponent,
-    ShoppingListComponent,
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    HttpClientXsrfModule.withOptions({
-      cookieName: 'XSRF-TOKEN',
-      headerName: 'X-XSRF-TOKEN',
-    }),
-    FormsModule,
-    ReactiveFormsModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: !isDevMode(),
-      // Register the ServiceWorker as soon as the application is stable
-      // or after 30 seconds (whichever comes first).
-      registrationStrategy: 'registerWhenStable:30000'
-    }),
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        PlanListComponent,
+        PlanDetailComponent,
+        DishCreateComponent,
+        DishCatalogComponent,
+        DishDetailComponent,
+        DashboardComponent,
+        SettingsComponent,
+        ShoppingListComponent,
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ServiceWorkerModule.register('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            // Register the ServiceWorker as soon as the application is stable
+            // or after 30 seconds (whichever comes first).
+            registrationStrategy: 'registerWhenStable:30000'
+        })], providers: [provideHttpClient(withInterceptorsFromDi(), withXsrfConfiguration({
+            cookieName: 'XSRF-TOKEN',
+            headerName: 'X-XSRF-TOKEN',
+        }))] })
 export class AppModule { }
 
