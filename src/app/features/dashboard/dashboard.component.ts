@@ -4,9 +4,10 @@ import { DashboardData } from '../../core/models';
 import { toAbsoluteImageUrl } from '../../core/image-url';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
+    selector: 'app-dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.scss'],
+    standalone: false
 })
 export class DashboardComponent implements OnInit {
   dashboard: DashboardData | null = null;

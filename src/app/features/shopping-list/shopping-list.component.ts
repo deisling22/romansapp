@@ -6,9 +6,10 @@ import { ConnectivityService } from '../../core/connectivity.service';
 import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.service';
 
 @Component({
-  selector: 'app-shopping-list',
-  templateUrl: './shopping-list.component.html',
-  styleUrls: ['./shopping-list.component.scss'],
+    selector: 'app-shopping-list',
+    templateUrl: './shopping-list.component.html',
+    styleUrls: ['./shopping-list.component.scss'],
+    standalone: false
 })
 export class ShoppingListComponent implements OnInit {
   planId = 0;

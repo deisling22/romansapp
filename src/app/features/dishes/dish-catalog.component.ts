@@ -3,9 +3,10 @@ import { DishApiService } from '../../core/dish-api.service';
 import { DishCatalogEntry } from '../../core/models';
 
 @Component({
-  selector: 'app-dish-catalog',
-  templateUrl: './dish-catalog.component.html',
-  styleUrls: ['./dish-catalog.component.scss'],
+    selector: 'app-dish-catalog',
+    templateUrl: './dish-catalog.component.html',
+    styleUrls: ['./dish-catalog.component.scss'],
+    standalone: false
 })
 export class DishCatalogComponent implements OnInit {
   dishes: DishCatalogEntry[] = [];

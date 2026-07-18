@@ -5,9 +5,10 @@ import { DishApiService } from '../../core/dish-api.service';
 import { DishDetail, Ingredient } from '../../core/models';
 
 @Component({
-  selector: 'app-dish-detail',
-  templateUrl: './dish-detail.component.html',
-  styleUrls: ['./dish-detail.component.scss'],
+    selector: 'app-dish-detail',
+    templateUrl: './dish-detail.component.html',
+    styleUrls: ['./dish-detail.component.scss'],
+    standalone: false
 })
 export class DishDetailComponent implements OnInit {
   readonly ingredientForm = this.formBuilder.nonNullable.group({

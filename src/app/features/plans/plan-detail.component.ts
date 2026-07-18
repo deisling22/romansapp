@@ -5,9 +5,10 @@ import { DashboardApiService } from '../../core/dashboard-api.service';
 import { Dish } from '../../core/models';
 
 @Component({
-  selector: 'app-plan-detail',
-  templateUrl: './plan-detail.component.html',
-  styleUrls: ['./plans.scss'],
+    selector: 'app-plan-detail',
+    templateUrl: './plan-detail.component.html',
+    styleUrls: ['./plans.scss'],
+    standalone: false
 })
 export class PlanDetailComponent implements OnInit {
   dishes: Dish[] = [];

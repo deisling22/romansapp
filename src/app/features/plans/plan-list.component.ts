@@ -3,9 +3,10 @@ import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { MealPlan } from '../../core/models';
 
 @Component({
-  selector: 'app-plan-list',
-  templateUrl: './plan-list.component.html',
-  styleUrls: ['./plans.scss'],
+    selector: 'app-plan-list',
+    templateUrl: './plan-list.component.html',
+    styleUrls: ['./plans.scss'],
+    standalone: false
 })
 export class PlanListComponent implements OnInit {
   plans: MealPlan[] = [];

@@ -4,9 +4,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 
 @Component({
-  selector: 'app-dish-create',
-  templateUrl: './dish-create.component.html',
-  styleUrls: ['./dish-create.component.scss'],
+    selector: 'app-dish-create',
+    templateUrl: './dish-create.component.html',
+    styleUrls: ['./dish-create.component.scss'],
+    standalone: false
 })
 export class DishCreateComponent implements OnInit, OnDestroy {
   readonly form = this.formBuilder.nonNullable.group({
