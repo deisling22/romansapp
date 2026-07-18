@@ -1,0 +1,15 @@
+- generic [ref=e2]:
+  - main [ref=e4]:
+    - generic [ref=e5]:
+      - paragraph [ref=e6]: Heute
+      - heading "Übersicht" [level=1] [ref=e7]
+    - alert [ref=e8]: Die Übersicht konnte nicht geladen werden. Ist das Backend gestartet?
+  - navigation "Hauptnavigation" [ref=e9]:
+    - link "Übersicht" [ref=e10] [cursor=pointer]:
+      - /url: "#/"
+    - link "Pläne" [ref=e12] [cursor=pointer]:
+      - /url: "#/plans"
+    - link "Gerichte" [ref=e14] [cursor=pointer]:
+      - /url: "#/dishes"
+    - link "Einstellungen" [ref=e16] [cursor=pointer]:
+      - /url: "#/settings"

@@ -74,10 +74,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "romansapp:build:production"
+              "buildTarget": "romansapp:build:production"
             },
             "development": {
-              "browserTarget": "romansapp:build:development"
+              "buildTarget": "romansapp:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -85,7 +85,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "romansapp:build"
+            "buildTarget": "romansapp:build"
           }
         },
         "test": {

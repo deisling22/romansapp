@@ -1,0 +1,4 @@
+[     269ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement disabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ http://localhost:4300/polyfills.js:6227
+[     322ms] [LOG] Angular is running in development mode. @ http://localhost:4300/vendor.js:54567
+[     371ms] [ERROR] Access to XMLHttpRequest at 'http://localhost:8080/api/dashboard' from origin 'http://localhost:4300' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:4300/#/:0
+[     372ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:8080/api/dashboard:0
