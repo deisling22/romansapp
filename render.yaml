@@ -10,19 +10,7 @@ services:
     autoDeployTrigger: commit
     healthCheckPath: /api/plans
     envVars:
-      - key: SPRING_DATASOURCE_URL
-        fromDatabase:
-          name: speiseplan-postgres
-          property: connectionString
       - key: CORS_ORIGINS
         value: https://deisling22.github.io
       - key: UPLOAD_DIR
         value: /opt/render/project/src/uploads
-
-databases:
-  - name: speiseplan-postgres
-    databaseName: speiseplan
-    user: speiseplan
-    region: oregon
-    plan: basic-256mb
-    ipAllowList: []
