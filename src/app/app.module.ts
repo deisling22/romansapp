@@ -34,22 +34,20 @@ import { ServiceWorkerModule } from '@angular/service-worker';
   imports: [
     BrowserModule,
     AppRoutingModule,
-        AccountComponent,
-        LoginComponent,
-    ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        AppRoutingModule,
-        FormsModule,
-        ReactiveFormsModule,
-        ServiceWorkerModule.register('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            // Register the ServiceWorker as soon as the application is stable
-            // or after 30 seconds (whichever comes first).
-            registrationStrategy: 'registerWhenStable:30000'
-        })], providers: [provideHttpClient(withXhr(), withInterceptorsFromDi(), withXsrfConfiguration({
-            cookieName: 'XSRF-TOKEN',
-            headerName: 'X-XSRF-TOKEN',
-        }))] })
->>>>>>> 0b72450 (feat: add account menu and Google login flow)
+    HttpClientModule,
+    HttpClientXsrfModule.withOptions({
+      cookieName: 'XSRF-TOKEN',
+      headerName: 'X-XSRF-TOKEN',
+    }),
+    FormsModule,
+    ReactiveFormsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
 export class AppModule { }
 
