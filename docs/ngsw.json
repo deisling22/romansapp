@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1784807436724,
+  "timestamp": 1784808766226,
   "index": "/romansapp/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "/romansapp/favicon.ico",
         "/romansapp/index.html",
-        "/romansapp/main.4241984d0700c18b.js",
+        "/romansapp/main.5b59665fa1542628.js",
         "/romansapp/manifest.webmanifest",
         "/romansapp/polyfills.40d12b305f454cea.js",
         "/romansapp/runtime.2dfb6d13a60bb430.js",
@@ -82,8 +82,8 @@
     "/romansapp/assets/icons/icon-72x72.png": "279825a1ac4377032ae996a1832c641e33ccf1b6",
     "/romansapp/assets/icons/icon-96x96.png": "592885efcbfee27e5e20be4fa3043589390d2740",
     "/romansapp/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/romansapp/index.html": "6bb3ec09c248a796532a76f79f2d283ed44a1183",
-    "/romansapp/main.4241984d0700c18b.js": "b70b50aac9bff4dae3bb185e53300bfc7d44fb00",
+    "/romansapp/index.html": "9ff6169392c4764b5fc48abe44102c13f2575dab",
+    "/romansapp/main.5b59665fa1542628.js": "4de4c215ed01523ee58c358e8d3722786772e7e1",
     "/romansapp/manifest.webmanifest": "511185f8ee4d6e527fec66e2eeffe6425e8ad565",
     "/romansapp/polyfills.40d12b305f454cea.js": "0c0d41a5c97732efd1b21cd2b0116e1affc53367",
     "/romansapp/runtime.2dfb6d13a60bb430.js": "9edff45f824f0c58ed1e74b4560c2e324eff624a",
