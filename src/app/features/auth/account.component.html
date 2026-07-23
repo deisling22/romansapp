@@ -1,0 +1,8 @@
+<main class="screen">
+  <section *ngIf="user" class="auth-panel" aria-labelledby="account-title">
+    <img *ngIf="user.pictureUrl" class="avatar" [src]="user.pictureUrl" alt="" />
+    <p class="eyebrow">Angemeldet</p>
+    <h1 id="account-title">{{ user.name }}</h1>
+    <p>{{ user.email }}</p>
+  </section>
+</main>

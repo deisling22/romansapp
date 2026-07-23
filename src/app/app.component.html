@@ -9,6 +9,11 @@
   <button type="button" (click)="reloadForUpdate()">Aktualisieren</button>
 </p>
 
+<div *ngIf="menuOpen" class="quick-menu" role="menu" aria-label="Weitere Bereiche">
+  <a routerLink="/settings" role="menuitem" (click)="closeMenu()">Einstellungen</a>
+  <a routerLink="/account" role="menuitem" (click)="closeMenu()">Konto & Anmeldung</a>
+</div>
+
 <nav class="bottom-nav" aria-label="Hauptnavigation">
   <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
     <span>Übersicht</span>
@@ -19,8 +24,14 @@
   <a routerLink="/dishes" routerLinkActive="active">
     <span>Gerichte</span>
   </a>
-  <a routerLink="/settings" routerLinkActive="active">
-    <span>Einstellungen</span>
-  </a>
+  <button
+    type="button"
+    class="menu-trigger"
+    aria-label="Weitere Bereiche öffnen"
+    [attr.aria-expanded]="menuOpen"
+    aria-controls="quick-menu"
+    (click)="toggleMenu()">
+    <span aria-hidden="true">+</span>
+  </button>
 </nav>
 
