@@ -8,10 +8,15 @@ import { PlanListComponent } from './features/plans/plan-list.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { ShoppingListComponent } from './features/shopping-list/shopping-list.component';
+import { AccountComponent } from './features/auth/account.component';
+import { LoginComponent } from './features/auth/login.component';
+import { AuthGuard } from './core/auth.guard';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: DashboardComponent },
   { path: 'settings', component: SettingsComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'account', component: AccountComponent, canActivate: [AuthGuard] },
   { path: 'dishes', component: DishCatalogComponent },
   { path: 'dishes/:dishId', component: DishDetailComponent },
   { path: 'plans', component: PlanListComponent },

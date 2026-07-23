@@ -13,6 +13,8 @@ import { PlanListComponent } from './features/plans/plan-list.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { ShoppingListComponent } from './features/shopping-list/shopping-list.component';
+import { AccountComponent } from './features/auth/account.component';
+import { LoginComponent } from './features/auth/login.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({ declarations: [
@@ -25,6 +27,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
         DashboardComponent,
         SettingsComponent,
         ShoppingListComponent,
+        AccountComponent,
+        LoginComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,

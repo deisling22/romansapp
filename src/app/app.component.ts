@@ -13,6 +13,7 @@ import { ShoppingListOutboxService } from './core/shopping-list-outbox.service';
 })
 export class AppComponent {
   updateAvailable = false;
+  menuOpen = false;
 
   constructor(
     readonly connectivity: ConnectivityService,
@@ -29,6 +30,14 @@ export class AppComponent {
 
   reloadForUpdate(): void {
     window.location.reload();
+  }
+
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMenu(): void {
+    this.menuOpen = false;
   }
 }
 
