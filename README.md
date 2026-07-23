@@ -27,7 +27,7 @@ redeploy the service. Keep `SESSION_COOKIE_SAME_SITE=none` and
 `SESSION_COOKIE_SECURE=true` so the GitHub Pages frontend can use the secure
 backend session.
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.0.
+This project uses [Angular CLI](https://angular.dev) version 22.
 
 ## Development server
 

@@ -1,13 +1,17 @@
 <router-outlet></router-outlet>
 
-<p *ngIf="(connectivity.online$ | async) === false" class="offline-banner" role="status">
-  Offline – Änderungen werden synchronisiert, sobald du wieder online bist.
-</p>
+@if ((connectivity.online$ | async) === false) {
+  <p class="offline-banner" role="status">
+    Offline – Änderungen werden synchronisiert, sobald du wieder online bist.
+  </p>
+}
 
-<p *ngIf="updateAvailable" class="update-banner" role="status">
-  Neue Version verfügbar.
-  <button type="button" (click)="reloadForUpdate()">Aktualisieren</button>
-</p>
+@if (updateAvailable) {
+  <p class="update-banner" role="status">
+    Neue Version verfügbar.
+    <button type="button" (click)="reloadForUpdate()">Aktualisieren</button>
+  </p>
+}
 
 <div *ngIf="menuOpen" class="quick-menu" role="menu" aria-label="Weitere Bereiche">
   <a routerLink="/settings" role="menuitem" (click)="closeMenu()">Einstellungen</a>

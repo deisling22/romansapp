@@ -1,71 +1,92 @@
 <main class="screen">
   <a class="back-link" routerLink="/dishes">‹ Alle Gerichte</a>
 
-  <p *ngIf="loading" class="status">Gericht wird geladen ...</p>
-  <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
+  @if (loading) {
+    <p class="status">Gericht wird geladen ...</p>
+  }
+  @if (errorMessage) {
+    <p class="status error" role="alert">{{ errorMessage }}</p>
+  }
 
-  <ng-container *ngIf="!loading && !errorMessage && dish">
+  @if (!loading && !errorMessage && dish) {
     <header class="page-header">
       <h1>{{ dish.name }}</h1>
-      <p *ngIf="dish.description">{{ dish.description }}</p>
+      @if (dish.description) {
+        <p>{{ dish.description }}</p>
+      }
       <div class="meta-row">
-        <span *ngIf="dish.prepMinutes">{{ dish.prepMinutes }} Min.</span>
+        @if (dish.prepMinutes) {
+          <span>{{ dish.prepMinutes }} Min.</span>
+        }
         <span>{{ dish.servings }} {{ dish.servings === 1 ? 'Portion' : 'Portionen' }}</span>
         <span>{{ dish.caloriesPerServing }} kcal / Portion</span>
         <span>{{ dish.proteinPerServing }} g Protein / Portion</span>
       </div>
-      <div class="tags" *ngIf="dish.tags.length">
-        <span *ngFor="let tag of dish.tags">{{ tag }}</span>
-      </div>
+      @if (dish.tags.length) {
+        <div class="tags">
+          @for (tag of dish.tags; track tag) {
+            <span>{{ tag }}</span>
+          }
+        </div>
+      }
     </header>
-
-    <section *ngIf="dish.galleryImageUrls.length" class="gallery" aria-label="Bildergalerie">
-      <img *ngFor="let url of dish.galleryImageUrls" [src]="dishApi.imageUrl(url)" [alt]="dish.name" />
-    </section>
-
+    @if (dish.galleryImageUrls.length) {
+      <section class="gallery" aria-label="Bildergalerie">
+        @for (url of dish.galleryImageUrls; track url) {
+          <img [src]="dishApi.imageUrl(url)" [alt]="dish.name" />
+        }
+      </section>
+    }
     <section class="steps" aria-label="Zubereitungsschritte">
       <h2>Zubereitung</h2>
       <ol>
-        <li *ngFor="let step of dish.steps">
-          <p>{{ step.text }}</p>
-          <button
-            *ngIf="step.timerSeconds && activeTimerStepId !== step.id"
-            type="button"
-            (click)="startTimer(step.id, step.timerSeconds)"
-          >
-            Timer starten ({{ step.timerSeconds }}s)
-          </button>
-          <p *ngIf="activeTimerStepId === step.id" class="timer">
-            {{ timerSecondsLeft }} s
-            <button type="button" (click)="stopTimer()">Stoppen</button>
-          </p>
-        </li>
+        @for (step of dish.steps; track step) {
+          <li>
+            <p>{{ step.text }}</p>
+            @if (step.timerSeconds && activeTimerStepId !== step.id) {
+              <button
+                type="button"
+                (click)="startTimer(step.id, step.timerSeconds)"
+                >
+                Timer starten ({{ step.timerSeconds }}s)
+              </button>
+            }
+            @if (activeTimerStepId === step.id) {
+              <p class="timer">
+                {{ timerSecondsLeft }} s
+                <button type="button" (click)="stopTimer()">Stoppen</button>
+              </p>
+            }
+          </li>
+        }
       </ol>
     </section>
-
     <section class="ingredients" aria-label="Zutaten">
       <h2>Zutaten</h2>
       <ul>
-        <li *ngFor="let ingredient of dish.ingredients">
-          {{ ingredient.ingredientName }} – {{ ingredient.quantityGrams }} {{ ingredient.unit }}
-        </li>
-        <li *ngIf="dish.ingredients.length === 0" class="status">Noch keine Zutaten hinterlegt.</li>
+        @for (ingredient of dish.ingredients; track ingredient) {
+          <li>
+            {{ ingredient.ingredientName }} – {{ ingredient.quantityGrams }} {{ ingredient.unit }}
+          </li>
+        }
+        @if (dish.ingredients.length === 0) {
+          <li class="status">Noch keine Zutaten hinterlegt.</li>
+        }
       </ul>
-
       <form [formGroup]="ingredientForm" (ngSubmit)="addIngredient()" novalidate>
         <label for="ingredientId">Zutat hinzufügen</label>
         <select id="ingredientId" formControlName="ingredientId">
           <option [value]="0" disabled>Zutat wählen ...</option>
-          <option *ngFor="let ingredient of ingredients" [value]="ingredient.id">{{ ingredient.name }}</option>
+          @for (ingredient of ingredients; track ingredient) {
+            <option [value]="ingredient.id">{{ ingredient.name }}</option>
+          }
         </select>
-
         <label for="quantityGrams">Menge (g)</label>
         <input id="quantityGrams" type="number" min="1" formControlName="quantityGrams" />
-
         <button type="submit" [disabled]="savingIngredient">
           {{ savingIngredient ? 'Wird gespeichert ...' : 'Hinzufügen' }}
         </button>
       </form>
     </section>
-  </ng-container>
+  }
 </main>

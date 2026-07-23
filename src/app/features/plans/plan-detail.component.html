@@ -5,24 +5,34 @@
     <h1>Gerichte</h1>
   </header>
 
-  <p *ngIf="loading" class="status">Gerichte werden geladen ...</p>
-  <p *ngIf="errorMessage" class="status error" role="alert">{{ errorMessage }}</p>
+  @if (loading) {
+    <p class="status">Gerichte werden geladen ...</p>
+  }
+  @if (errorMessage) {
+    <p class="status error" role="alert">{{ errorMessage }}</p>
+  }
 
-  <section *ngIf="!loading && !errorMessage" class="dish-grid" aria-label="Gerichte im Plan">
-    <article *ngFor="let dish of dishes" class="dish-card" [class.cooked]="dish.cooked">
-      <img [src]="mealPlanApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
-      <h2>{{ dish.name }}</h2>
-      <button
-        type="button"
-        class="cook-button"
-        [disabled]="dish.cooked || cookingDishId === dish.id"
-        (click)="markCooked(dish)"
-      >
-        {{ dish.cooked ? 'Gekocht' : cookingDishId === dish.id ? 'Wird gespeichert ...' : 'Als gekocht markieren' }}
-      </button>
-    </article>
-    <p *ngIf="dishes.length === 0" class="status">Dieser Plan enthält noch keine Gerichte.</p>
-  </section>
+  @if (!loading && !errorMessage) {
+    <section class="dish-grid" aria-label="Gerichte im Plan">
+      @for (dish of dishes; track dish) {
+        <article class="dish-card" [class.cooked]="dish.cooked">
+          <img [src]="mealPlanApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
+          <h2>{{ dish.name }}</h2>
+          <button
+            type="button"
+            class="cook-button"
+            [disabled]="dish.cooked || cookingDishId === dish.id"
+            (click)="markCooked(dish)"
+            >
+            {{ dish.cooked ? 'Gekocht' : cookingDishId === dish.id ? 'Wird gespeichert ...' : 'Als gekocht markieren' }}
+          </button>
+        </article>
+      }
+      @if (dishes.length === 0) {
+        <p class="status">Dieser Plan enthält noch keine Gerichte.</p>
+      }
+    </section>
+  }
 
   <a class="secondary-action" [routerLink]="['/plans', planId, 'shopping-list']">Einkaufsliste</a>
   <a class="primary-action" [routerLink]="['/plans', planId, 'dishes', 'new']">Gericht hinzufügen</a>

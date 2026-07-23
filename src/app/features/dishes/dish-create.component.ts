@@ -1,12 +1,14 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 
 @Component({
-  selector: 'app-dish-create',
-  templateUrl: './dish-create.component.html',
-  styleUrls: ['./dish-create.component.scss'],
+    selector: 'app-dish-create',
+    templateUrl: './dish-create.component.html',
+    styleUrls: ['./dish-create.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class DishCreateComponent implements OnInit, OnDestroy {
   readonly form = this.formBuilder.nonNullable.group({

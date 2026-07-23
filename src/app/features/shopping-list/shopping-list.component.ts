@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { ShoppingListItem } from '../../core/models';
@@ -6,9 +6,11 @@ import { ConnectivityService } from '../../core/connectivity.service';
 import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.service';
 
 @Component({
-  selector: 'app-shopping-list',
-  templateUrl: './shopping-list.component.html',
-  styleUrls: ['./shopping-list.component.scss'],
+    selector: 'app-shopping-list',
+    templateUrl: './shopping-list.component.html',
+    styleUrls: ['./shopping-list.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ShoppingListComponent implements OnInit {
   planId = 0;
