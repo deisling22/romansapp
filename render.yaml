@@ -10,6 +10,18 @@ services:
     autoDeployTrigger: commit
     healthCheckPath: /api/plans
     envVars:
+      - key: FRONTEND_URL
+        value: https://deisling22.github.io/romansapp
+      - key: GOOGLE_OAUTH_ENABLED
+        sync: false
+      - key: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID
+        sync: false
+      - key: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: SESSION_COOKIE_SAME_SITE
+        value: none
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
       - key: CORS_ORIGINS
         value: https://deisling22.github.io
       - key: UPLOAD_DIR
