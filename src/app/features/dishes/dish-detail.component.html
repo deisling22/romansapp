@@ -22,6 +22,15 @@
         <span>{{ dish.caloriesPerServing }} kcal / Portion</span>
         <span>{{ dish.proteinPerServing }} g Protein / Portion</span>
       </div>
+      <div class="rating-block">
+        <app-star-rating [average]="dish.averageRating" [count]="dish.ratingCount"></app-star-rating>
+        @if (currentUser) {
+          <div class="my-rating">
+            <span>Deine Bewertung:</span>
+            <app-star-rating [interactive]="true" [value]="dish.myRating" (rated)="rate($event)"></app-star-rating>
+          </div>
+        }
+      </div>
       @if (dish.tags.length) {
         <div class="tags">
           @for (tag of dish.tags; track tag) {

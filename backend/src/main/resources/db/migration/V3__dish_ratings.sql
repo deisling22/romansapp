@@ -1,0 +1,9 @@
+CREATE TABLE dish_rating (
+    id BIGSERIAL PRIMARY KEY,
+    dish_id BIGINT NOT NULL REFERENCES dish(id) ON DELETE CASCADE,
+    user_email VARCHAR(255) NOT NULL,
+    stars INTEGER NOT NULL CHECK (stars BETWEEN 1 AND 5),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_dish_rating_dish_user UNIQUE (dish_id, user_email)
+);

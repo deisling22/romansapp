@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +33,25 @@ public class DishController {
     }
 
     @GetMapping("/{dishId}")
-    public DishDetailDto getDish(@PathVariable Long dishId) {
-        return dishService.getDishDetail(dishId);
+    public DishDetailDto getDish(
+            @PathVariable Long dishId, @AuthenticationPrincipal(errorOnInvalidType = false) OAuth2User user) {
+        return dishService.getDishDetail(dishId, extractEmail(user));
+    }
+
+    @PostMapping("/{dishId}/ratings")
+    public DishRatingResponseDto rateDish(
+            @PathVariable Long dishId,
+            @Valid @RequestBody RateDishRequest request,
+            @AuthenticationPrincipal(errorOnInvalidType = false) OAuth2User user) {
+        return dishService.rateDish(dishId, extractEmail(user), request.stars());
+    }
+
+    private static String extractEmail(OAuth2User user) {
+        if (user == null) {
+            return null;
+        }
+        Object email = user.getAttributes().get("email");
+        return email == null ? user.getName() : email.toString();
     }
 
     @PostMapping(path = "/{dishId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

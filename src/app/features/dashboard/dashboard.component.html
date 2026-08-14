@@ -35,6 +35,10 @@
             <img [src]="imageUrl(dashboard.nextDish.imageUrl)" [alt]="dashboard.nextDish.name" />
             <div class="next-dish-copy">
               <h2>{{ dashboard.nextDish.name }}</h2>
+              <app-star-rating
+                [average]="dashboard.nextDish.averageRating"
+                [count]="dashboard.nextDish.ratingCount"
+                ></app-star-rating>
               <a [routerLink]="['/plans', dashboard.nextDish.planId]">Zum Plan</a>
             </div>
           </div>

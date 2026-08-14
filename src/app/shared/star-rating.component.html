@@ -1,0 +1,26 @@
+<div class="star-rating" [class.interactive]="interactive">
+  <span class="stars" [attr.aria-label]="'Bewertung: ' + (average ?? 0) + ' von 5 Sternen'">
+    @for (star of stars; track star) {
+      <span
+        class="star"
+        [class.filled]="isFilled(star)"
+        [attr.role]="interactive ? 'button' : null"
+        [attr.tabindex]="interactive ? 0 : null"
+        [attr.aria-label]="interactive ? 'Mit ' + star + ' Sternen bewerten' : null"
+        (click)="onClick(star)"
+        (mouseenter)="onEnter(star)"
+        (mouseleave)="onLeave()"
+        (keydown.enter)="onClick(star)"
+        >★</span>
+    }
+  </span>
+  @if (!interactive) {
+    <span class="rating-summary">
+      @if (count > 0) {
+        {{ average | number: '1.1-1' }} ({{ count }})
+      } @else {
+        Noch keine Bewertungen
+      }
+    </span>
+  }
+</div>

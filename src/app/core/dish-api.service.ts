@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DishCatalogEntry, DishDetail, DishIngredientEntry, Ingredient, PrepStep } from './models';
+import { DishCatalogEntry, DishDetail, DishIngredientEntry, DishRatingSummary, Ingredient, PrepStep } from './models';
 import { toAbsoluteImageUrl } from './image-url';
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +24,10 @@ export class DishApiService {
 
   getDish(dishId: number): Observable<DishDetail> {
     return this.http.get<DishDetail>(`${this.apiUrl}/dishes/${dishId}`);
+  }
+
+  rateDish(dishId: number, stars: number): Observable<DishRatingSummary> {
+    return this.http.post<DishRatingSummary>(`${this.apiUrl}/dishes/${dishId}/ratings`, { stars });
   }
 
   addImage(dishId: number, image: File): Observable<{ imageUrl: string }> {

@@ -14,5 +14,8 @@ public record DishDetailDto(
         double proteinPerServing,
         List<String> galleryImageUrls,
         List<PrepStepDto> steps,
-        List<DishIngredientDto> ingredients) {
+        List<DishIngredientDto> ingredients,
+        Double averageRating,
+        int ratingCount,
+        Integer myRating) {
 }

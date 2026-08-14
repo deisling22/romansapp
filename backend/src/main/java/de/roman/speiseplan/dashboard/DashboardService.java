@@ -4,6 +4,7 @@ import de.roman.speiseplan.dish.Dish;
 import de.roman.speiseplan.dish.DishIngredient;
 import de.roman.speiseplan.dish.DishIngredientRepository;
 import de.roman.speiseplan.dish.DishNutritionCalculator;
+import de.roman.speiseplan.dish.DishRatingRepository;
 import de.roman.speiseplan.plan.PlanEntry;
 import de.roman.speiseplan.plan.PlanEntryRepository;
 import de.roman.speiseplan.profile.ProfileDto;
@@ -23,16 +24,20 @@ import org.springframework.web.server.ResponseStatusException;
 public class DashboardService {
     private final PlanEntryRepository planEntryRepository;
     private final DishIngredientRepository dishIngredientRepository;
+    private final DishRatingRepository dishRatingRepository;
     private final ProfileService profileService;
 
     public DashboardService(
             PlanEntryRepository planEntryRepository,
             DishIngredientRepository dishIngredientRepository,
+            DishRatingRepository dishRatingRepository,
             ProfileService profileService) {
         this.planEntryRepository = planEntryRepository;
         this.dishIngredientRepository = dishIngredientRepository;
+        this.dishRatingRepository = dishRatingRepository;
         this.profileService = profileService;
     }
+
 
     @Transactional(readOnly = true)
     public DashboardDto getDashboard() {
@@ -63,12 +68,22 @@ public class DashboardService {
                 : (int) Math.round(proteinToday / proteinGoal * 100);
 
         NextDishDto nextDish = planEntryRepository.findFirstByCookedFalseOrderByPlanIdAscSortOrderAsc()
-                .map(entry -> new NextDishDto(
-                        entry.getId(),
-                        entry.getPlan().getId(),
-                        entry.getDish().getId(),
-                        entry.getDish().getName(),
-                        entry.getDish().getImageUrl()))
+                .map(entry -> {
+                    Dish nextDishEntity = entry.getDish();
+                    DishRatingRepository.DishRatingSummaryProjection summary = dishRatingRepository
+                            .summarizeByDishIds(List.of(nextDishEntity.getId()))
+                            .stream()
+                            .findFirst()
+                            .orElse(null);
+                    return new NextDishDto(
+                            entry.getId(),
+                            entry.getPlan().getId(),
+                            nextDishEntity.getId(),
+                            nextDishEntity.getName(),
+                            nextDishEntity.getImageUrl(),
+                            summary == null ? null : summary.getAverageRating(),
+                            summary == null ? 0 : summary.getRatingCount().intValue());
+                })
                 .orElse(null);
 
         return new DashboardDto(caloriesToday, proteinToday, proteinGoal, proteinPercent, nextDish);

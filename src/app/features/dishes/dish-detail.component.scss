@@ -53,6 +53,21 @@
   font-size: 0.85rem;
 }
 
+.rating-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.my-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #54716d;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;

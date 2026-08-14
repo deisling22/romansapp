@@ -3,6 +3,8 @@ package de.roman.speiseplan.dish;
 import de.roman.speiseplan.storage.LocalImageStorage;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ public class DishService {
     private final DishImageRepository dishImageRepository;
     private final PrepStepRepository prepStepRepository;
     private final IngredientRepository ingredientRepository;
+    private final DishRatingRepository dishRatingRepository;
     private final LocalImageStorage imageStorage;
 
     public DishService(
@@ -24,12 +27,14 @@ public class DishService {
             DishImageRepository dishImageRepository,
             PrepStepRepository prepStepRepository,
             IngredientRepository ingredientRepository,
+            DishRatingRepository dishRatingRepository,
             LocalImageStorage imageStorage) {
         this.dishRepository = dishRepository;
         this.dishIngredientRepository = dishIngredientRepository;
         this.dishImageRepository = dishImageRepository;
         this.prepStepRepository = prepStepRepository;
         this.ingredientRepository = ingredientRepository;
+        this.dishRatingRepository = dishRatingRepository;
         this.imageStorage = imageStorage;
     }
 
@@ -37,23 +42,39 @@ public class DishService {
     public List<DishCatalogEntryDto> searchDishes(String search, String tag) {
         String normalizedSearch = blankToNull(search);
         String normalizedTag = blankToNull(tag);
-        return dishRepository.search(normalizedSearch, normalizedTag).stream()
-                .map(dish -> new DishCatalogEntryDto(
-                        dish.getId(),
-                        dish.getName(),
-                        dish.getImageUrl(),
-                        dish.getDescription(),
-                        dish.getPrepMinutes(),
-                        splitTags(dish.getTags())))
+        List<Dish> dishes = dishRepository.search(normalizedSearch, normalizedTag);
+        Map<Long, DishRatingRepository.DishRatingSummaryProjection> ratings =
+                loadRatingSummaries(dishes.stream().map(Dish::getId).toList());
+        return dishes.stream()
+                .map(dish -> {
+                    DishRatingRepository.DishRatingSummaryProjection summary = ratings.get(dish.getId());
+                    return new DishCatalogEntryDto(
+                            dish.getId(),
+                            dish.getName(),
+                            dish.getImageUrl(),
+                            dish.getDescription(),
+                            dish.getPrepMinutes(),
+                            splitTags(dish.getTags()),
+                            summary == null ? null : summary.getAverageRating(),
+                            summary == null ? 0 : summary.getRatingCount().intValue());
+                })
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public DishDetailDto getDishDetail(Long dishId) {
+    public DishDetailDto getDishDetail(Long dishId, String userEmail) {
         Dish dish = requireDish(dishId);
         List<DishIngredient> dishIngredients = dishIngredientRepository.findByDishId(dishId);
         List<DishImage> images = dishImageRepository.findByDishIdOrderBySortOrderAsc(dishId);
         List<PrepStep> steps = prepStepRepository.findByDishIdOrderByStepOrderAsc(dishId);
+        DishRatingRepository.DishRatingSummaryProjection summary =
+                loadRatingSummaries(List.of(dishId)).get(dishId);
+        Integer myRating = userEmail == null
+                ? null
+                : dishRatingRepository
+                        .findByDishIdAndUserEmail(dishId, userEmail)
+                        .map(DishRating::getStars)
+                        .orElse(null);
 
         return new DishDetailDto(
                 dish.getId(),
@@ -75,7 +96,35 @@ public class DishService {
                                 entry.getIngredient().getName(),
                                 entry.getQuantityGrams(),
                                 entry.getIngredient().getUnit()))
-                        .toList());
+                        .toList(),
+                summary == null ? null : summary.getAverageRating(),
+                summary == null ? 0 : summary.getRatingCount().intValue(),
+                myRating);
+    }
+
+    @Transactional
+    public DishRatingResponseDto rateDish(Long dishId, String userEmail, int stars) {
+        Dish dish = requireDish(dishId);
+        DishRating rating = dishRatingRepository
+                .findByDishIdAndUserEmail(dishId, userEmail)
+                .orElseGet(() -> new DishRating(dish, userEmail, stars));
+        rating.setStars(stars);
+        dishRatingRepository.save(rating);
+
+        DishRatingRepository.DishRatingSummaryProjection summary =
+                loadRatingSummaries(List.of(dishId)).get(dishId);
+        return new DishRatingResponseDto(
+                summary == null ? stars : summary.getAverageRating(),
+                summary == null ? 1 : summary.getRatingCount().intValue(),
+                stars);
+    }
+
+    private Map<Long, DishRatingRepository.DishRatingSummaryProjection> loadRatingSummaries(List<Long> dishIds) {
+        if (dishIds.isEmpty()) {
+            return Map.of();
+        }
+        return dishRatingRepository.summarizeByDishIds(dishIds).stream()
+                .collect(Collectors.toMap(DishRatingRepository.DishRatingSummaryProjection::getDishId, s -> s));
     }
 
     @Transactional

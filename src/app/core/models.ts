@@ -20,6 +20,8 @@ export interface DishCatalogEntry {
   description: string | null;
   prepMinutes: number | null;
   tags: string[];
+  averageRating: number | null;
+  ratingCount: number;
 }
 
 export interface PrepStep {
@@ -49,6 +51,15 @@ export interface DishDetail {
   galleryImageUrls: string[];
   steps: PrepStep[];
   ingredients: DishIngredientEntry[];
+  averageRating: number | null;
+  ratingCount: number;
+  myRating: number | null;
+}
+
+export interface DishRatingSummary {
+  averageRating: number;
+  ratingCount: number;
+  myRating: number;
 }
 
 export interface Ingredient {
@@ -65,6 +76,8 @@ export interface NextDish {
   dishId: number;
   name: string;
   imageUrl: string;
+  averageRating: number | null;
+  ratingCount: number;
 }
 
 export interface DashboardData {

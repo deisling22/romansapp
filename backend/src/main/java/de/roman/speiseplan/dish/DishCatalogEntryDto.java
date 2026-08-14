@@ -8,5 +8,7 @@ public record DishCatalogEntryDto(
         String imageUrl,
         String description,
         Integer prepMinutes,
-        List<String> tags) {
+        List<String> tags,
+        Double averageRating,
+        int ratingCount) {
 }

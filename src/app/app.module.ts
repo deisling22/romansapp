@@ -16,6 +16,7 @@ import { ShoppingListComponent } from './features/shopping-list/shopping-list.co
 import { AccountComponent } from './features/auth/account.component';
 import { LoginComponent } from './features/auth/login.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { StarRatingComponent } from './shared/star-rating.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -29,6 +30,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
         ShoppingListComponent,
         AccountComponent,
         LoginComponent,
+        StarRatingComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,

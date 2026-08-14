@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { DishApiService } from '../../core/dish-api.service';
+import { AuthService, AuthenticatedUser } from '../../core/auth.service';
 import { DishDetail, Ingredient } from '../../core/models';
 
 @Component({
@@ -20,6 +21,7 @@ export class DishDetailComponent implements OnInit {
   dishId = 0;
   dish: DishDetail | null = null;
   ingredients: Ingredient[] = [];
+  currentUser: AuthenticatedUser | null = null;
   loading = true;
   errorMessage = '';
   savingIngredient = false;
@@ -30,6 +32,7 @@ export class DishDetailComponent implements OnInit {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly route: ActivatedRoute,
+    private readonly authService: AuthService,
     readonly dishApi: DishApiService,
   ) {}
 
@@ -37,6 +40,10 @@ export class DishDetailComponent implements OnInit {
     this.dishId = Number(this.route.snapshot.paramMap.get('dishId'));
     this.dishApi.getIngredients().subscribe({
       next: (ingredients) => (this.ingredients = ingredients),
+    });
+    this.authService.getCurrentUser().subscribe({
+      next: (user) => (this.currentUser = user),
+      error: () => (this.currentUser = null),
     });
     this.load();
   }
@@ -71,6 +78,25 @@ export class DishDetailComponent implements OnInit {
       error: () => {
         this.errorMessage = 'Die Zutat konnte nicht hinzugefügt werden.';
         this.savingIngredient = false;
+      },
+    });
+  }
+
+  rate(stars: number): void {
+    if (!this.dish) {
+      return;
+    }
+
+    this.dishApi.rateDish(this.dishId, stars).subscribe({
+      next: (summary) => {
+        if (this.dish) {
+          this.dish.averageRating = summary.averageRating;
+          this.dish.ratingCount = summary.ratingCount;
+          this.dish.myRating = summary.myRating;
+        }
+      },
+      error: () => {
+        this.errorMessage = 'Die Bewertung konnte nicht gespeichert werden.';
       },
     });
   }
