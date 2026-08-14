@@ -12,6 +12,8 @@ export interface AuthenticatedUser {
   pictureUrl: string | null;
 }
 
+const TOKEN_STORAGE_KEY = 'speiseplan_auth_token';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly backendUrl = environment.apiUrl.replace(/\/api$/, '');
@@ -26,5 +28,20 @@ export class AuthService {
 
   signInWithGoogle(): void {
     window.location.assign(`${this.backendUrl}${authConfig.googleAuthorizationPath}`);
+  }
+
+  // The bearer token is used instead of (or alongside) the session cookie because the
+  // frontend (GitHub Pages) and backend (Render) are on different domains, and browsers
+  // such as Safari block cross-site cookies by default even with SameSite=None.
+  getToken(): string | null {
+    return localStorage.getItem(TOKEN_STORAGE_KEY);
+  }
+
+  setToken(token: string): void {
+    localStorage.setItem(TOKEN_STORAGE_KEY, token);
+  }
+
+  clearToken(): void {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
   }
 }

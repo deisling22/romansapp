@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, UrlTree } from '@angular/router';
 import { Observable, catchError, map, of } from 'rxjs';
 import { AuthService } from './auth.service';
 
@@ -10,9 +10,15 @@ export class AuthGuard implements CanActivate {
     private readonly router: Router,
   ) {}
 
-  canActivate(): Observable<boolean | UrlTree> {
+  canActivate(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
+    // After a Google login, the backend redirects here with ?token=... in the URL.
+    // Store it, then re-navigate without the query param once we've confirmed it works.
+    const token = route.queryParamMap.get('token');
+    if (token) {
+      this.authService.setToken(token);
+    }
     return this.authService.getCurrentUser().pipe(
-      map(() => true),
+      map(() => (token ? this.router.createUrlTree(['/account']) : true)),
       catchError(() => of(this.router.createUrlTree(['/login']))),
     );
   }

@@ -3,7 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { provideHttpClient, withInterceptorsFromDi, withXsrfConfiguration, withXhr } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXsrfConfiguration, withXhr } from '@angular/common/http';
+import { AuthInterceptor } from './auth.interceptor';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DishCreateComponent } from './features/dishes/dish-create.component';
 import { DishCatalogComponent } from './features/dishes/dish-catalog.component';
@@ -44,6 +45,8 @@ import { StarRatingComponent } from './shared/star-rating.component';
         })], providers: [provideHttpClient(withXhr(), withInterceptorsFromDi(), withXsrfConfiguration({
             cookieName: 'XSRF-TOKEN',
             headerName: 'X-XSRF-TOKEN',
-        }))] })
+        })),
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    ] })
 export class AppModule { }
 
