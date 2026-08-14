@@ -29,11 +29,11 @@ jobs:
         run: npm run build -- --configuration production --base-href /${{ github.event.repository.name }}/
 
       - name: Add SPA fallback
-        run: cp dist/romansapp/index.html dist/romansapp/404.html
+        run: cp dist/romansapp/browser/index.html dist/romansapp/browser/404.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/romansapp
+          publish_dir: ./dist/romansapp/browser
           destination_dir: docs
