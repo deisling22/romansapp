@@ -1,5 +1,5 @@
 <main class="screen">
-  <section *ngIf="user" class="auth-panel" aria-labelledby="account-title">
+  <section *ngIf="user; else loadingAccount" class="auth-panel" aria-labelledby="account-title">
     <img *ngIf="user.pictureUrl" class="avatar" [src]="user.pictureUrl" alt="" />
     <p class="eyebrow">Angemeldet mit Google</p>
     <h1 id="account-title">Hallo {{ user.firstName }} {{ user.lastName }}</h1>
@@ -18,4 +18,9 @@
       </div>
     </dl>
   </section>
+  <ng-template #loadingAccount>
+    <section class="auth-panel" aria-labelledby="account-title">
+      <p class="eyebrow">Konto wird geladen …</p>
+    </section>
+  </ng-template>
 </main>

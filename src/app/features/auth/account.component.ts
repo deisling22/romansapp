@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AuthService, AuthenticatedUser } from '../../core/auth.service';
 
 @Component({
@@ -10,9 +10,24 @@ import { AuthService, AuthenticatedUser } from '../../core/auth.service';
 export class AccountComponent implements OnInit {
   user: AuthenticatedUser | null = null;
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
-    this.authService.getCurrentUser().subscribe((user) => (this.user = user));
+    // Angular defaults components to OnPush-style change detection now, so a plain
+    // property assignment inside an async subscribe callback needs an explicit
+    // markForCheck() to make the view actually reflect the new value.
+    this.authService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.user = user;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.user = null;
+        this.cdr.markForCheck();
+      },
+    });
   }
 }
