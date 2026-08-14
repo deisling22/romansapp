@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1784808766226,
+  "timestamp": 1786743549484,
   "index": "/romansapp/index.html",
   "assetGroups": [
     {
@@ -13,11 +13,10 @@
       "urls": [
         "/romansapp/favicon.ico",
         "/romansapp/index.html",
-        "/romansapp/main.5b59665fa1542628.js",
+        "/romansapp/main-MHRZQ7WK.js",
         "/romansapp/manifest.webmanifest",
-        "/romansapp/polyfills.40d12b305f454cea.js",
-        "/romansapp/runtime.2dfb6d13a60bb430.js",
-        "/romansapp/styles.1eba337d6f35ca8a.css"
+        "/romansapp/polyfills-RV3JTMEC.js",
+        "/romansapp/styles-UWJAJSLB.css"
       ],
       "patterns": []
     },
@@ -82,12 +81,11 @@
     "/romansapp/assets/icons/icon-72x72.png": "279825a1ac4377032ae996a1832c641e33ccf1b6",
     "/romansapp/assets/icons/icon-96x96.png": "592885efcbfee27e5e20be4fa3043589390d2740",
     "/romansapp/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/romansapp/index.html": "9ff6169392c4764b5fc48abe44102c13f2575dab",
-    "/romansapp/main.5b59665fa1542628.js": "4de4c215ed01523ee58c358e8d3722786772e7e1",
+    "/romansapp/index.html": "c4d5156d77cdc087b3d1f5437000a6924306ce19",
+    "/romansapp/main-MHRZQ7WK.js": "66591b3f67bd7bc4b14e1b4bc0e481430cb6d11f",
     "/romansapp/manifest.webmanifest": "511185f8ee4d6e527fec66e2eeffe6425e8ad565",
-    "/romansapp/polyfills.40d12b305f454cea.js": "0c0d41a5c97732efd1b21cd2b0116e1affc53367",
-    "/romansapp/runtime.2dfb6d13a60bb430.js": "9edff45f824f0c58ed1e74b4560c2e324eff624a",
-    "/romansapp/styles.1eba337d6f35ca8a.css": "716d0a22210f2698c21d7ea9a0bb270678064f35"
+    "/romansapp/polyfills-RV3JTMEC.js": "e83dcd401293cfb45ad0988a17d1815b3bb09c33",
+    "/romansapp/styles-UWJAJSLB.css": "cc0ed2aadc165bf18bf6ac5928bea70bfab7e0d3"
   },
   "navigationUrls": [
     {
