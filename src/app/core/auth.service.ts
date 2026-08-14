@@ -6,6 +6,8 @@ import { environment } from '../../environments/environment';
 
 export interface AuthenticatedUser {
   name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   pictureUrl: string | null;
 }

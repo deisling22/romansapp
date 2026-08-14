@@ -1,5 +1,5 @@
 <main class="screen">
-  <section class="auth-panel" aria-labelledby="login-title">
+  <section *ngIf="!isAuthenticated" class="auth-panel" aria-labelledby="login-title">
     <p class="eyebrow">Geschützter Bereich</p>
     <h1 id="login-title">Konto anmelden</h1>
     <p>Für diesen Bereich ist eine Anmeldung mit deinem Google-Konto erforderlich.</p>

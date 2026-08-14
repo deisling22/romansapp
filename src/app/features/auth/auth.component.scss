@@ -58,3 +58,26 @@ button {
   border-radius: 50%;
   object-fit: cover;
 }
+
+.user-details {
+  margin: 16px 0 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid #d7e5dd;
+  }
+
+  dt {
+    color: #26736f;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 0;
+    color: #16342f;
+    text-align: right;
+  }
+}

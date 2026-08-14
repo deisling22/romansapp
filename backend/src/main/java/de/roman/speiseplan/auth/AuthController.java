@@ -15,10 +15,12 @@ public class AuthController {
         Map<String, Object> attributes = user.getAttributes();
         return new AuthenticatedUser(
                 (String) attributes.getOrDefault("name", user.getName()),
+                (String) attributes.getOrDefault("given_name", ""),
+                (String) attributes.getOrDefault("family_name", ""),
                 (String) attributes.getOrDefault("email", ""),
                 (String) attributes.get("picture"));
     }
 
-    public record AuthenticatedUser(String name, String email, String pictureUrl) {
+    public record AuthenticatedUser(String name, String firstName, String lastName, String email, String pictureUrl) {
     }
 }

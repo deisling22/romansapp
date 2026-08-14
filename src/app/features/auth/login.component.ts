@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 
 @Component({
@@ -7,8 +8,23 @@ import { AuthService } from '../../core/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./auth.component.scss'],
 })
-export class LoginComponent {
-  constructor(private readonly authService: AuthService) {}
+export class LoginComponent implements OnInit {
+  isAuthenticated = false;
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.getCurrentUser().subscribe({
+      next: () => {
+        this.isAuthenticated = true;
+        this.router.navigate(['/account']);
+      },
+      error: () => (this.isAuthenticated = false),
+    });
+  }
 
   signInWithGoogle(): void {
     this.authService.signInWithGoogle();
