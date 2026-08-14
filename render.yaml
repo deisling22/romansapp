@@ -8,6 +8,9 @@ services:
     dockerfilePath: ./backend/Dockerfile
     plan: free
     autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - backend/**
     healthCheckPath: /api/plans
     envVars:
       - key: FRONTEND_URL
