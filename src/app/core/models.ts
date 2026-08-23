@@ -86,6 +86,8 @@ export interface DashboardData {
   proteinGoal: number | null;
   proteinPercent: number | null;
   nextDish: NextDish | null;
+  cartItemCount: number;
+  pantryItemCount: number;
 }
 
 export interface Profile {
@@ -100,4 +102,12 @@ export interface ShoppingListItem {
   quantity: number;
   unit: string;
   checked: boolean;
+}
+
+export interface PantryItem {
+  id: number;
+  ingredientName: string;
+  quantity: number;
+  unit: string;
+  purchasedAt: string;
 }

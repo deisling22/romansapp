@@ -40,6 +40,20 @@ public class ShoppingListService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<ShoppingListItemDto> getAllItems() {
+        return shoppingListItemRepository.findAllByOrderByCheckedAscIngredientNameAsc().stream()
+                .map(ShoppingListItemDto::from)
+                .toList();
+    }
+
+    @Transactional
+    public ShoppingListItemDto addItem(CreateShoppingListItemRequest request) {
+        ShoppingListItem item = new ShoppingListItem(
+                request.ingredientName().trim(), request.quantity(), request.unit().trim());
+        return ShoppingListItemDto.from(shoppingListItemRepository.save(item));
+    }
+
     @Transactional
     public List<ShoppingListItemDto> generate(Long planId) {
         MealPlan plan = requirePlan(planId);
@@ -70,6 +84,19 @@ public class ShoppingListService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Eintrag wurde nicht gefunden."));
         item.setChecked(checked);
         return ShoppingListItemDto.from(item);
+    }
+
+    @Transactional
+    public void deleteItem(Long itemId) {
+        if (!shoppingListItemRepository.existsById(itemId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Eintrag wurde nicht gefunden.");
+        }
+        shoppingListItemRepository.deleteById(itemId);
+    }
+
+    @Transactional(readOnly = true)
+    public long countItems() {
+        return shoppingListItemRepository.count();
     }
 
     private MealPlan requirePlan(Long planId) {

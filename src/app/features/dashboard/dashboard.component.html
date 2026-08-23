@@ -50,6 +50,29 @@
       @if (!dashboard.nextDish) {
         <p class="status">Kein offenes Gericht in deinen Plänen.</p>
       }
+      <section class="action-widgets" aria-label="Einkauf und Vorrat">
+        <a class="action-widget cart-widget" routerLink="/shopping-list">
+          <span class="widget-index">02</span>
+          <span class="widget-copy">
+            <strong>Warenkorb</strong>
+            <span>
+              {{ dashboard.cartItemCount }}
+              {{ dashboard.cartItemCount === 1 ? 'Produkt' : 'Produkte' }}
+            </span>
+          </span>
+          <span class="widget-arrow" aria-hidden="true">›</span>
+        </a>
+        <a class="action-widget pantry-widget" routerLink="/pantry">
+          <span class="widget-index">03</span>
+          <span class="widget-copy">
+            <strong>Vorratsschrank</strong>
+            <span>
+              {{ dashboard.pantryItemCount }} Artikel
+            </span>
+          </span>
+          <span class="widget-arrow" aria-hidden="true">›</span>
+        </a>
+      </section>
     </section>
   }
 </main>

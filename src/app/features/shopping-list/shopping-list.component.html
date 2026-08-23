@@ -1,13 +1,42 @@
 <main class="screen">
-  <a class="back-link" [routerLink]="['/plans', planId]">‹ Zurück zum Plan</a>
+  <a class="back-link" [routerLink]="hasPlanContext ? ['/plans', planId] : ['/']">
+    ‹ {{ hasPlanContext ? 'Zurück zum Plan' : 'Zur Übersicht' }}
+  </a>
   <header class="page-header">
-    <p class="eyebrow">Einkaufsliste</p>
-    <h1>Einkaufsliste</h1>
+    <p class="eyebrow">Einkaufen</p>
+    <h1>Warenkorb</h1>
   </header>
 
-  <button type="button" class="generate" [disabled]="generating" (click)="generate()">
-    {{ generating ? 'Wird erstellt ...' : 'Aus Plan neu erstellen' }}
-  </button>
+  @if (hasPlanContext) {
+    <button type="button" class="generate" [disabled]="generating" (click)="generate()">
+      {{ generating ? 'Wird erstellt ...' : 'Aus Plan neu erstellen' }}
+    </button>
+  } @else {
+    <form class="add-form" (ngSubmit)="addItem()">
+      <label>
+        <span>Zutat</span>
+        <input name="ingredientName" [(ngModel)]="newIngredientName" required placeholder="z. B. Haferflocken" />
+      </label>
+      <label class="quantity-field">
+        <span>Anzahl</span>
+        <input name="quantity" type="number" min="0.01" step="0.01" [(ngModel)]="newQuantity" required />
+      </label>
+      <label class="unit-field">
+        <span>Einheit</span>
+        <select name="unit" [(ngModel)]="newUnit">
+          <option>Stk.</option>
+          <option>g</option>
+          <option>kg</option>
+          <option>ml</option>
+          <option>l</option>
+          <option>Packung</option>
+        </select>
+      </label>
+      <button type="submit" [disabled]="adding">
+        {{ adding ? 'Wird ergänzt ...' : 'Hinzufügen' }}
+      </button>
+    </form>
+  }
 
   @if ((connectivity.online$ | async) === false) {
     <p class="status offline">
@@ -23,18 +52,52 @@
   }
 
   @if (!loading) {
-    <ul class="item-list">
-      @for (item of items; track item) {
-        <li [class.checked]="item.checked">
-          <label>
-            <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
-            <span>{{ item.ingredientName }} – {{ item.quantity }} {{ item.unit }}</span>
-          </label>
-        </li>
-      }
-      @if (items.length === 0) {
-        <li class="status">Noch keine Einkaufsliste erstellt.</li>
-      }
-    </ul>
+    <section class="list-section" aria-labelledby="open-items-heading">
+      <div class="section-heading">
+        <h2 id="open-items-heading">Noch einzukaufen</h2>
+        <span>{{ openItems.length }}</span>
+      </div>
+      <ul class="item-list">
+        @for (item of openItems; track item.id) {
+          <li>
+            <label>
+              <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
+              <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
+              <strong>{{ item.ingredientName }}</strong>
+            </label>
+            <button type="button" class="remove-button" [disabled]="deletingItemId === item.id" (click)="remove(item)">
+              Entfernen
+            </button>
+          </li>
+        }
+        @if (openItems.length === 0) {
+          <li class="status empty">Alles eingekauft.</li>
+        }
+      </ul>
+    </section>
+
+    @if (checkedItems.length > 0) {
+      <section class="list-section completed" aria-labelledby="checked-items-heading">
+        <div class="section-heading">
+          <h2 id="checked-items-heading">Bereits im Wagen</h2>
+          <span>{{ checkedItems.length }}</span>
+        </div>
+        <ul class="item-list">
+          @for (item of checkedItems; track item.id) {
+            <li class="checked">
+              <label>
+                <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
+                <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
+                <strong>{{ item.ingredientName }}</strong>
+              </label>
+              <button type="button" class="remove-button" [disabled]="deletingItemId === item.id" (click)="remove(item)">
+                Entfernen
+              </button>
+            </li>
+          }
+        </ul>
+        <p class="checkout-note">Beim Verlassen des Warenkorbs wandern diese Artikel in den Vorratsschrank.</p>
+      </section>
+    }
   }
 </main>

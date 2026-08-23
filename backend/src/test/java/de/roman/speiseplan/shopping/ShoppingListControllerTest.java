@@ -1,6 +1,7 @@
 package de.roman.speiseplan.shopping;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,6 +59,48 @@ class ShoppingListControllerTest {
         mockMvc.perform(get("/api/plans/{planId}/shopping-list", planId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].checked").value(true));
+    }
+
+    @Test
+    void checkedCartItemsMoveToPantryAndCanBeRemoved() throws Exception {
+        long planId = createPlan("Vorrats-Test-Plan");
+        long dishId = createDish(planId, "Vorrats-Test-Gericht");
+        long ingredientId = createIngredient("Vorrats-Test-Zutat", 100, 10, "g");
+        mockMvc.perform(post("/api/dishes/{dishId}/ingredients", dishId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new AddDishIngredientRequest(ingredientId, 250))))
+                .andExpect(status().isCreated());
+
+        String generateResponse = mockMvc.perform(post("/api/plans/{planId}/shopping-list/generate", planId))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long itemId = objectMapper.readTree(generateResponse).get(0).get("id").asLong();
+        mockMvc.perform(patch("/api/shopping-list/{itemId}", itemId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"checked\": true}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/shopping-list"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + itemId + ")].checked").value(true));
+
+        String pantryResponse = mockMvc.perform(post("/api/shopping-list/checkout"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].ingredientName").value("Vorrats-Test-Zutat"))
+                .andExpect(jsonPath("$[0].quantity").value(250.0))
+                .andExpect(jsonPath("$[0].purchasedAt").isNotEmpty())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long pantryItemId = objectMapper.readTree(pantryResponse).get(0).get("id").asLong();
+
+        mockMvc.perform(get("/api/shopping-list"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + itemId + ")]").isEmpty());
+        mockMvc.perform(delete("/api/pantry/{itemId}", pantryItemId))
+                .andExpect(status().isNoContent());
     }
 
     private long createPlan(String name) throws Exception {

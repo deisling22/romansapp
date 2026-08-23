@@ -7,7 +7,8 @@ import { PlanDetailComponent } from './features/plans/plan-detail.component';
 import { PlanListComponent } from './features/plans/plan-list.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { SettingsComponent } from './features/settings/settings.component';
-import { ShoppingListComponent } from './features/shopping-list/shopping-list.component';
+import { pendingCartCheckoutGuard, ShoppingListComponent } from './features/shopping-list/shopping-list.component';
+import { PantryComponent } from './features/pantry/pantry.component';
 import { AccountComponent } from './features/auth/account.component';
 import { LoginComponent } from './features/auth/login.component';
 import { AuthGuard } from './core/auth.guard';
@@ -22,7 +23,13 @@ const routes: Routes = [
   { path: 'plans', component: PlanListComponent },
   { path: 'plans/:planId', component: PlanDetailComponent },
   { path: 'plans/:planId/dishes/new', component: DishCreateComponent },
-  { path: 'plans/:planId/shopping-list', component: ShoppingListComponent },
+  { path: 'shopping-list', component: ShoppingListComponent, canDeactivate: [pendingCartCheckoutGuard] },
+  { path: 'pantry', component: PantryComponent },
+  {
+    path: 'plans/:planId/shopping-list',
+    component: ShoppingListComponent,
+    canDeactivate: [pendingCartCheckoutGuard],
+  },
   { path: '**', redirectTo: '' },
 ];
 

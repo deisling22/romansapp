@@ -7,8 +7,10 @@ import de.roman.speiseplan.dish.DishNutritionCalculator;
 import de.roman.speiseplan.dish.DishRatingRepository;
 import de.roman.speiseplan.plan.PlanEntry;
 import de.roman.speiseplan.plan.PlanEntryRepository;
+import de.roman.speiseplan.pantry.PantryService;
 import de.roman.speiseplan.profile.ProfileDto;
 import de.roman.speiseplan.profile.ProfileService;
+import de.roman.speiseplan.shopping.ShoppingListService;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -26,16 +28,22 @@ public class DashboardService {
     private final DishIngredientRepository dishIngredientRepository;
     private final DishRatingRepository dishRatingRepository;
     private final ProfileService profileService;
+    private final ShoppingListService shoppingListService;
+    private final PantryService pantryService;
 
     public DashboardService(
             PlanEntryRepository planEntryRepository,
             DishIngredientRepository dishIngredientRepository,
             DishRatingRepository dishRatingRepository,
-            ProfileService profileService) {
+            ProfileService profileService,
+            ShoppingListService shoppingListService,
+            PantryService pantryService) {
         this.planEntryRepository = planEntryRepository;
         this.dishIngredientRepository = dishIngredientRepository;
         this.dishRatingRepository = dishRatingRepository;
         this.profileService = profileService;
+        this.shoppingListService = shoppingListService;
+        this.pantryService = pantryService;
     }
 
 
@@ -86,13 +94,24 @@ public class DashboardService {
                 })
                 .orElse(null);
 
-        return new DashboardDto(caloriesToday, proteinToday, proteinGoal, proteinPercent, nextDish);
+        return new DashboardDto(
+            caloriesToday,
+            proteinToday,
+            proteinGoal,
+            proteinPercent,
+            nextDish,
+            shoppingListService.countItems(),
+            pantryService.countItems());
     }
 
     @Transactional
     public void markCooked(Long planEntryId) {
         PlanEntry entry = planEntryRepository.findById(planEntryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan-Eintrag wurde nicht gefunden."));
+        if (entry.isCooked()) {
+            return;
+        }
+        pantryService.consume(dishIngredientRepository.findByDishId(entry.getDish().getId()));
         entry.markCooked(Instant.now());
     }
 

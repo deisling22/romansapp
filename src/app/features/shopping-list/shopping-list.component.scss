@@ -54,6 +54,46 @@ h1 {
   opacity: 0.65;
 }
 
+.add-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 90px 110px;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.add-form label {
+  display: grid;
+  gap: 5px;
+  color: #5d746e;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.add-form input,
+.add-form select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #bfd0c7;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #16342f;
+  font: inherit;
+  padding: 0 10px;
+}
+
+.add-form button {
+  grid-column: 1 / -1;
+  min-height: 46px;
+  border: 0;
+  border-radius: 8px;
+  background: #26736f;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
 .status {
   border-left: 3px solid #94b8a5;
   color: #4e6661;
@@ -78,7 +118,40 @@ h1 {
   list-style: none;
 }
 
+.list-section + .list-section {
+  margin-top: 28px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: #16342f;
+  font-size: 1rem;
+}
+
+.section-heading span {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #dceae2;
+  color: #26736f;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 .item-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   border: 1px solid #d7e5dd;
   border-radius: 8px;
   background: #ffffff;
@@ -94,8 +167,63 @@ h1 {
 }
 
 .item-list label {
-  display: flex;
+  display: grid;
+  grid-template-columns: 22px minmax(74px, auto) minmax(0, 1fr);
   align-items: center;
   gap: 10px;
   color: #16342f;
+  min-width: 0;
+}
+
+.item-list strong {
+  overflow-wrap: anywhere;
+}
+
+.quantity {
+  color: #26736f;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.remove-button {
+  min-height: 38px;
+  border: 1px solid #d8b3a8;
+  border-radius: 8px;
+  background: #fff7f4;
+  color: #9b3d2e;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0 10px;
+}
+
+.checkout-note {
+  margin: 10px 0 0;
+  color: #6b827d;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.empty {
+  display: block !important;
+}
+
+@media (max-width: 520px) {
+  .add-form {
+    grid-template-columns: minmax(0, 1fr) minmax(100px, 0.7fr);
+  }
+
+  .add-form > label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .item-list li {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .remove-button {
+    align-self: flex-end;
+  }
 }

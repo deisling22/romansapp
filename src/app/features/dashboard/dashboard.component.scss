@@ -102,6 +102,12 @@ h1 {
   background: #e9eee9;
 }
 
+.next-dish-copy {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
 .next-dish-copy h2 {
   margin: 0 0 4px;
   color: #16342f;
@@ -128,4 +134,66 @@ button {
 button:disabled {
   cursor: wait;
   opacity: 0.65;
+}
+
+.action-widgets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.action-widget {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 92px;
+  border: 1px solid #d7e5dd;
+  border-radius: 8px;
+  color: #16342f;
+  padding: 16px;
+  text-decoration: none;
+}
+
+.cart-widget {
+  background: #fff4e8;
+  border-color: #e9c7a5;
+}
+
+.pantry-widget {
+  background: #e8f1eb;
+  border-color: #bcd2c3;
+}
+
+.widget-index {
+  align-self: start;
+  color: #7b8f88;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.82rem;
+}
+
+.widget-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.widget-copy strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
+}
+
+.widget-copy span {
+  color: #5d746e;
+  font-size: 0.84rem;
+}
+
+.widget-arrow {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+@media (max-width: 520px) {
+  .action-widgets {
+    grid-template-columns: 1fr;
+  }
 }

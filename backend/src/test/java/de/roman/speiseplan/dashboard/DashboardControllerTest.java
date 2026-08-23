@@ -73,6 +73,48 @@ class DashboardControllerTest {
         org.assertj.core.api.Assertions.assertThat(caloriesAfter - caloriesBefore).isEqualTo(300.0);
     }
 
+    @Test
+    void markingADishCookedConsumesMatchingPantryStock() throws Exception {
+        String ingredientName = "Vorratsverbrauch-Zutat";
+        String cartResponse = mockMvc.perform(post("/api/shopping-list")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ingredientName\":\"" + ingredientName
+                                + "\",\"quantity\":250,\"unit\":\"g\"}"))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long cartItemId = objectMapper.readTree(cartResponse).get("id").asLong();
+        mockMvc.perform(patch("/api/shopping-list/{itemId}", cartItemId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"checked\":true}"))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/shopping-list/checkout"))
+                .andExpect(status().isOk());
+
+        long planId = createPlan("Vorratsverbrauch-Plan");
+        long dishId = createDish(planId, "Vorratsverbrauch-Gericht");
+        long ingredientId = createIngredient(ingredientName, 100, 10, "g");
+        mockMvc.perform(post("/api/dishes/{dishId}/ingredients", dishId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new AddDishIngredientRequest(ingredientId, 100))))
+                .andExpect(status().isCreated());
+        String dishesResponse = mockMvc.perform(get("/api/plans/{planId}/dishes", planId))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long planEntryId = objectMapper.readTree(dishesResponse).get(0).get("planEntryId").asLong();
+
+        mockMvc.perform(patch("/api/plan-entries/{id}/cook", planEntryId))
+                .andExpect(status().isOk());
+        mockMvc.perform(patch("/api/plan-entries/{id}/cook", planEntryId))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/pantry"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.ingredientName == '" + ingredientName + "')].quantity").value(150.0));
+    }
+
     private long createPlan(String name) throws Exception {
         String response = mockMvc.perform(post("/api/plans")
                         .contentType(MediaType.APPLICATION_JSON)

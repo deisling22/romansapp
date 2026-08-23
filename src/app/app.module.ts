@@ -14,6 +14,7 @@ import { PlanListComponent } from './features/plans/plan-list.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { ShoppingListComponent } from './features/shopping-list/shopping-list.component';
+import { PantryComponent } from './features/pantry/pantry.component';
 import { AccountComponent } from './features/auth/account.component';
 import { LoginComponent } from './features/auth/login.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -29,6 +30,7 @@ import { StarRatingComponent } from './shared/star-rating.component';
         DashboardComponent,
         SettingsComponent,
         ShoppingListComponent,
+        PantryComponent,
         AccountComponent,
         LoginComponent,
         StarRatingComponent,

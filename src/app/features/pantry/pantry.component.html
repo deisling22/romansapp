@@ -1,0 +1,40 @@
+<main class="screen">
+  <a class="back-link" routerLink="/">‹ Zur Übersicht</a>
+  <header class="page-header">
+    <p class="eyebrow">Lebensmittel</p>
+    <h1>Vorratsschrank</h1>
+    <p class="intro">Beim Kochen werden passende Zutaten automatisch vom ältesten Bestand abgezogen.</p>
+  </header>
+
+  @if (loading) {
+    <p class="status">Vorrat wird geladen ...</p>
+  }
+  @if (errorMessage) {
+    <p class="status error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (!loading) {
+    <ul class="item-list" aria-label="Vorräte nach Kaufdatum">
+      @for (item of items; track item.id) {
+        <li>
+          <div class="item-main">
+            <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
+            <strong>{{ item.ingredientName }}</strong>
+            <time [attr.datetime]="item.purchasedAt">Gekauft am {{ item.purchasedAt | date:'dd.MM.yyyy' }}</time>
+          </div>
+          <button
+            type="button"
+            class="remove-button"
+            [disabled]="deletingItemId === item.id"
+            [attr.aria-label]="item.ingredientName + ' aus dem Vorrat entfernen'"
+            (click)="remove(item)">
+            Entfernen
+          </button>
+        </li>
+      }
+      @if (items.length === 0) {
+        <li class="status empty">Noch keine Lebensmittel im Vorrat.</li>
+      }
+    </ul>
+  }
+</main>

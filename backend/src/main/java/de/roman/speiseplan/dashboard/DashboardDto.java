@@ -5,5 +5,7 @@ public record DashboardDto(
         double proteinToday,
         Double proteinGoal,
         Integer proteinPercent,
-        NextDishDto nextDish) {
+        NextDishDto nextDish,
+        long cartItemCount,
+        long pantryItemCount) {
 }

@@ -1,25 +1,19 @@
-package de.roman.speiseplan.shopping;
+package de.roman.speiseplan.pantry;
 
-import de.roman.speiseplan.plan.MealPlan;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.Instant;
 
 @Entity
-@Table(name = "shopping_list_item")
-public class ShoppingListItem {
+@Table(name = "pantry_item")
+public class PantryItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "plan_id")
-    private MealPlan plan;
 
     @Column(name = "ingredient_name", nullable = false, length = 120)
     private String ingredientName;
@@ -30,29 +24,21 @@ public class ShoppingListItem {
     @Column(nullable = false, length = 20)
     private String unit;
 
-    @Column(nullable = false)
-    private boolean checked = false;
+    @Column(name = "purchased_at", nullable = false)
+    private Instant purchasedAt;
 
-    protected ShoppingListItem() {
+    protected PantryItem() {
     }
 
-    public ShoppingListItem(MealPlan plan, String ingredientName, double quantity, String unit) {
-        this.plan = plan;
+    public PantryItem(String ingredientName, double quantity, String unit, Instant purchasedAt) {
         this.ingredientName = ingredientName;
         this.quantity = quantity;
         this.unit = unit;
-    }
-
-    public ShoppingListItem(String ingredientName, double quantity, String unit) {
-        this(null, ingredientName, quantity, unit);
+        this.purchasedAt = purchasedAt;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public MealPlan getPlan() {
-        return plan;
     }
 
     public String getIngredientName() {
@@ -67,11 +53,11 @@ public class ShoppingListItem {
         return unit;
     }
 
-    public boolean isChecked() {
-        return checked;
+    public Instant getPurchasedAt() {
+        return purchasedAt;
     }
 
-    public void setChecked(boolean checked) {
-        this.checked = checked;
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
     }
 }
