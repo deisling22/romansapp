@@ -12,6 +12,9 @@ import { PantryComponent } from './features/pantry/pantry.component';
 import { AccountComponent } from './features/auth/account.component';
 import { LoginComponent } from './features/auth/login.component';
 import { AuthGuard } from './core/auth.guard';
+import { CreatorFeedComponent } from './features/creators/creator-feed.component';
+import { CreatorPlanComponent } from './features/creators/creator-plan.component';
+import { CreatorProfileComponent } from './features/creators/creator-profile.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: DashboardComponent },
@@ -25,6 +28,9 @@ const routes: Routes = [
   { path: 'plans/:planId/dishes/new', component: DishCreateComponent },
   { path: 'shopping-list', component: ShoppingListComponent, canDeactivate: [pendingCartCheckoutGuard] },
   { path: 'pantry', component: PantryComponent },
+  { path: 'creators', component: CreatorFeedComponent },
+  { path: 'creators/:creatorId', component: CreatorProfileComponent },
+  { path: 'creators/:creatorId/plans/:planId', component: CreatorPlanComponent },
   {
     path: 'plans/:planId/shopping-list',
     component: ShoppingListComponent,

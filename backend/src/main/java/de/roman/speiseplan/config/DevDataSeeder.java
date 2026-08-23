@@ -1,5 +1,7 @@
 package de.roman.speiseplan.config;
 
+import de.roman.speiseplan.creator.Creator;
+import de.roman.speiseplan.creator.CreatorRepository;
 import de.roman.speiseplan.dish.Dish;
 import de.roman.speiseplan.dish.DishIngredient;
 import de.roman.speiseplan.dish.DishIngredientRepository;
@@ -16,6 +18,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -23,6 +26,7 @@ import java.util.List;
 public class DevDataSeeder {
     @Bean
     CommandLineRunner seedDemoData(
+            CreatorRepository creatorRepository,
             MealPlanRepository mealPlanRepository,
             DishRepository dishRepository,
             PlanEntryRepository planEntryRepository,
@@ -125,14 +129,40 @@ public class DevDataSeeder {
                         ingredient("Kartoffeln", 700, 77, 2), ingredient("Möhren", 300, 41, 0.9),
                         ingredient("Gemüsebrühe", 800, 5, 0.2, "ml"), ingredient("Wiener Würstchen", 4, 301, 12, "Stk.")));
 
-                seedRecipes(weekPlan, 1, weekRecipes, dishRepository, planEntryRepository,
+                List<Dish> weekDishes = seedRecipes(weekPlan, 1, weekRecipes, dishRepository, planEntryRepository,
                     ingredientRepository, dishIngredientRepository, prepStepRepository);
-                seedRecipes(quickPlan, 1, quickRecipes, dishRepository, planEntryRepository,
+                List<Dish> quickDishes = seedRecipes(quickPlan, 1, quickRecipes, dishRepository, planEntryRepository,
                     ingredientRepository, dishIngredientRepository, prepStepRepository);
+
+                Creator mia = creatorRepository.save(new Creator(
+                    "Mia Sommer", "miasfamilienkueche",
+                    "Schnelle Wohlfühlküche für volle Familientage.",
+                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=85",
+                    "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1000&q=85"));
+                Creator jonas = creatorRepository.save(new Creator(
+                    "Jonas Feld", "jonaskochtfix",
+                    "Einfaches Feierabendessen, das Kindern und Eltern schmeckt.",
+                    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=85",
+                    "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1000&q=85"));
+                Creator aylin = creatorRepository.save(new Creator(
+                    "Aylin Kaya", "familientisch",
+                    "Bunte Familiengerichte mit wenigen Zutaten und viel Geschmack.",
+                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=85",
+                    "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=85"));
+
+                seedCreatorPlan("Mias Feierabend-Favoriten", mia,
+                    List.of(weekDishes.get(0), weekDishes.get(2), weekDishes.get(5), weekDishes.get(9)),
+                    mealPlanRepository, planEntryRepository);
+                seedCreatorPlan("Jonas' 20-Minuten-Hits", jonas,
+                    List.of(quickDishes.get(1), quickDishes.get(2), quickDishes.get(6), quickDishes.get(8)),
+                    mealPlanRepository, planEntryRepository);
+                seedCreatorPlan("Aylins bunter Familientisch", aylin,
+                    List.of(weekDishes.get(3), quickDishes.get(3), quickDishes.get(4), quickDishes.get(9)),
+                    mealPlanRepository, planEntryRepository);
         };
     }
 
-            private void seedRecipes(
+            private List<Dish> seedRecipes(
                 MealPlan plan,
                 int firstSortOrder,
                 List<RecipeSeed> recipes,
@@ -141,6 +171,7 @@ public class DevDataSeeder {
                 IngredientRepository ingredientRepository,
                 DishIngredientRepository dishIngredientRepository,
                 PrepStepRepository prepStepRepository) {
+            List<Dish> dishes = new ArrayList<>();
             for (int index = 0; index < recipes.size(); index++) {
                 RecipeSeed seed = recipes.get(index);
                 Dish dish = new Dish(seed.name(), imageUrl(seed.name()));
@@ -165,6 +196,20 @@ public class DevDataSeeder {
                     prepStepRepository.save(new PrepStep(dish, step, instructions.get(step), timerSeconds));
                     }
                 planEntryRepository.save(new PlanEntry(plan, dish, firstSortOrder + index));
+                dishes.add(dish);
+            }
+            return dishes;
+            }
+
+            private void seedCreatorPlan(
+                String name,
+                Creator creator,
+                List<Dish> dishes,
+                MealPlanRepository mealPlanRepository,
+                PlanEntryRepository planEntryRepository) {
+            MealPlan plan = mealPlanRepository.save(new MealPlan(name, creator));
+            for (int index = 0; index < dishes.size(); index++) {
+                planEntryRepository.save(new PlanEntry(plan, dishes.get(index), index));
             }
             }
 

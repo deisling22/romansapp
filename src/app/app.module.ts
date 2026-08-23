@@ -19,6 +19,9 @@ import { AccountComponent } from './features/auth/account.component';
 import { LoginComponent } from './features/auth/login.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { StarRatingComponent } from './shared/star-rating.component';
+import { CreatorFeedComponent } from './features/creators/creator-feed.component';
+import { CreatorPlanComponent } from './features/creators/creator-plan.component';
+import { CreatorProfileComponent } from './features/creators/creator-profile.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -34,6 +37,9 @@ import { StarRatingComponent } from './shared/star-rating.component';
         AccountComponent,
         LoginComponent,
         StarRatingComponent,
+        CreatorFeedComponent,
+        CreatorProfileComponent,
+        CreatorPlanComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,

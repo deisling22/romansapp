@@ -1,0 +1,50 @@
+<main class="creator-feed-screen">
+  <header class="feed-header">
+    <a routerLink="/" aria-label="Zur Übersicht">‹</a>
+    <h1>Creator</h1>
+  </header>
+
+  @if (loading) {
+    <p class="creator-status">Creator werden geladen ...</p>
+  }
+  @if (errorMessage) {
+    <p class="creator-status error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (!loading && !errorMessage) {
+    <section
+      #feed
+      class="reel-feed"
+      aria-label="Creator"
+      (scroll)="updateActiveCreator(feed)">
+      @for (creator of creators; track creator.id; let index = $index) {
+        <a
+          class="creator-reel"
+          [routerLink]="['/creators', creator.id]"
+          [attr.aria-label]="'Profil von ' + creator.name + ' öffnen'">
+          <img class="reel-image" [src]="creator.reelImageUrl" [alt]="creator.name + ' beim Kochen'" />
+          <span class="reel-shade" aria-hidden="true"></span>
+          <span class="reel-content">
+            <img class="reel-avatar" [src]="creator.avatarUrl" alt="" />
+            <span class="reel-copy">
+              <strong>{{ creator.name }}</strong>
+              <span>&#64;{{ creator.handle }}</span>
+              <small>{{ creator.bio }}</small>
+              <b>{{ creator.planCount }} Plan</b>
+            </span>
+          </span>
+        </a>
+      }
+    </section>
+
+    <nav class="reel-progress" aria-label="Creator auswählen">
+      @for (creator of creators; track creator.id; let index = $index) {
+        <button
+          type="button"
+          [class.active]="index === activeIndex"
+          [attr.aria-label]="creator.name"
+          (click)="scrollToCreator(feed, index)"></button>
+      }
+    </nav>
+  }
+</main>

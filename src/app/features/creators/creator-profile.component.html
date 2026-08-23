@@ -1,0 +1,38 @@
+<main class="creator-screen">
+  <a class="creator-back" routerLink="/creators">‹ Creator</a>
+
+  @if (loading) {
+    <p class="creator-status">Profil wird geladen ...</p>
+  }
+  @if (errorMessage) {
+    <p class="creator-status error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (creator) {
+    <header class="profile-header">
+      <img [src]="creator.avatarUrl" [alt]="creator.name" />
+      <div>
+        <p class="creator-eyebrow">&#64;{{ creator.handle }}</p>
+        <h1>{{ creator.name }}</h1>
+        <p>{{ creator.bio }}</p>
+      </div>
+    </header>
+
+    <section class="creator-plans" aria-labelledby="creator-plans-heading">
+      <div class="section-heading">
+        <h2 id="creator-plans-heading">Erstellte Pläne</h2>
+        <span>{{ creator.plans.length }}</span>
+      </div>
+      @for (plan of creator.plans; track plan.id) {
+        <a class="creator-plan-card" [routerLink]="['/creators', creator.id, 'plans', plan.id]">
+          <img [src]="mealPlanApi.imageUrl(plan.coverImageUrl)" [alt]="plan.name" />
+          <span>
+            <strong>{{ plan.name }}</strong>
+            <small>{{ plan.dishCount }} Gerichte</small>
+          </span>
+          <b aria-hidden="true">›</b>
+        </a>
+      }
+    </section>
+  }
+</main>

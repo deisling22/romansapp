@@ -4,6 +4,32 @@ export interface MealPlan {
   dishCount: number;
 }
 
+export interface CreatorSummary {
+  id: number;
+  name: string;
+  handle: string;
+  bio: string;
+  avatarUrl: string;
+  reelImageUrl: string;
+  planCount: number;
+}
+
+export interface CreatorPlan {
+  id: number;
+  name: string;
+  dishCount: number;
+  coverImageUrl: string;
+}
+
+export interface CreatorDetail {
+  id: number;
+  name: string;
+  handle: string;
+  bio: string;
+  avatarUrl: string;
+  plans: CreatorPlan[];
+}
+
 export interface Dish {
   id: number;
   name: string;

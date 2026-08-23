@@ -55,7 +55,8 @@ public class DashboardService {
         Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
         Instant endOfDay = today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
 
-        List<PlanEntry> cookedToday = planEntryRepository.findByCookedTrueAndCookedAtBetween(startOfDay, endOfDay);
+        List<PlanEntry> cookedToday = planEntryRepository
+            .findByPlanCreatorIsNullAndCookedTrueAndCookedAtBetween(startOfDay, endOfDay);
         Map<Long, List<DishIngredient>> ingredientsByDish = loadIngredients(
                 cookedToday.stream().map(entry -> entry.getDish().getId()).distinct().toList());
 
@@ -75,7 +76,8 @@ public class DashboardService {
                 ? null
                 : (int) Math.round(proteinToday / proteinGoal * 100);
 
-        NextDishDto nextDish = planEntryRepository.findFirstByCookedFalseOrderByPlanIdAscSortOrderAsc()
+        NextDishDto nextDish = planEntryRepository
+            .findFirstByPlanCreatorIsNullAndCookedFalseOrderByPlanIdAscSortOrderAsc()
                 .map(entry -> {
                     Dish nextDishEntity = entry.getDish();
                     DishRatingRepository.DishRatingSummaryProjection summary = dishRatingRepository
@@ -108,6 +110,9 @@ public class DashboardService {
     public void markCooked(Long planEntryId) {
         PlanEntry entry = planEntryRepository.findById(planEntryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan-Eintrag wurde nicht gefunden."));
+        if (entry.getPlan().getCreator() != null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan-Eintrag wurde nicht gefunden.");
+        }
         if (entry.isCooked()) {
             return;
         }

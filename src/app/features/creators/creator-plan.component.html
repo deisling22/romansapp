@@ -1,0 +1,38 @@
+<main class="creator-screen creator-plan-screen">
+  <a class="creator-back" [routerLink]="creator ? ['/creators', creator.id] : ['/creators']">‹ Profil</a>
+
+  @if (loading) {
+    <p class="creator-status">Plan wird geladen ...</p>
+  }
+  @if (errorMessage) {
+    <p class="creator-status error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (creator && plan) {
+    <header class="plan-header">
+      <p class="creator-eyebrow">Von {{ creator.name }}</p>
+      <h1>{{ plan.name }}</h1>
+      <p>{{ plan.dishCount }} schnelle Familiengerichte</p>
+    </header>
+
+    @if (copied) {
+      <p class="copy-success" role="status">
+        Der Plan ist jetzt bei deinen Plänen.
+        <a routerLink="/plans">Meine Pläne öffnen</a>
+      </p>
+    }
+
+    <section class="creator-dish-grid" aria-label="Gerichte im Creator-Plan">
+      @for (dish of dishes; track dish.id) {
+        <a class="creator-dish" [routerLink]="['/dishes', dish.id]">
+          <img [src]="mealPlanApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
+          <strong>{{ dish.name }}</strong>
+        </a>
+      }
+    </section>
+
+    <button class="copy-plan-button" type="button" [disabled]="copying || copied" (click)="copyPlan()">
+      {{ copied ? 'Plan kopiert' : copying ? 'Wird kopiert ...' : 'In meine Pläne kopieren' }}
+    </button>
+  }
+</main>

@@ -1,0 +1,371 @@
+:host {
+  display: block;
+}
+
+.creator-feed-screen {
+  position: relative;
+  height: calc(100dvh - 60px);
+  overflow: hidden;
+  background: #101714;
+}
+
+.feed-header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: max(14px, env(safe-area-inset-top)) 16px 12px;
+  color: #ffffff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65);
+}
+
+.feed-header a {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: inherit;
+  font-size: 2rem;
+  text-decoration: none;
+}
+
+.feed-header h1 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.reel-feed {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  touch-action: pan-y;
+}
+
+.reel-feed::-webkit-scrollbar {
+  display: none;
+}
+
+.creator-reel {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.reel-image,
+.reel-shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.reel-image {
+  object-fit: cover;
+}
+
+.reel-shade {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 38%, rgba(8, 17, 13, 0.88) 100%);
+}
+
+.reel-content {
+  position: absolute;
+  right: 28px;
+  bottom: 38px;
+  left: 24px;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.reel-avatar {
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.reel-copy {
+  display: grid;
+  gap: 4px;
+  max-width: 520px;
+}
+
+.reel-copy strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.55rem;
+}
+
+.reel-copy span,
+.reel-copy small,
+.reel-copy b {
+  font-size: 0.88rem;
+}
+
+.reel-copy small {
+  line-height: 1.4;
+}
+
+.reel-copy b {
+  margin-top: 5px;
+  color: #d9f2c7;
+}
+
+.reel-progress {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  gap: 8px;
+  transform: translateY(-50%);
+}
+
+.reel-progress button {
+  width: 4px;
+  height: 26px;
+  border: 0;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0;
+}
+
+.reel-progress button.active {
+  background: #ffffff;
+}
+
+.creator-screen {
+  box-sizing: border-box;
+  width: min(100%, 760px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 28px 20px 112px;
+}
+
+.creator-back {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #26736f;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.profile-header {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  align-items: center;
+  gap: 22px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #d7e5dd;
+}
+
+.profile-header > img {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.creator-eyebrow {
+  margin: 0 0 6px;
+  color: #26736f;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.profile-header h1,
+.plan-header h1 {
+  margin: 0 0 8px;
+  color: #16342f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.35rem;
+  line-height: 1.05;
+}
+
+.profile-header p:last-child,
+.plan-header > p:last-child {
+  margin: 0;
+  color: #54716d;
+  line-height: 1.5;
+}
+
+.creator-plans {
+  margin-top: 30px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: #16342f;
+  font-size: 1.1rem;
+}
+
+.section-heading span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e4f0d4;
+  color: #204e43;
+  font-weight: 800;
+}
+
+.creator-plan-card {
+  display: grid;
+  grid-template-columns: 116px 1fr 24px;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #d7e5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #16342f;
+  text-decoration: none;
+}
+
+.creator-plan-card > img {
+  width: 116px;
+  height: 92px;
+  object-fit: cover;
+}
+
+.creator-plan-card > span {
+  display: grid;
+  gap: 6px;
+  padding: 12px 16px;
+}
+
+.creator-plan-card small {
+  color: #6b827d;
+}
+
+.creator-plan-card > b {
+  color: #26736f;
+  font-size: 1.8rem;
+}
+
+.plan-header {
+  margin-bottom: 24px;
+}
+
+.creator-dish-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.creator-dish {
+  overflow: hidden;
+  border: 1px solid #d7e5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #16342f;
+  text-decoration: none;
+}
+
+.creator-dish img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.creator-dish strong {
+  display: block;
+  padding: 12px;
+  font-size: 0.92rem;
+}
+
+.copy-plan-button {
+  position: fixed;
+  right: max(20px, calc((100vw - 720px) / 2));
+  bottom: 76px;
+  min-height: 52px;
+  border: 0;
+  border-radius: 8px;
+  background: #e06c47;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 0 20px;
+}
+
+.copy-plan-button:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.copy-success,
+.creator-status {
+  border-left: 3px solid #94b8a5;
+  color: #4e6661;
+  padding: 12px 14px;
+}
+
+.copy-success a {
+  color: #26736f;
+  font-weight: 800;
+}
+
+.creator-status.error {
+  border-color: #b54636;
+  color: #8d2d21;
+}
+
+@media (min-width: 640px) {
+  .creator-feed-screen {
+    width: min(100%, 620px);
+    margin: 0 auto;
+  }
+
+  .creator-dish-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-header {
+    grid-template-columns: 82px 1fr;
+    gap: 16px;
+  }
+
+  .profile-header > img {
+    width: 82px;
+    height: 82px;
+  }
+
+  .profile-header h1,
+  .plan-header h1 {
+    font-size: 1.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reel-feed {
+    scroll-behavior: auto;
+  }
+}

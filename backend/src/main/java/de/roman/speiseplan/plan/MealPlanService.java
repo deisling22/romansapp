@@ -31,7 +31,7 @@ public class MealPlanService {
 
     @Transactional(readOnly = true)
     public List<PlanSummaryDto> getPlans() {
-        return mealPlanRepository.findAllByOrderByCreatedAtAsc().stream()
+        return mealPlanRepository.findAllByCreatorIsNullOrderByCreatedAtAsc().stream()
                 .map(plan -> new PlanSummaryDto(plan.getId(), plan.getName(), planEntryRepository.countByPlanId(plan.getId())))
                 .toList();
     }
