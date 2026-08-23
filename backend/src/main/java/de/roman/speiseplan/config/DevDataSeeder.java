@@ -314,8 +314,31 @@ public class DevDataSeeder {
             }
 
             private String imageUrl(String recipeName) {
-            return "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80&recipe="
-                + recipeName.replace(' ', '-');
+            String photoId = switch (recipeName) {
+                case "Spaghetti Bolognese" -> "1551183053-bf91a1d81141";
+                case "Hähnchen-Gemüse-Pfanne" -> "1604908176997-125f25cc6f3d";
+                case "Kartoffel-Möhren-Puffer" -> "1518013431117-eb1465fa5752";
+                case "Cremige Schinken-Nudeln" -> "1563379926898-05f4575a45d8";
+                case "Fischstäbchen mit Kartoffelstampf" -> "1534948216015-843149f72be3";
+                case "Tortellini in Tomaten-Sahne" -> "1473093295043-cdd812d0e601";
+                case "Hackbällchen in Paprikasauce" -> "1529042410759-befb1204b468";
+                case "Käsespätzle mit Röstzwiebeln" -> "1571997478779-2adcbbe9ab2f";
+                case "Mildes Chili con Carne" -> "1533777857889-4be7c70b33f7";
+                case "Gnocchi-Spinat-Pfanne" -> "1585032226651-759b368d7246";
+                case "Pfannkuchen mit Apfelmus" -> "1528207776546-365bb710ee93";
+                case "Pizza-Toast" -> "1565299624946-b28f40a0ae38";
+                case "Gebratener Reis mit Ei" -> "1603133872878-684f208fb84b";
+                case "Wraps mit Hähnchen" -> "1626700051175-6818013e1d4f";
+                case "Tomaten-Mozzarella-Couscous" -> "1547592180-85f173990554";
+                case "Würstchen-Kartoffel-Pfanne" -> "1601050690117-94f5f6fa8bd7";
+                case "Brokkoli-Käse-Nudeln" -> "1621996346565-e3dbc646d9a9";
+                case "Flammkuchen-Wraps" -> "1603105037880-880cd4edfb0d";
+                case "Maultaschen-Gemüse-Pfanne" -> "1543353071-873f17a7a088";
+                case "Schnelle Kartoffelsuppe" -> "1547592166-23ac45744acd";
+                default -> throw new IllegalArgumentException("Kein Bild für " + recipeName);
+            };
+            return "https://images.unsplash.com/photo-" + photoId
+                + "?auto=format&fit=crop&w=900&q=80";
             }
 
             private record RecipeSeed(

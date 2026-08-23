@@ -35,6 +35,13 @@ class DevDataSeederTest {
         assertThat(quickRecipes).hasSize(10);
         assertThat(weekRecipes).doesNotContainAnyElementsOf(quickRecipes);
 
+        assertThat(List.of(weekEntries, quickEntries).stream()
+            .flatMap(entries -> entries.stream().skip(1))
+            .map(entry -> entry.getDish().getImageUrl()))
+            .hasSize(20)
+            .doesNotHaveDuplicates()
+            .allMatch(url -> url.startsWith("https://images.unsplash.com/photo-"));
+
         assertThat(weekEntries.stream().skip(1).map(entry -> entry.getDish()))
                 .allSatisfy(dish -> {
                     assertThat(dish.getPrepMinutes()).isLessThan(25);
