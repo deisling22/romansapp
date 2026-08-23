@@ -4,6 +4,7 @@ import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { DashboardApiService } from '../../core/dashboard-api.service';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { Dish } from '../../core/models';
+import { ShareService } from '../../core/share.service';
 
 @Component({
     selector: 'app-plan-detail',
@@ -19,12 +20,14 @@ export class PlanDetailComponent implements OnInit {
   errorMessage = '';
   cookingDishId: number | null = null;
   addingToCart = false;
+  shareMessage = '';
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly dashboardApi: DashboardApiService,
     private readonly shoppingListApi: ShoppingListApiService,
+    private readonly shareService: ShareService,
     readonly mealPlanApi: MealPlanApiService,
   ) {}
 
@@ -79,5 +82,20 @@ export class PlanDetailComponent implements OnInit {
         this.addingToCart = false;
       },
     });
+  }
+
+  async sharePlan(): Promise<void> {
+    this.shareMessage = '';
+    try {
+      const result = await this.shareService.share(
+        'Speiseplan',
+        'Schau dir diesen Speiseplan an.',
+      );
+      if (result === 'copied') {
+        this.shareMessage = 'Link zum Plan kopiert.';
+      }
+    } catch {
+      this.errorMessage = 'Der Link konnte nicht geteilt werden.';
+    }
   }
 }

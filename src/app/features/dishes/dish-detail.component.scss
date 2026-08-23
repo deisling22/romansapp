@@ -48,6 +48,31 @@
   line-height: 1.05;
 }
 
+.share-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.share-button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  border: 1px solid #26736f;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #26736f;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0 12px;
+}
+
+.share-success {
+  border-color: #26736f;
+}
+
 .page-header p {
   margin: 0 0 12px;
   color: #54716d;

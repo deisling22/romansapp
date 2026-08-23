@@ -11,9 +11,16 @@
   @if (creator && plan) {
     <header class="plan-header">
       <p class="creator-eyebrow">Von {{ creator.name }}</p>
-      <h1>{{ plan.name }}</h1>
+      <div class="share-heading">
+        <h1>{{ plan.name }}</h1>
+        <button type="button" class="share-button" (click)="sharePlan()">Teilen</button>
+      </div>
       <p>{{ plan.dishCount }} schnelle Familiengerichte</p>
     </header>
+
+    @if (shareMessage) {
+      <p class="share-success" role="status">{{ shareMessage }}</p>
+    }
 
     @if (copied) {
       <p class="copy-success" role="status">

@@ -13,10 +13,17 @@
       <img [src]="creator.avatarUrl" [alt]="creator.name" />
       <div>
         <p class="creator-eyebrow">&#64;{{ creator.handle }}</p>
-        <h1>{{ creator.name }}</h1>
+        <div class="share-heading">
+          <h1>{{ creator.name }}</h1>
+          <button type="button" class="share-button" (click)="shareCreator()">Teilen</button>
+        </div>
         <p>{{ creator.bio }}</p>
       </div>
     </header>
+
+    @if (shareMessage) {
+      <p class="share-success" role="status">{{ shareMessage }}</p>
+    }
 
     <section class="creator-plans" aria-labelledby="creator-plans-heading">
       <div class="section-heading">

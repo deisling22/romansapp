@@ -4,6 +4,7 @@ import { forkJoin } from 'rxjs';
 import { CreatorApiService } from '../../core/creator-api.service';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { CreatorDetail, CreatorPlan, Dish } from '../../core/models';
+import { ShareService } from '../../core/share.service';
 
 @Component({
   selector: 'app-creator-plan',
@@ -20,10 +21,12 @@ export class CreatorPlanComponent implements OnInit {
   copying = false;
   copied = false;
   errorMessage = '';
+  shareMessage = '';
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly creatorApi: CreatorApiService,
+    private readonly shareService: ShareService,
     readonly mealPlanApi: MealPlanApiService,
   ) {}
 
@@ -63,5 +66,23 @@ export class CreatorPlanComponent implements OnInit {
         this.copying = false;
       },
     });
+  }
+
+  async sharePlan(): Promise<void> {
+    if (!this.creator || !this.plan) {
+      return;
+    }
+    this.shareMessage = '';
+    try {
+      const result = await this.shareService.share(
+        this.plan.name,
+        `Entdecke den Speiseplan ${this.plan.name} von ${this.creator.name}.`,
+      );
+      if (result === 'copied') {
+        this.shareMessage = 'Link zum Plan kopiert.';
+      }
+    } catch {
+      this.errorMessage = 'Der Link konnte nicht geteilt werden.';
+    }
   }
 }

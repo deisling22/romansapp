@@ -2,8 +2,15 @@
   <a class="back-link" routerLink="/plans">‹ Alle Pläne</a>
   <header class="page-header compact">
     <p class="eyebrow">Dein Plan</p>
-    <h1>Gerichte</h1>
+    <div class="share-heading">
+      <h1>Gerichte</h1>
+      <button type="button" class="share-button" (click)="sharePlan()">Teilen</button>
+    </div>
   </header>
+
+  @if (shareMessage) {
+    <p class="status share-success" role="status">{{ shareMessage }}</p>
+  }
 
   @if (loading) {
     <p class="status">Gerichte werden geladen ...</p>

@@ -11,7 +11,10 @@
   @if (!loading && !errorMessage && dish) {
     <img class="dish-hero" [src]="dishApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
     <header class="page-header">
-      <h1>{{ dish.name }}</h1>
+      <div class="share-heading">
+        <h1>{{ dish.name }}</h1>
+        <button type="button" class="share-button" (click)="shareDish()">Teilen</button>
+      </div>
       @if (dish.description) {
         <p>{{ dish.description }}</p>
       }
@@ -40,6 +43,9 @@
         </div>
       }
     </header>
+    @if (shareMessage) {
+      <p class="status share-success" role="status">{{ shareMessage }}</p>
+    }
     @if (dish.galleryImageUrls.length) {
       <section class="gallery" aria-label="Bildergalerie">
         @for (url of dish.galleryImageUrls; track url) {

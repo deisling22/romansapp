@@ -7,6 +7,7 @@ import { AuthService, AuthenticatedUser } from '../../core/auth.service';
 import { PantryApiService } from '../../core/pantry-api.service';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { DishDetail, DishIngredientEntry, Ingredient, PantryItem, ShoppingListItem } from '../../core/models';
+import { ShareService } from '../../core/share.service';
 
 @Component({
     selector: 'app-dish-detail',
@@ -33,6 +34,7 @@ export class DishDetailComponent implements OnInit {
   savingIngredient = false;
   addingMissingIngredients = false;
   successMessage = '';
+  shareMessage = '';
   activeTimerStepId: number | null = null;
   timerSecondsLeft = 0;
   private timerHandle: ReturnType<typeof setInterval> | null = null;
@@ -43,6 +45,7 @@ export class DishDetailComponent implements OnInit {
     private readonly authService: AuthService,
     private readonly pantryApi: PantryApiService,
     private readonly shoppingListApi: ShoppingListApiService,
+    private readonly shareService: ShareService,
     readonly dishApi: DishApiService,
   ) {}
 
@@ -202,5 +205,23 @@ export class DishDetailComponent implements OnInit {
     }
     this.activeTimerStepId = null;
     this.timerSecondsLeft = 0;
+  }
+
+  async shareDish(): Promise<void> {
+    if (!this.dish) {
+      return;
+    }
+    this.shareMessage = '';
+    try {
+      const result = await this.shareService.share(
+        this.dish.name,
+        `Schau dir das Gericht ${this.dish.name} an.`,
+      );
+      if (result === 'copied') {
+        this.shareMessage = 'Link zum Gericht kopiert.';
+      }
+    } catch {
+      this.errorMessage = 'Der Link konnte nicht geteilt werden.';
+    }
   }
 }
