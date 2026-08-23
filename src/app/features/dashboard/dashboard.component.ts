@@ -22,6 +22,10 @@ export class DashboardComponent implements OnInit {
     return toAbsoluteImageUrl(path);
   }
 
+  displayInteger(value: number): string {
+    return Math.trunc(value).toString();
+  }
+
   ngOnInit(): void {
     this.load();
   }

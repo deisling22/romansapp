@@ -16,11 +16,11 @@
       <div class="stat-grid">
         <div class="stat-card">
           <span class="stat-label">Kalorien heute</span>
-          <span class="stat-value">{{ dashboard.caloriesToday | number:'1.0-2' }} kcal</span>
+          <span class="stat-value">{{ displayInteger(dashboard.caloriesToday) }} kcal</span>
         </div>
         <div class="stat-card">
           <span class="stat-label">Protein heute</span>
-          <span class="stat-value">{{ dashboard.proteinToday | number:'1.0-2' }} g</span>
+          <span class="stat-value">{{ displayInteger(dashboard.proteinToday) }} g</span>
           @if (dashboard.proteinGoal) {
             <span class="stat-sub">
               von {{ dashboard.proteinGoal | number:'1.0-2' }} g ({{ dashboard.proteinPercent }}%)
