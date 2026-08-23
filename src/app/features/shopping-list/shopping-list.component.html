@@ -50,6 +50,9 @@
   @if (errorMessage) {
     <p class="status error" role="alert">{{ errorMessage }}</p>
   }
+  @if (successMessage) {
+    <p class="status success" role="status">{{ successMessage }}</p>
+  }
 
   @if (!loading) {
     <section class="list-section" aria-labelledby="open-items-heading">
@@ -59,7 +62,7 @@
       </div>
       <ul class="item-list">
         @for (item of openItems; track item.id) {
-          <li>
+          <li class="item-row">
             <label>
               <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
               <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
@@ -84,7 +87,7 @@
         </div>
         <ul class="item-list">
           @for (item of checkedItems; track item.id) {
-            <li class="checked">
+            <li class="item-row checked">
               <label>
                 <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
                 <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>

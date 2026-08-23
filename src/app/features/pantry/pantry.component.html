@@ -12,15 +12,25 @@
   @if (errorMessage) {
     <p class="status error" role="alert">{{ errorMessage }}</p>
   }
+  @if (successMessage) {
+    <p class="status success" role="status">{{ successMessage }}</p>
+  }
 
   @if (!loading) {
+    @if (items.length > 0) {
+      <p class="inventory-summary" role="status">
+        <strong>{{ items.length }}</strong> {{ items.length === 1 ? 'Artikel' : 'Artikel' }} griffbereit
+      </p>
+    }
     <ul class="item-list" aria-label="Vorräte nach Kaufdatum">
       @for (item of items; track item.id) {
         <li>
           <div class="item-main">
             <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
             <strong>{{ item.ingredientName }}</strong>
-            <time [attr.datetime]="item.purchasedAt">Gekauft am {{ item.purchasedAt | date:'dd.MM.yyyy' }}</time>
+            <time [attr.datetime]="item.purchasedAt">
+              {{ purchaseAgeLabel(item.purchasedAt) }} · {{ item.purchasedAt | date:'dd.MM.yyyy' }}
+            </time>
           </div>
           <button
             type="button"

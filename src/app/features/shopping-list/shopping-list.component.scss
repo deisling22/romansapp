@@ -105,6 +105,12 @@ h1 {
   color: #8d2d21;
 }
 
+.success {
+  border-color: #4f8c62;
+  background: #edf5ef;
+  color: #28573a;
+}
+
 .offline {
   border-color: #e0a83d;
   color: #8a6a1f;
@@ -158,6 +164,10 @@ h1 {
   padding: 12px;
 }
 
+.item-row {
+  animation: item-reveal 180ms ease-out both;
+}
+
 .item-list li.checked {
   opacity: 0.6;
 }
@@ -205,6 +215,13 @@ h1 {
   line-height: 1.4;
 }
 
+@keyframes item-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+}
+
 .empty {
   display: block !important;
 }
@@ -225,5 +242,11 @@ h1 {
 
   .remove-button {
     align-self: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-row {
+    animation: none;
   }
 }

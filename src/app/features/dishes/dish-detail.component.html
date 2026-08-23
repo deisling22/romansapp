@@ -9,6 +9,7 @@
   }
 
   @if (!loading && !errorMessage && dish) {
+    <img class="dish-hero" [src]="dishApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
     <header class="page-header">
       <h1>{{ dish.name }}</h1>
       @if (dish.description) {
@@ -71,31 +72,72 @@
       </ol>
     </section>
     <section class="ingredients" aria-label="Zutaten">
-      <h2>Zutaten</h2>
-      <ul>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Für {{ dish.servings }} {{ dish.servings === 1 ? 'Portion' : 'Portionen' }}</p>
+          <h2>Zutaten</h2>
+        </div>
+        @if (pantryLoaded && dish.ingredients.length) {
+          <span class="availability-summary" [class.complete]="missingIngredients.length === 0">
+            {{ missingIngredients.length === 0 ? 'Alles vorhanden' : missingIngredients.length + ' fehlen' }}
+          </span>
+        }
+      </div>
+      <ul class="ingredient-list">
         @for (ingredient of dish.ingredients; track ingredient) {
           <li>
-            {{ ingredient.ingredientName }} – {{ ingredient.quantityGrams }} {{ ingredient.unit }}
+            <span class="ingredient-quantity">{{ ingredient.quantityGrams | number:'1.0-2' }} {{ ingredient.unit }}</span>
+            <strong>{{ ingredient.ingredientName }}</strong>
+            @if (pantryLoaded) {
+              @if (missingQuantity(ingredient) === 0) {
+                <span class="stock-state available">Vorhanden</span>
+              } @else {
+                <span class="stock-state missing">
+                  @if (cartQuantity(ingredient) >= missingQuantity(ingredient)) {
+                    Im Warenkorb
+                  } @else {
+                    {{ missingQuantity(ingredient) | number:'1.0-2' }} {{ ingredient.unit }} fehlen
+                  }
+                </span>
+              }
+            }
           </li>
         }
         @if (dish.ingredients.length === 0) {
           <li class="status">Noch keine Zutaten hinterlegt.</li>
         }
       </ul>
-      <form [formGroup]="ingredientForm" (ngSubmit)="addIngredient()" novalidate>
-        <label for="ingredientId">Zutat hinzufügen</label>
-        <select id="ingredientId" formControlName="ingredientId">
-          <option [value]="0" disabled>Zutat wählen ...</option>
-          @for (ingredient of ingredients; track ingredient) {
-            <option [value]="ingredient.id">{{ ingredient.name }}</option>
-          }
-        </select>
-        <label for="quantityGrams">Menge (g)</label>
-        <input id="quantityGrams" type="number" min="1" formControlName="quantityGrams" />
-        <button type="submit" [disabled]="savingIngredient">
-          {{ savingIngredient ? 'Wird gespeichert ...' : 'Hinzufügen' }}
+      @if (pantryLoaded && ingredientsToAdd.length > 0) {
+        <button
+          type="button"
+          class="missing-action"
+          [disabled]="addingMissingIngredients"
+          (click)="addMissingIngredientsToCart()">
+          {{ addingMissingIngredients ? 'Wird ergänzt ...' : 'Fehlende Zutaten in den Warenkorb' }}
         </button>
-      </form>
+      } @else if (pantryLoaded && missingIngredients.length > 0) {
+        <a class="cart-link" routerLink="/shopping-list">Fehlende Zutaten sind im Warenkorb</a>
+      }
+      @if (successMessage) {
+        <p class="success-message" role="status">{{ successMessage }}</p>
+      }
+      <details class="recipe-editor">
+        <summary>Rezept bearbeiten</summary>
+        <form [formGroup]="ingredientForm" (ngSubmit)="addIngredient()" novalidate>
+          <label for="ingredientId">Zutat hinzufügen</label>
+          <select id="ingredientId" formControlName="ingredientId">
+            <option [value]="0" disabled>Zutat wählen ...</option>
+            @for (ingredient of ingredients; track ingredient) {
+              <option [value]="ingredient.id">{{ ingredient.name }}</option>
+            }
+          </select>
+          <label for="quantityGrams">Menge (g)</label>
+          <input id="quantityGrams" type="number" min="1" formControlName="quantityGrams" />
+          <button type="submit" [disabled]="savingIngredient">
+            {{ savingIngredient ? 'Wird gespeichert ...' : 'Hinzufügen' }}
+          </button>
+        </form>
+      </details>
     </section>
   }
 </main>

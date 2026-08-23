@@ -25,6 +25,11 @@
             <span class="stat-sub">
               von {{ dashboard.proteinGoal }} g ({{ dashboard.proteinPercent }}%)
             </span>
+            <progress
+              [value]="dashboard.proteinToday"
+              [max]="dashboard.proteinGoal"
+              [attr.aria-label]="'Proteinziel zu ' + dashboard.proteinPercent + ' Prozent erreicht'">
+            </progress>
           }
         </div>
       </div>
@@ -39,7 +44,7 @@
                 [average]="dashboard.nextDish.averageRating"
                 [count]="dashboard.nextDish.ratingCount"
                 ></app-star-rating>
-              <a [routerLink]="['/plans', dashboard.nextDish.planId]">Zum Plan</a>
+              <a [routerLink]="['/dishes', dashboard.nextDish.dishId]">Rezept öffnen</a>
             </div>
           </div>
           <button type="button" [disabled]="cooking" (click)="markCooked()">

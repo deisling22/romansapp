@@ -20,6 +20,7 @@ export class ShoppingListComponent implements OnInit {
   loading = true;
   generating = false;
   errorMessage = '';
+  successMessage = '';
   newIngredientName = '';
   newQuantity = 1;
   newUnit = 'Stk.';
@@ -72,11 +73,13 @@ export class ShoppingListComponent implements OnInit {
       return;
     }
     this.adding = true;
+    this.successMessage = '';
     this.shoppingListApi.addItem(name, this.newQuantity, unit).subscribe({
       next: (item) => {
         this.items = [...this.items, item];
         this.newIngredientName = '';
         this.newQuantity = 1;
+        this.successMessage = `${item.ingredientName} wurde hinzugefügt.`;
         this.adding = false;
       },
       error: () => {
@@ -106,6 +109,9 @@ export class ShoppingListComponent implements OnInit {
   toggle(item: ShoppingListItem): void {
     const checked = !item.checked;
     item.checked = checked;
+    this.successMessage = checked
+      ? `${item.ingredientName} liegt jetzt im Wagen.`
+      : `${item.ingredientName} steht wieder auf der Liste.`;
 
     if (!this.connectivity.isOnline) {
       void this.outbox.queue(item.id, checked);
@@ -127,6 +133,7 @@ export class ShoppingListComponent implements OnInit {
     this.shoppingListApi.deleteItem(item.id).subscribe({
       next: () => {
         this.items = this.items.filter((entry) => entry.id !== item.id);
+        this.successMessage = `${item.ingredientName} wurde entfernt.`;
         this.deletingItemId = null;
       },
       error: () => {
