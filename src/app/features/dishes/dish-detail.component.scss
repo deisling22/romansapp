@@ -69,6 +69,26 @@
   padding: 0 12px;
 }
 
+.header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.favorite-button {
+  min-height: 38px;
+  border: 1px solid #b94b43;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #a43e37;
+  padding: 0 12px;
+  font-size: 0.82rem;
+}
+
+.favorite-button.active {
+  background: #fff0ee;
+}
+
 .share-success {
   border-color: #26736f;
 }
@@ -185,6 +205,37 @@ h2 {
 
 .section-heading h2 {
   margin-bottom: 0;
+}
+
+.secondary-action {
+  border: 1px solid #26736f;
+  background: #ffffff;
+  color: #26736f;
+  padding: 0 14px;
+}
+
+.serving-control {
+  display: grid;
+  grid-template-columns: 40px 42px 40px;
+  align-items: center;
+  min-height: 40px;
+  border: 1px solid #aac9ba;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.serving-control button {
+  min-height: 40px;
+  border-radius: 0;
+  background: #edf5ef;
+  color: #204e43;
+  font-size: 1.2rem;
+}
+
+.serving-control output {
+  color: #16342f;
+  font-weight: 800;
+  text-align: center;
 }
 
 .availability-summary {
@@ -326,6 +377,84 @@ button:disabled {
   opacity: 0.65;
 }
 
+.cooking-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  background: rgb(16 35 31 / 68%);
+}
+
+.cooking-mode {
+  position: fixed;
+  z-index: 21;
+  top: 50%;
+  left: 50%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 24px;
+  transform: translate(-50%, -50%);
+  overflow-y: auto;
+}
+
+.cooking-mode header,
+.cooking-mode footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cooking-mode progress {
+  width: 100%;
+  height: 8px;
+  margin: 18px 0 28px;
+  accent-color: #26736f;
+}
+
+.cooking-step {
+  margin: auto 0;
+  padding: 16px 0 28px;
+  color: #16342f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.45rem, 4vw, 2.1rem);
+  line-height: 1.35;
+}
+
+.cooking-mode footer {
+  align-items: center;
+  margin-top: 28px;
+}
+
+.cooking-mode footer button {
+  min-width: 112px;
+  padding: 0 18px;
+}
+
+.close-button {
+  flex: 0 0 44px;
+  width: 44px;
+  background: transparent;
+  color: #26736f;
+  font-size: 1.6rem;
+}
+
+.timer-action {
+  align-self: flex-start;
+  padding: 0 16px;
+}
+
+.cooking-timer {
+  margin: 0 0 12px;
+  color: #26736f;
+  font-size: 2.4rem;
+  font-weight: 800;
+}
+
 @keyframes reveal {
   from {
     opacity: 0;
@@ -334,6 +463,19 @@ button:disabled {
 }
 
 @media (max-width: 520px) {
+  .share-heading {
+    flex-direction: column;
+  }
+
+  .section-heading {
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .availability-summary {
+    width: 100%;
+  }
+
   .ingredient-list li {
     grid-template-columns: minmax(64px, auto) minmax(0, 1fr);
     gap: 4px 10px;

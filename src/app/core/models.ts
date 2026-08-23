@@ -80,6 +80,7 @@ export interface DishDetail {
   averageRating: number | null;
   ratingCount: number;
   myRating: number | null;
+  favorite: boolean;
 }
 
 export interface DishRatingSummary {

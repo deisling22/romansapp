@@ -11,13 +11,16 @@ export class DishApiService {
 
   constructor(private readonly http: HttpClient) {}
 
-  search(search: string, tag: string): Observable<DishCatalogEntry[]> {
+  search(search: string, tag: string, favoritesOnly = false): Observable<DishCatalogEntry[]> {
     let params = new HttpParams();
     if (search) {
       params = params.set('search', search);
     }
     if (tag) {
       params = params.set('tag', tag);
+    }
+    if (favoritesOnly) {
+      params = params.set('favorites', true);
     }
     return this.http.get<DishCatalogEntry[]>(`${this.apiUrl}/dishes`, { params });
   }
@@ -28,6 +31,10 @@ export class DishApiService {
 
   rateDish(dishId: number, stars: number): Observable<DishRatingSummary> {
     return this.http.post<DishRatingSummary>(`${this.apiUrl}/dishes/${dishId}/ratings`, { stars });
+  }
+
+  setFavorite(dishId: number, favorite: boolean): Observable<{ favorite: boolean }> {
+    return this.http.put<{ favorite: boolean }>(`${this.apiUrl}/dishes/${dishId}/favorite`, { favorite });
   }
 
   addImage(dishId: number, image: File): Observable<{ imageUrl: string }> {

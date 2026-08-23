@@ -19,6 +19,12 @@
       (ngModelChange)="onFilterChange()"
       aria-label="Tag filtern"
       />
+    @if (currentUser) {
+      <label class="favorite-filter">
+        <input type="checkbox" [(ngModel)]="favoritesOnly" (ngModelChange)="onFilterChange()" />
+        Nur mein Kochbuch
+      </label>
+    }
   </div>
 
   @if (loading) {

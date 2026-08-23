@@ -4,6 +4,7 @@ import de.roman.speiseplan.storage.LocalImageStorage;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class DishService {
     private final PrepStepRepository prepStepRepository;
     private final IngredientRepository ingredientRepository;
     private final DishRatingRepository dishRatingRepository;
+        private final DishFavoriteRepository dishFavoriteRepository;
     private final LocalImageStorage imageStorage;
 
     public DishService(
@@ -28,6 +30,7 @@ public class DishService {
             PrepStepRepository prepStepRepository,
             IngredientRepository ingredientRepository,
             DishRatingRepository dishRatingRepository,
+            DishFavoriteRepository dishFavoriteRepository,
             LocalImageStorage imageStorage) {
         this.dishRepository = dishRepository;
         this.dishIngredientRepository = dishIngredientRepository;
@@ -35,14 +38,24 @@ public class DishService {
         this.prepStepRepository = prepStepRepository;
         this.ingredientRepository = ingredientRepository;
         this.dishRatingRepository = dishRatingRepository;
+        this.dishFavoriteRepository = dishFavoriteRepository;
         this.imageStorage = imageStorage;
     }
 
     @Transactional(readOnly = true)
-    public List<DishCatalogEntryDto> searchDishes(String search, String tag) {
+        public List<DishCatalogEntryDto> searchDishes(String search, String tag, boolean favoritesOnly, String userEmail) {
         String normalizedSearch = blankToNull(search);
         String normalizedTag = blankToNull(tag);
         List<Dish> dishes = dishRepository.search(normalizedSearch, normalizedTag);
+                if (favoritesOnly) {
+                        if (userEmail == null) {
+                                return List.of();
+                        }
+                        Set<Long> favoriteDishIds = dishFavoriteRepository.findByUserEmail(userEmail).stream()
+                                        .map(favorite -> favorite.getDish().getId())
+                                        .collect(Collectors.toSet());
+                        dishes = dishes.stream().filter(dish -> favoriteDishIds.contains(dish.getId())).toList();
+                }
         Map<Long, DishRatingRepository.DishRatingSummaryProjection> ratings =
                 loadRatingSummaries(dishes.stream().map(Dish::getId).toList());
         return dishes.stream()
@@ -99,7 +112,8 @@ public class DishService {
                         .toList(),
                 summary == null ? null : summary.getAverageRating(),
                 summary == null ? 0 : summary.getRatingCount().intValue(),
-                myRating);
+                myRating,
+                userEmail != null && dishFavoriteRepository.existsByDishIdAndUserEmail(dishId, userEmail));
     }
 
     @Transactional
@@ -118,6 +132,21 @@ public class DishService {
                 summary == null ? 1 : summary.getRatingCount().intValue(),
                 stars);
     }
+
+        @Transactional
+        public DishFavoriteResponseDto setFavorite(Long dishId, String userEmail, boolean favorite) {
+                if (userEmail == null || userEmail.isBlank()) {
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Anmeldung erforderlich.");
+                }
+                Dish dish = requireDish(dishId);
+                boolean exists = dishFavoriteRepository.existsByDishIdAndUserEmail(dishId, userEmail);
+                if (favorite && !exists) {
+                        dishFavoriteRepository.save(new DishFavorite(dish, userEmail));
+                } else if (!favorite && exists) {
+                        dishFavoriteRepository.deleteByDishIdAndUserEmail(dishId, userEmail);
+                }
+                return new DishFavoriteResponseDto(favorite);
+        }
 
     private Map<Long, DishRatingRepository.DishRatingSummaryProjection> loadRatingSummaries(List<Long> dishIds) {
         if (dishIds.isEmpty()) {

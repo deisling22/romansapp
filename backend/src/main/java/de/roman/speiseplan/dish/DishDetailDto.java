@@ -17,5 +17,6 @@ public record DishDetailDto(
         List<DishIngredientDto> ingredients,
         Double averageRating,
         int ratingCount,
-        Integer myRating) {
+        Integer myRating,
+        boolean favorite) {
 }

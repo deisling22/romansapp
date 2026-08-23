@@ -32,9 +32,13 @@ export class DishDetailComponent implements OnInit {
   loading = true;
   errorMessage = '';
   savingIngredient = false;
+  savingFavorite = false;
   addingMissingIngredients = false;
   successMessage = '';
   shareMessage = '';
+  selectedServings = 1;
+  cookingModeActive = false;
+  activeStepIndex = 0;
   activeTimerStepId: number | null = null;
   timerSecondsLeft = 0;
   private timerHandle: ReturnType<typeof setInterval> | null = null;
@@ -80,7 +84,18 @@ export class DishDetailComponent implements OnInit {
   }
 
   missingQuantity(ingredient: DishIngredientEntry): number {
-    return Math.max(0, ingredient.quantityGrams - this.availableQuantity(ingredient));
+    return Math.max(0, this.scaledQuantity(ingredient) - this.availableQuantity(ingredient));
+  }
+
+  scaledQuantity(ingredient: DishIngredientEntry): number {
+    if (!this.dish || this.dish.servings <= 0) {
+      return ingredient.quantityGrams;
+    }
+    return ingredient.quantityGrams * this.selectedServings / this.dish.servings;
+  }
+
+  changeServings(delta: number): void {
+    this.selectedServings = Math.max(1, Math.min(24, this.selectedServings + delta));
   }
 
   cartQuantity(ingredient: DishIngredientEntry): number {
@@ -138,6 +153,7 @@ export class DishDetailComponent implements OnInit {
     this.dishApi.getDish(this.dishId).subscribe({
       next: (dish) => {
         this.dish = dish;
+        this.selectedServings = dish.servings;
         this.loading = false;
       },
       error: () => {
@@ -186,6 +202,25 @@ export class DishDetailComponent implements OnInit {
     });
   }
 
+  toggleFavorite(): void {
+    if (!this.dish || this.savingFavorite) {
+      return;
+    }
+    this.savingFavorite = true;
+    this.dishApi.setFavorite(this.dishId, !this.dish.favorite).subscribe({
+      next: ({ favorite }) => {
+        if (this.dish) {
+          this.dish.favorite = favorite;
+        }
+        this.savingFavorite = false;
+      },
+      error: () => {
+        this.errorMessage = 'Das Kochbuch konnte nicht aktualisiert werden.';
+        this.savingFavorite = false;
+      },
+    });
+  }
+
   startTimer(stepId: number, seconds: number): void {
     this.stopTimer();
     this.activeTimerStepId = stepId;
@@ -196,6 +231,32 @@ export class DishDetailComponent implements OnInit {
         this.stopTimer();
       }
     }, 1000);
+  }
+
+  startCookingMode(): void {
+    if (!this.dish?.steps.length) {
+      return;
+    }
+    this.activeStepIndex = 0;
+    this.cookingModeActive = true;
+  }
+
+  closeCookingMode(): void {
+    this.stopTimer();
+    this.cookingModeActive = false;
+  }
+
+  previousStep(): void {
+    this.stopTimer();
+    this.activeStepIndex = Math.max(0, this.activeStepIndex - 1);
+  }
+
+  nextStep(): void {
+    if (!this.dish) {
+      return;
+    }
+    this.stopTimer();
+    this.activeStepIndex = Math.min(this.dish.steps.length - 1, this.activeStepIndex + 1);
   }
 
   stopTimer(): void {

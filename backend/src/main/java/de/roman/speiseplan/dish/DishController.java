@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -28,8 +29,10 @@ public class DishController {
     @GetMapping
     public List<DishCatalogEntryDto> search(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String tag) {
-        return dishService.searchDishes(search, tag);
+            @RequestParam(required = false) String tag,
+            @RequestParam(defaultValue = "false") boolean favorites,
+            @AuthenticationPrincipal(errorOnInvalidType = false) OAuth2User user) {
+        return dishService.searchDishes(search, tag, favorites, extractEmail(user));
     }
 
     @GetMapping("/{dishId}")
@@ -44,6 +47,14 @@ public class DishController {
             @Valid @RequestBody RateDishRequest request,
             @AuthenticationPrincipal(errorOnInvalidType = false) OAuth2User user) {
         return dishService.rateDish(dishId, extractEmail(user), request.stars());
+    }
+
+    @PutMapping("/{dishId}/favorite")
+    public DishFavoriteResponseDto setFavorite(
+            @PathVariable Long dishId,
+            @RequestBody SetDishFavoriteRequest request,
+            @AuthenticationPrincipal(errorOnInvalidType = false) OAuth2User user) {
+        return dishService.setFavorite(dishId, extractEmail(user), request.favorite());
     }
 
     private static String extractEmail(OAuth2User user) {

@@ -13,7 +13,20 @@
     <header class="page-header">
       <div class="share-heading">
         <h1>{{ dish.name }}</h1>
-        <button type="button" class="share-button" (click)="shareDish()">Teilen</button>
+        <div class="header-actions">
+          @if (currentUser) {
+            <button
+              type="button"
+              class="favorite-button"
+              [class.active]="dish.favorite"
+              [attr.aria-pressed]="dish.favorite"
+              [disabled]="savingFavorite"
+              (click)="toggleFavorite()">
+              {{ dish.favorite ? '♥ Gemerkt' : '♡ Merken' }}
+            </button>
+          }
+          <button type="button" class="share-button" (click)="shareDish()">Teilen</button>
+        </div>
       </div>
       @if (dish.description) {
         <p>{{ dish.description }}</p>
@@ -54,7 +67,12 @@
       </section>
     }
     <section class="steps" aria-label="Zubereitungsschritte">
-      <h2>Zubereitung</h2>
+      <div class="section-heading">
+        <h2>Zubereitung</h2>
+        @if (dish.steps.length) {
+          <button type="button" class="secondary-action" (click)="startCookingMode()">Kochmodus starten</button>
+        }
+      </div>
       <ol>
         @for (step of dish.steps; track step) {
           <li>
@@ -80,8 +98,13 @@
     <section class="ingredients" aria-label="Zutaten">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Für {{ dish.servings }} {{ dish.servings === 1 ? 'Portion' : 'Portionen' }}</p>
+          <p class="eyebrow">Portionen anpassen</p>
           <h2>Zutaten</h2>
+        </div>
+        <div class="serving-control" aria-label="Portionsanzahl">
+          <button type="button" aria-label="Eine Portion weniger" [disabled]="selectedServings <= 1" (click)="changeServings(-1)">−</button>
+          <output>{{ selectedServings }}</output>
+          <button type="button" aria-label="Eine Portion mehr" [disabled]="selectedServings >= 24" (click)="changeServings(1)">+</button>
         </div>
         @if (pantryLoaded && dish.ingredients.length) {
           <span class="availability-summary" [class.complete]="missingIngredients.length === 0">
@@ -92,7 +115,7 @@
       <ul class="ingredient-list">
         @for (ingredient of dish.ingredients; track ingredient) {
           <li>
-            <span class="ingredient-quantity">{{ ingredient.quantityGrams | number:'1.0-2' }} {{ ingredient.unit }}</span>
+            <span class="ingredient-quantity">{{ scaledQuantity(ingredient) | number:'1.0-2' }} {{ ingredient.unit }}</span>
             <strong>{{ ingredient.ingredientName }}</strong>
             @if (pantryLoaded) {
               @if (missingQuantity(ingredient) === 0) {
@@ -145,5 +168,37 @@
         </form>
       </details>
     </section>
+
+    @if (cookingModeActive && dish.steps.length) {
+      <div class="cooking-backdrop" (click)="closeCookingMode()"></div>
+      <section class="cooking-mode" role="dialog" aria-modal="true" aria-labelledby="cooking-title">
+        <header>
+          <div>
+            <p class="eyebrow">Schritt {{ activeStepIndex + 1 }} von {{ dish.steps.length }}</p>
+            <h2 id="cooking-title">{{ dish.name }}</h2>
+          </div>
+          <button type="button" class="close-button" aria-label="Kochmodus schließen" (click)="closeCookingMode()">×</button>
+        </header>
+        <progress [value]="activeStepIndex + 1" [max]="dish.steps.length"></progress>
+        <p class="cooking-step">{{ dish.steps[activeStepIndex].text }}</p>
+        @if (dish.steps[activeStepIndex].timerSeconds && activeTimerStepId !== dish.steps[activeStepIndex].id) {
+          <button type="button" class="timer-action" (click)="startTimer(dish.steps[activeStepIndex].id, dish.steps[activeStepIndex].timerSeconds!)">
+            Timer starten ({{ dish.steps[activeStepIndex].timerSeconds }} s)
+          </button>
+        }
+        @if (activeTimerStepId === dish.steps[activeStepIndex].id) {
+          <p class="cooking-timer" role="timer">{{ timerSecondsLeft }} s</p>
+          <button type="button" class="secondary-action" (click)="stopTimer()">Timer stoppen</button>
+        }
+        <footer>
+          <button type="button" class="secondary-action" [disabled]="activeStepIndex === 0" (click)="previousStep()">Zurück</button>
+          @if (activeStepIndex < dish.steps.length - 1) {
+            <button type="button" (click)="nextStep()">Weiter</button>
+          } @else {
+            <button type="button" (click)="closeCookingMode()">Fertig</button>
+          }
+        </footer>
+      </section>
+    }
   }
 </main>

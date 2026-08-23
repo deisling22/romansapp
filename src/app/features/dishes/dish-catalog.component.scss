@@ -50,6 +50,22 @@ h1 {
   font: inherit;
 }
 
+.favorite-filter {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  color: #244b43;
+  font-weight: 700;
+}
+
+.favorite-filter input {
+  width: 20px;
+  min-height: 20px;
+  accent-color: #26736f;
+}
+
 .status {
   border-left: 3px solid #94b8a5;
   color: #4e6661;

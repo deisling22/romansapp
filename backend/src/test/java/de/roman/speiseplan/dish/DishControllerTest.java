@@ -3,11 +3,14 @@ package de.roman.speiseplan.dish;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import tools.jackson.databind.ObjectMapper;
+import de.roman.speiseplan.auth.TokenService;
 import de.roman.speiseplan.plan.CreatePlanRequest;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -25,6 +28,9 @@ class DishControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+        @Autowired
+        private TokenService tokenService;
 
     @Test
     void addIngredientsAndStepsComputeNutritionAndAreVisibleInDetail() throws Exception {
@@ -67,6 +73,43 @@ class DishControllerTest {
 
         mockMvc.perform(get("/api/dishes").param("tag", "vegetarisch"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void favoritesCanBeSavedFilteredAndRemoved() throws Exception {
+        long planId = createPlan("Favoriten-Test-Plan");
+        long dishId = createDish(planId, "Favoriten-Test-Gericht");
+        String token = tokenService.issueToken(Map.of("email", "favorites@example.com", "name", "Favoriten Test"));
+
+        mockMvc.perform(put("/api/dishes/{dishId}/favorite", dishId)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"favorite\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.favorite").value(true));
+
+        mockMvc.perform(get("/api/dishes/{dishId}", dishId).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.favorite").value(true));
+
+        mockMvc.perform(get("/api/dishes")
+                        .header("Authorization", "Bearer " + token)
+                        .param("favorites", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(dishId));
+
+        mockMvc.perform(put("/api/dishes/{dishId}/favorite", dishId)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"favorite\":false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.favorite").value(false));
+
+        mockMvc.perform(get("/api/dishes")
+                        .header("Authorization", "Bearer " + token)
+                        .param("favorites", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     private long createPlan(String name) throws Exception {

@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/dishes/*/ratings").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/dishes/*/favorite").authenticated()
                         .anyRequest().permitAll())
                 .exceptionHandling(exceptions -> exceptions.defaultAuthenticationEntryPointFor(
                         new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
