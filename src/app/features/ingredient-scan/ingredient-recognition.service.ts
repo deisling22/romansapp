@@ -83,7 +83,13 @@ export class IngredientRecognitionService {
       ]).then(async ([tensorflow, _cpuBackend, _webglBackend, cocoSsd]) => {
         await tensorflow.setBackend('webgl');
         await tensorflow.ready();
-        return cocoSsd.load({ base: 'lite_mobilenet_v2' });
+        return cocoSsd.load({
+          base: 'lite_mobilenet_v2',
+          modelUrl: 'assets/models/coco-ssd/model.json',
+        });
+      }).catch((error: unknown) => {
+        this.modelPromise = null;
+        throw error;
       });
     }
     return this.modelPromise;

@@ -68,7 +68,7 @@ export class IngredientScanComponent implements OnDestroy {
         this.errorMessage = 'Keine unterstützte Zutat sicher erkannt. Ergänze sie unten manuell.';
       }
     } catch {
-      this.errorMessage = 'Das lokale KI-Modell konnte nicht geladen werden. Prüfe beim ersten Scan die Internetverbindung.';
+      this.errorMessage = 'Das lokale KI-Modell konnte nicht gestartet werden. Versuche es erneut.';
     } finally {
       this.analyzing = false;
     }

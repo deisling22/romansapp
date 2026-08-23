@@ -16,6 +16,16 @@
       }
     },
     {
+      "name": "ingredient-recognition-model",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/models/coco-ssd/**"
+        ]
+      }
+    },
+    {
       "name": "assets",
       "installMode": "lazy",
       "updateMode": "prefetch",
