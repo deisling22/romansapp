@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1787518392458,
+  "timestamp": 1787519553407,
   "index": "/romansapp/index.html",
   "assetGroups": [
     {
@@ -11,18 +11,35 @@
         "ignoreVary": true
       },
       "urls": [
-        "/romansapp/chunk-B4jSOYpv.js",
-        "/romansapp/chunk-BLNVVSQn.js",
-        "/romansapp/chunk-BoM890ce.js",
-        "/romansapp/chunk-C2UYh8q6.js",
-        "/romansapp/chunk-DC0E9vif.js",
-        "/romansapp/chunk-DGO8AHT_.js",
+        "/romansapp/chunk-B7a197ZR.js",
+        "/romansapp/chunk-BMsVtroE.js",
+        "/romansapp/chunk-Bb6Nc7ib.js",
+        "/romansapp/chunk-CjRSxA_N.js",
+        "/romansapp/chunk-DyQxFC0K.js",
+        "/romansapp/chunk-Uiag_jOe.js",
         "/romansapp/favicon.ico",
         "/romansapp/index.html",
-        "/romansapp/main-RNQQQK7U.js",
+        "/romansapp/main-SMBY3PP4.js",
         "/romansapp/manifest.webmanifest",
         "/romansapp/polyfills-RV3JTMEC.js",
         "/romansapp/styles-MCYR27DI.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "ingredient-recognition-model",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/romansapp/assets/models/coco-ssd/group1-shard1of5",
+        "/romansapp/assets/models/coco-ssd/group1-shard2of5",
+        "/romansapp/assets/models/coco-ssd/group1-shard3of5",
+        "/romansapp/assets/models/coco-ssd/group1-shard4of5",
+        "/romansapp/assets/models/coco-ssd/group1-shard5of5",
+        "/romansapp/assets/models/coco-ssd/model.json"
       ],
       "patterns": []
     },
@@ -86,15 +103,21 @@
     "/romansapp/assets/icons/icon-512x512.png": "559d9c4318b45a1f2b10596bbb4c960fe521dbcc",
     "/romansapp/assets/icons/icon-72x72.png": "279825a1ac4377032ae996a1832c641e33ccf1b6",
     "/romansapp/assets/icons/icon-96x96.png": "592885efcbfee27e5e20be4fa3043589390d2740",
-    "/romansapp/chunk-B4jSOYpv.js": "d2477eaeb214b844a813cbbe721a3afce2044cd8",
-    "/romansapp/chunk-BLNVVSQn.js": "80f3c76198f2172e29e62b8ab521c37d72bb13f0",
-    "/romansapp/chunk-BoM890ce.js": "b28a0e75625da8bc4dc4c24e3ed5d3ad6c764c60",
-    "/romansapp/chunk-C2UYh8q6.js": "05f67bfb9dcb804b00625eeeb3ad76b09fa20316",
-    "/romansapp/chunk-DC0E9vif.js": "913bf3fba0adc41c8cc695aa9b703862202484da",
-    "/romansapp/chunk-DGO8AHT_.js": "86ac788b64256487f37a50fe955142678945ae49",
+    "/romansapp/assets/models/coco-ssd/group1-shard1of5": "beac87049d0e92f12ba12efd5581fab388bd0ca5",
+    "/romansapp/assets/models/coco-ssd/group1-shard2of5": "7e088a254885605d65163ac4cc4e4fc87f271642",
+    "/romansapp/assets/models/coco-ssd/group1-shard3of5": "f459bf06bbe055c6bab78baba088586cdfb8acb6",
+    "/romansapp/assets/models/coco-ssd/group1-shard4of5": "b8b8843bfd77fd5f488c76cde573775dfcc7f8bc",
+    "/romansapp/assets/models/coco-ssd/group1-shard5of5": "3528069df60c4b919de2c22c2a0bb36abde8484c",
+    "/romansapp/assets/models/coco-ssd/model.json": "a9a9244138f615ede4a437177453527b69c7aece",
+    "/romansapp/chunk-B7a197ZR.js": "5208827e47c75ce12de5211a57565d76790b8b42",
+    "/romansapp/chunk-BMsVtroE.js": "78da69813dd672f958abfe31f0616d674ed2b836",
+    "/romansapp/chunk-Bb6Nc7ib.js": "2e11cd6a3e2451e6c8e24c239a5a7d58bc80f393",
+    "/romansapp/chunk-CjRSxA_N.js": "53f478b1171912f9d6ab9c430f2a9ddd77f77a09",
+    "/romansapp/chunk-DyQxFC0K.js": "364fd1ff2259f5c34a94f5d55e90c5db16503e15",
+    "/romansapp/chunk-Uiag_jOe.js": "890f051c179cec90f6ffa0e56b8462cc8d622ccb",
     "/romansapp/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/romansapp/index.html": "6e0e8c3c5c23bc20bbbd43499b78b8b1bfe3a2d0",
-    "/romansapp/main-RNQQQK7U.js": "3609352eba433c49f104b57d53fef6a1db661d44",
+    "/romansapp/index.html": "434863589d915be01724c214bd7c2f632b7b9b98",
+    "/romansapp/main-SMBY3PP4.js": "069df93e867754fbba2fe3400c468eea145909bc",
     "/romansapp/manifest.webmanifest": "511185f8ee4d6e527fec66e2eeffe6425e8ad565",
     "/romansapp/polyfills-RV3JTMEC.js": "e83dcd401293cfb45ad0988a17d1815b3bb09c33",
     "/romansapp/styles-MCYR27DI.css": "efd77613e1a2d62ce3ac682e0f2245ed4e3675f3"
