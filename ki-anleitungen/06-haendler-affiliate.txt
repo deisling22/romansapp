@@ -1,0 +1,192 @@
+HAENDLERINTEGRATIONEN UND AFFILIATE-MONETARISIERUNG
+Stand: 23. August 2026
+
+ZIEL
+Diese Notiz sammelt moegliche Partner fuer die Uebergabe von Rezeptzutaten an
+Lebensmittelhaendler. Angaben zu Zugang, Reichweite und Verguetung muessen vor
+einer Umsetzung erneut anhand der aktuellen Partnerbedingungen geprueft werden.
+
+
+1. MOEGLICHE HAENDLER UND PLATTFORMEN
+
+REWE (Deutschland)
+- Affiliate-Partnerprogramm und individuelle B2B-Kooperationen vorhanden.
+- Eine frei dokumentierte Warenkorb-API fuer beliebige Apps ist nicht erkennbar.
+- Ein kompletter Rezept-zu-Warenkorb-Transfer erfordert voraussichtlich eine
+  direkte Vereinbarung mit REWE.
+- Prioritaet fuer Romansapp: hoch.
+
+EDEKA (Deutschland)
+- Geschuetzte API-Infrastruktur mit Client-ID und Client-Secret vorhanden.
+- Oeffentlich sichtbare Endpunkte liefern unter anderem Marktinformationen.
+- Eine frei registrierbare Produkt-, Warenkorb- oder Checkout-API ist nicht
+  belegt. Zugang und Funktionsumfang muessen direkt mit EDEKA geklaert werden.
+- Prioritaet fuer Romansapp: hoch als zweite Geschaeftsanfrage.
+
+Knuspr (Deutschland)
+- Online-Supermarkt mit eigenem Warenkorb und eigener Auslieferung.
+- Keine oeffentlich dokumentierte Verbraucher-Warenkorb-API gefunden.
+- Nur ueber individuelle Partnerschaft einplanen.
+
+Picnic (Deutschland und weitere europaeische Maerkte)
+- Online-Supermarkt mit Rezeptinhalten und eigener App.
+- Keine oeffentlich dokumentierte Warenkorb-API fuer externe Rezept-Apps gefunden.
+- Nur ueber individuelle Partnerschaft einplanen.
+
+Amazon Fresh (ausgewaehlte Regionen)
+- Amazon PartnerNet kann fuer zulaessige Produktlinks verwendet werden.
+- Keine allgemein nutzbare API fuer das Befuellen eines Fresh-Warenkorbs belegt.
+- PartnerNet-Regeln, Produktkategorien und regionale Verfuegbarkeit pruefen.
+
+Instacart Developer Platform (vor allem USA und Kanada)
+- Offizielle Entwicklerplattform fuer Rezept- und Meal-Planning-Apps.
+- Unterstuetzt Zutaten-Matching, Einkaufslisten, nahe Haendler, Preise,
+  Verfuegbarkeit und E-Commerce-Uebergaben.
+- API-Zugang und Produktionsfreigabe muessen beantragt werden.
+- Laut Dokumentation dauert der Weg von der Anfrage bis zur Freigabe typischerweise
+  etwa 30 bis 40 Tage.
+- Prioritaet fuer Romansapp: hoch bei Expansion nach Nordamerika, fuer den
+  deutschen Start ungeeignet.
+
+Kroger (USA)
+- Frei registrierbare, dokumentierte APIs fuer Produkte, Standorte, Identitaet
+  und das Hinzufuegen von Artikeln zum Kundenwarenkorb.
+- Geeignet fuer eine direkte technische Integration in den USA.
+- Prioritaet fuer Romansapp: nur bei US-Expansion.
+
+SmartCommerce / Basketful (international, Schwerpunkt USA)
+- Kommerzielle Click-to-Cart- und Shoppable-Recipe-Plattform.
+- Verbindet Inhalte laut Anbieter mit einem grossen Haendlernetzwerk.
+- Konkrete deutsche Haendlerabdeckung, Preise und Mindestvolumen vorab anfragen.
+- Eher B2B-Vertrag als frei nutzbare Entwickler-API.
+
+Ocado Smart Platform (international)
+- Enterprise-Plattform fuer den vollstaendigen Online-Lebensmittelhandel.
+- Fuer grosse Haendlerpartnerschaften, nicht als einfache API fuer kleine Apps.
+- Fuer Romansapp derzeit keine realistische Erstintegration.
+
+Bring! (Europa)
+- Publisher- und Einkaufslistenintegration als moegliche Zwischenstufe.
+- Uebergibt Zutaten in eine Einkaufsliste, bietet aber nicht automatisch einen
+  vollstaendigen Supermarkt-Checkout.
+
+
+2. WIE ROMANSAPP MIT AFFILIATE-LINKS GELD VERDIENEN KANN
+
+Grundmodell
+1. Ein Nutzer plant Rezepte und erzeugt daraus seine Einkaufsliste.
+2. Romansapp zeigt eine klar gekennzeichnete Aktion wie "Bei REWE suchen" oder
+   "Einkauf beim Partner starten".
+3. Der Link enthaelt die vom Partnerprogramm erlaubte Publisher- oder Tracking-ID.
+4. Der Nutzer waehlt beim Haendler Produkte aus und schliesst dort den Kauf ab.
+5. Romansapp erhaelt je nach Programm eine Verguetung, zum Beispiel fuer einen
+   qualifizierten Kauf, einen Neukunden oder eine andere vereinbarte Aktion.
+
+Die Verguetungsart, Cookie-Laufzeit, Storno-Regeln und Provisionshoehe sind je
+Partner verschieden und duerfen nicht fest in der App angenommen werden.
+
+Empfohlenes MVP
+- Ein Button pro Einkaufsliste: "Beim Partner einkaufen".
+- Optional ein Haendlerwaehler, wenn mehrere Partner zugelassen sind.
+- Zutaten als Suchbegriffe oder erlaubte Produkt-Deep-Links uebergeben.
+- Nicht automatisch behaupten, dass alle Zutaten im Warenkorb liegen, wenn nur
+  Suchseiten geoeffnet werden.
+- Klicks und abgeschlossene, vom Netzwerk gemeldete Conversions getrennt messen.
+- Bestehende Vorratsmengen vor der Uebergabe abziehen.
+
+Warum ein gemeinsamer Einstieg besser als viele Zutatenlinks ist
+- Der Nutzer versteht, dass er den Einkauf beim Haendler fortsetzt.
+- Die Rezeptansicht wird nicht mit Werbelinks ueberladen.
+- Tracking, Offenlegung und Partnerwechsel lassen sich zentral verwalten.
+- Eine spaetere echte Warenkorb-API kann dieselbe Bedienoberflaeche verwenden.
+
+Moegliche Einnahmemodelle
+- CPS/Revenue Share: Anteil oder Festbetrag nach einem qualifizierten Kauf.
+- CPA: feste Verguetung fuer Neukunden oder eine definierte Bestellung.
+- CPC: Verguetung pro gueltigem Klick, im Lebensmittelhandel eher seltener.
+- Sponsoring: hervorgehobener, klar gekennzeichneter Haendler oder Hersteller.
+- B2B-Lizenz: Romansapp stellt Rezept- und Mengenlogik einem Haendler bereit.
+
+
+3. TECHNISCHE VORBEREITUNG
+
+Die App sollte keine haendlerspezifischen URLs in Komponenten verteilen. Sinnvoll
+ist eine gemeinsame RetailerIntegration-Schnittstelle mit beispielsweise:
+
+- getAvailability(postalCode)
+- createSearchLink(ingredient, trackingContext)
+- createCart(items, postalCode), falls der Partner dies erlaubt
+- getCheckoutUrl(cartReference)
+- supportsDirectCart
+- supportsAffiliateTracking
+
+Ein zentraler Redirect-Endpunkt im Romansapp-Backend kann erlaubte Affiliate-Links
+erzeugen und Klickereignisse zaehlen. Er darf keine Ziel-URLs ungeprueft aus
+Benutzereingaben uebernehmen, damit kein Open Redirect entsteht.
+
+Fuer jede Uebergabe speichern:
+- interner Haendlercode
+- Kampagnen- oder Sub-ID ohne sensible Nutzerdaten
+- Zeitpunkt und Quelle, zum Beispiel Rezept oder Wochenplan
+- Anzahl der uebergebenen Zutaten
+- keine unnoetigen personenbezogenen Daten
+
+Bestellwert und Provision sollten nur aus offiziellen Conversion-Reports oder
+Webhooks des Partnerprogramms stammen, nicht aus Schaetzungen der App.
+
+
+4. PRODUKT-MATCHING
+
+Eine Zutat ist noch kein kaufbares Produkt. Fuer eine echte Warenkorbuebergabe
+werden mindestens folgende Schritte benoetigt:
+
+- Bezeichnungen normalisieren, zum Beispiel "Tomate" und "Tomaten".
+- Rezeptmengen in verfuegbare Packungsgroessen umrechnen.
+- generische Zutaten konkreten SKUs des ausgewaehlten Haendlers zuordnen.
+- Postleitzahl, Markt, Preis, Bestand und Ersatzprodukte beruecksichtigen.
+- Nutzer vor der Uebergabe Produktwahl und Mengen bestaetigen lassen.
+
+Ohne offiziellen Produktfeed oder eine Partner-API sollte Romansapp nur eine
+Haendlersuche verlinken und kein dauerhaftes SKU-Mapping aufbauen.
+
+
+5. RECHTLICHE UND PRODUKTSEITIGE LEITPLANKEN
+
+- Affiliate-Aktionen sichtbar als "Werbelink" oder "Affiliate-Link" kennzeichnen.
+- Datenschutz und Einwilligung fuer Cookies, Pixel oder vergleichbare
+  Tracking-Technologien nach aktueller Rechtslage pruefen.
+- Keine E-Mail-Adresse oder andere personenbezogene Daten in Affiliate-Sub-IDs
+  uebertragen.
+- Nur vom Partner erlaubte Logos, Produktbilder, Preise und Deep-Links verwenden.
+- Preise und Verfuegbarkeit nur anzeigen, wenn sie aktuell ueber eine zugelassene
+  Quelle geliefert werden.
+- Programmregeln zu Eigenbestellungen, Gutscheinseiten, App-Traffic und
+  Incentivierung beachten.
+- Vor Produktivstart Datenschutzerklaerung, Anbieterkennzeichnung und Texte durch
+  fachkundige Rechtsberatung pruefen lassen.
+
+
+6. EMPFOHLENE NAECHSTE SCHRITTE
+
+1. REWE Affiliate-Partnerprogramm mit einer kurzen Produktbeschreibung anfragen.
+2. Gleichzeitig REWE und EDEKA nach Produktfeed, Deep-Link- und Warenkorbzugang
+   fuer eine Rezept- und Einkaufslisten-App fragen.
+3. Nachfragen, ob App-Traffic/PWA-Traffic erlaubt ist und welche Parameter fuer
+   Sub-ID-Tracking genutzt werden duerfen.
+4. Provisionshoehe, Attributionsfenster, Mindestumsatz, Stornos, Auszahlungsgrenze
+   und Reporting schriftlich klaeren.
+5. Zunaechst einen transparenten Affiliate-Redirect zu Haendlersuchen umsetzen.
+6. Erst nach schriftlicher Freigabe Produktfeed oder Warenkorb-API integrieren.
+
+
+OFFIZIELLE EINSTIEGSPUNKTE
+- REWE Partnerprogramm: https://www.rewe.de/partnerprogramm/
+- EDEKA API-Anmeldung: https://b2c-gw.api.edeka/documentation/index.html
+- Instacart Developer Platform: https://docs.instacart.com/developer_platform_api/
+- Kroger Developer Portal: https://developer.kroger.com/
+- Amazon PartnerNet: https://partnernet.amazon.de/
+- SmartCommerce: https://www.smartcommerce.com/
+- Ocado Smart Platform: https://www.ocadogroup.com/solutions/ocado-smart-platform
+
+Hinweis: Diese Datei ist eine technische und geschaeftliche Arbeitsnotiz und
+keine Rechts- oder Steuerberatung.
