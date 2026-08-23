@@ -5,7 +5,10 @@ import de.roman.speiseplan.shopping.ShoppingListItem;
 import de.roman.speiseplan.shopping.ShoppingListItemRepository;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +26,24 @@ public class PantryService {
         this.shoppingListItemRepository = shoppingListItemRepository;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<PantryItemDto> getItems() {
-        return pantryItemRepository.findAllByOrderByPurchasedAtDescIngredientNameAsc().stream()
+        List<PantryItem> items = pantryItemRepository.findAllByOrderByPurchasedAtDescIngredientNameAsc();
+        Map<String, List<PantryItem>> grouped = items.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        this::batchKey,
+                        LinkedHashMap::new,
+                        java.util.stream.Collectors.toList()));
+        for (List<PantryItem> matches : grouped.values()) {
+            if (matches.size() < 2) {
+                continue;
+            }
+            PantryItem target = matches.getFirst();
+            target.setQuantity(matches.stream().mapToDouble(item -> item.getQuantity()).sum());
+            pantryItemRepository.deleteAll(matches.subList(1, matches.size()));
+        }
+        return grouped.values().stream()
+                .map(matches -> matches.getFirst())
                 .map(PantryItemDto::from)
                 .toList();
     }
@@ -34,11 +52,19 @@ public class PantryService {
     public List<PantryItemDto> checkoutCheckedItems() {
         List<ShoppingListItem> checkedItems = shoppingListItemRepository.findByCheckedTrue();
         Instant purchasedAt = Instant.now();
-        List<PantryItem> pantryItems = checkedItems.stream()
-                .map(item -> new PantryItem(
-                        item.getIngredientName(), item.getQuantity(), item.getUnit(), purchasedAt))
-                .toList();
-        List<PantryItem> savedItems = pantryItemRepository.saveAll(pantryItems);
+        Map<String, PantryItem> pantryItems = new LinkedHashMap<>();
+        for (ShoppingListItem item : checkedItems) {
+            String key = item.getIngredientName().toLowerCase(Locale.ROOT)
+                + "|" + item.getUnit().toLowerCase(Locale.ROOT);
+            PantryItem existing = pantryItems.get(key);
+            if (existing == null) {
+            pantryItems.put(key, new PantryItem(
+                item.getIngredientName(), item.getQuantity(), item.getUnit(), purchasedAt));
+            } else {
+            existing.setQuantity(existing.getQuantity() + item.getQuantity());
+            }
+        }
+        List<PantryItem> savedItems = pantryItemRepository.saveAll(pantryItems.values());
         shoppingListItemRepository.deleteAll(checkedItems);
         return savedItems.stream().map(PantryItemDto::from).toList();
     }
@@ -77,5 +103,11 @@ public class PantryService {
     @Transactional(readOnly = true)
     public long countItems() {
         return pantryItemRepository.count();
+    }
+
+    private String batchKey(PantryItem item) {
+        return item.getIngredientName().toLowerCase(Locale.ROOT)
+                + "|" + item.getUnit().toLowerCase(Locale.ROOT)
+                + "|" + item.getPurchasedAt();
     }
 }

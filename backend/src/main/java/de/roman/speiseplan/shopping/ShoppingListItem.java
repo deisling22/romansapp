@@ -71,6 +71,15 @@ public class ShoppingListItem {
         return checked;
     }
 
+    public void addQuantity(double additionalQuantity) {
+        this.quantity += additionalQuantity;
+        this.checked = false;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
+    }
+
     public void setChecked(boolean checked) {
         this.checked = checked;
     }

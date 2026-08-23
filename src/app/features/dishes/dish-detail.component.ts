@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, switchMap } from 'rxjs';
 import { DishApiService } from '../../core/dish-api.service';
 import { AuthService, AuthenticatedUser } from '../../core/auth.service';
 import { PantryApiService } from '../../core/pantry-api.service';
@@ -115,9 +115,11 @@ export class DishDetailComponent implements OnInit {
       ingredient.ingredientName,
       this.quantityToAdd(ingredient),
       ingredient.unit,
-    ))).subscribe({
+    ))).pipe(
+      switchMap(() => this.shoppingListApi.getAllItems()),
+    ).subscribe({
       next: (items) => {
-        this.cartItems = [...this.cartItems, ...items];
+        this.cartItems = items;
         this.successMessage = `${missing.length} ${missing.length === 1 ? 'Zutat wurde' : 'Zutaten wurden'} ergänzt.`;
         this.addingMissingIngredients = false;
       },

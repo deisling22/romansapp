@@ -76,7 +76,10 @@ export class ShoppingListComponent implements OnInit {
     this.successMessage = '';
     this.shoppingListApi.addItem(name, this.newQuantity, unit).subscribe({
       next: (item) => {
-        this.items = [...this.items, item];
+        const existingIndex = this.items.findIndex((entry) => entry.id === item.id);
+        this.items = existingIndex === -1
+          ? [...this.items, item]
+          : this.items.map((entry) => entry.id === item.id ? item : entry);
         this.newIngredientName = '';
         this.newQuantity = 1;
         this.successMessage = `${item.ingredientName} wurde hinzugefügt.`;

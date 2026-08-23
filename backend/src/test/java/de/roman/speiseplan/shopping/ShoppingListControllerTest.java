@@ -11,7 +11,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import tools.jackson.databind.ObjectMapper;
 import de.roman.speiseplan.dish.AddDishIngredientRequest;
 import de.roman.speiseplan.dish.CreateIngredientRequest;
+import de.roman.speiseplan.pantry.PantryItem;
+import de.roman.speiseplan.pantry.PantryItemRepository;
 import de.roman.speiseplan.plan.CreatePlanRequest;
+import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -19,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.JsonNode;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -29,6 +34,9 @@ class ShoppingListControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+        @Autowired
+        private PantryItemRepository pantryItemRepository;
 
     @Test
     void generateAndToggleShoppingListItems() throws Exception {
@@ -107,6 +115,117 @@ class ShoppingListControllerTest {
         mockMvc.perform(delete("/api/pantry/{itemId}", pantryItemId))
                 .andExpect(status().isNoContent());
     }
+
+        @Test
+        void equalCartItemsAreCombinedByIngredientAndUnit() throws Exception {
+                String ingredientName = "Warenkorb-Summen-Tomaten";
+
+                addCartItem(ingredientName, 400, "g");
+                addCartItem(ingredientName.toLowerCase(), 400, "g");
+
+                String cartResponse = mockMvc.perform(get("/api/shopping-list"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[?(@.ingredientName == '" + ingredientName + "')].quantity").value(800.0))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString();
+                long matchCount = 0;
+                for (JsonNode item : objectMapper.readTree(cartResponse)) {
+                        if (ingredientName.equalsIgnoreCase(item.get("ingredientName").stringValue())) {
+                                matchCount++;
+                        }
+                }
+                org.assertj.core.api.Assertions.assertThat(matchCount).isEqualTo(1);
+        }
+
+        @Test
+        void equalItemsShareOnePantryEntryPerCheckoutButNotAcrossCheckouts() throws Exception {
+                String ingredientName = "Vorrats-Chargen-Tomaten";
+
+                long firstItemId = addCartItem(ingredientName, 400, "g");
+                long combinedItemId = addCartItem(ingredientName, 400, "g");
+                org.assertj.core.api.Assertions.assertThat(combinedItemId).isEqualTo(firstItemId);
+                checkItem(firstItemId);
+                mockMvc.perform(post("/api/shopping-list/checkout"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].quantity").value(800.0));
+
+                long secondPurchaseId = addCartItem(ingredientName, 200, "g");
+                checkItem(secondPurchaseId);
+                mockMvc.perform(post("/api/shopping-list/checkout"))
+                                .andExpect(status().isOk());
+
+                String pantryResponse = mockMvc.perform(get("/api/pantry"))
+                                .andExpect(status().isOk())
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString();
+                JsonNode matchingItems = objectMapper.readTree(pantryResponse);
+                long matchCount = 0;
+                double totalQuantity = 0;
+                for (JsonNode item : matchingItems) {
+                        if (ingredientName.equals(item.get("ingredientName").stringValue())) {
+                                matchCount++;
+                                totalQuantity += item.get("quantity").asDouble();
+                        }
+                }
+                org.assertj.core.api.Assertions.assertThat(matchCount).isEqualTo(2);
+                org.assertj.core.api.Assertions.assertThat(totalQuantity).isEqualTo(1000.0);
+        }
+
+        @Test
+        void existingPantryDuplicatesAreCombinedOnlyWhenTheirPurchaseTimeMatches() throws Exception {
+                String ingredientName = "Bestehende-Vorrats-Chargen-Tomaten";
+                Instant firstPurchase = Instant.parse("2026-08-20T10:15:30Z");
+                Instant secondPurchase = Instant.parse("2026-08-21T10:15:30Z");
+                pantryItemRepository.saveAll(List.of(
+                                new PantryItem(ingredientName, 400, "g", firstPurchase),
+                                new PantryItem(ingredientName, 400, "g", firstPurchase),
+                                new PantryItem(ingredientName, 200, "g", secondPurchase)));
+
+                String pantryResponse = mockMvc.perform(get("/api/pantry"))
+                                .andExpect(status().isOk())
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString();
+                long matchCount = 0;
+                double firstBatchQuantity = 0;
+                double secondBatchQuantity = 0;
+                for (JsonNode item : objectMapper.readTree(pantryResponse)) {
+                        if (!ingredientName.equals(item.get("ingredientName").stringValue())) {
+                                continue;
+                        }
+                        matchCount++;
+                        if (firstPurchase.toString().equals(item.get("purchasedAt").stringValue())) {
+                                firstBatchQuantity = item.get("quantity").asDouble();
+                        }
+                        if (secondPurchase.toString().equals(item.get("purchasedAt").stringValue())) {
+                                secondBatchQuantity = item.get("quantity").asDouble();
+                        }
+                }
+                org.assertj.core.api.Assertions.assertThat(matchCount).isEqualTo(2);
+                org.assertj.core.api.Assertions.assertThat(firstBatchQuantity).isEqualTo(800.0);
+                org.assertj.core.api.Assertions.assertThat(secondBatchQuantity).isEqualTo(200.0);
+        }
+
+        private long addCartItem(String ingredientName, double quantity, String unit) throws Exception {
+                String response = mockMvc.perform(post("/api/shopping-list")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(objectMapper.writeValueAsString(
+                                                                new CreateShoppingListItemRequest(ingredientName, quantity, unit))))
+                                .andExpect(status().isCreated())
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString();
+                return objectMapper.readTree(response).get("id").asLong();
+        }
+
+        private void checkItem(long itemId) throws Exception {
+                mockMvc.perform(patch("/api/shopping-list/{itemId}", itemId)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content("{\"checked\": true}"))
+                                .andExpect(status().isOk());
+        }
 
     private long createPlan(String name) throws Exception {
         String response = mockMvc.perform(post("/api/plans")

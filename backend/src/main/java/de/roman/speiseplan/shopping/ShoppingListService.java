@@ -40,18 +40,33 @@ public class ShoppingListService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<ShoppingListItemDto> getAllItems() {
-        return shoppingListItemRepository.findAllByOrderByCheckedAscIngredientNameAsc().stream()
+        List<ShoppingListItem> items = shoppingListItemRepository.findAllByOrderByCheckedAscIngredientNameAsc();
+        Map<String, List<ShoppingListItem>> grouped = items.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        item -> normalizedKey(item.getIngredientName(), item.getUnit()),
+                        LinkedHashMap::new,
+                        java.util.stream.Collectors.toList()));
+        for (List<ShoppingListItem> matches : grouped.values()) {
+            if (matches.size() < 2) {
+                continue;
+            }
+            ShoppingListItem target = matches.getFirst();
+            target.setQuantity(matches.stream().mapToDouble(item -> item.getQuantity()).sum());
+            target.setChecked(matches.stream().allMatch(item -> item.isChecked()));
+            shoppingListItemRepository.deleteAll(matches.subList(1, matches.size()));
+        }
+        return grouped.values().stream()
+                .map(matches -> matches.getFirst())
                 .map(ShoppingListItemDto::from)
                 .toList();
     }
 
     @Transactional
     public ShoppingListItemDto addItem(CreateShoppingListItemRequest request) {
-        ShoppingListItem item = new ShoppingListItem(
-                request.ingredientName().trim(), request.quantity(), request.unit().trim());
-        return ShoppingListItemDto.from(shoppingListItemRepository.save(item));
+        return ShoppingListItemDto.from(mergeItem(
+            null, request.ingredientName().trim(), request.quantity(), request.unit().trim()));
     }
 
     @Transactional
@@ -65,7 +80,7 @@ public class ShoppingListService {
         for (DishIngredient dishIngredient : dishIngredients) {
             String name = dishIngredient.getIngredient().getName();
             String unit = dishIngredient.getIngredient().getUnit();
-            String key = name.toLowerCase() + "|" + unit.toLowerCase();
+            String key = normalizedKey(name, unit);
             aggregated.merge(
                     key,
                     new ShoppingListItem(plan, name, dishIngredient.getQuantityGrams(), unit),
@@ -73,9 +88,10 @@ public class ShoppingListService {
                             plan, existing.getIngredientName(), existing.getQuantity() + addition.getQuantity(), unit));
         }
 
-        shoppingListItemRepository.deleteByPlanId(planId);
-        List<ShoppingListItem> saved = shoppingListItemRepository.saveAll(aggregated.values());
-        return saved.stream().map(ShoppingListItemDto::from).toList();
+        return aggregated.values().stream()
+            .map(item -> mergeItem(plan, item.getIngredientName(), item.getQuantity(), item.getUnit()))
+            .map(ShoppingListItemDto::from)
+            .toList();
     }
 
     @Transactional
@@ -97,6 +113,30 @@ public class ShoppingListService {
     @Transactional(readOnly = true)
     public long countItems() {
         return shoppingListItemRepository.count();
+    }
+
+    private ShoppingListItem mergeItem(
+            MealPlan plan, String ingredientName, double quantity, String unit) {
+        List<ShoppingListItem> matches = shoppingListItemRepository
+                .findByIngredientNameIgnoreCaseAndUnitIgnoreCaseOrderByIdAsc(ingredientName, unit);
+        if (matches.isEmpty()) {
+            return shoppingListItemRepository.save(new ShoppingListItem(plan, ingredientName, quantity, unit));
+        }
+
+        ShoppingListItem target = matches.getFirst();
+        double combinedQuantity = quantity + matches.stream()
+                .mapToDouble(item -> item.getQuantity())
+                .sum();
+        target.addQuantity(combinedQuantity - target.getQuantity());
+        if (matches.size() > 1) {
+            shoppingListItemRepository.deleteAll(matches.subList(1, matches.size()));
+        }
+        return target;
+    }
+
+    private String normalizedKey(String ingredientName, String unit) {
+        return ingredientName.toLowerCase(java.util.Locale.ROOT)
+                + "|" + unit.toLowerCase(java.util.Locale.ROOT);
     }
 
     private MealPlan requirePlan(Long planId) {
