@@ -14,6 +14,10 @@ export class PantryApiService {
     return this.http.get<PantryItem[]>(`${this.apiUrl}/pantry`);
   }
 
+  addBatch(items: Array<{ ingredientName: string; quantity: number; unit: string }>): Observable<PantryItem[]> {
+    return this.http.post<PantryItem[]>(`${this.apiUrl}/pantry/batches`, { items });
+  }
+
   deleteItem(itemId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/pantry/${itemId}`);
   }

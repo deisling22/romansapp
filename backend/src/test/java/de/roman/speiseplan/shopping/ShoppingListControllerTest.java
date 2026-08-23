@@ -208,6 +208,29 @@ class ShoppingListControllerTest {
                 org.assertj.core.api.Assertions.assertThat(secondBatchQuantity).isEqualTo(200.0);
         }
 
+                @Test
+                void scannedIngredientsAreStoredAsOneCombinedPantryBatch() throws Exception {
+                                String response = mockMvc.perform(post("/api/pantry/batches")
+                                                                                                .contentType(MediaType.APPLICATION_JSON)
+                                                                                                .content("""
+                                                                                                                                {"items":[
+                                                                                                                                        {"ingredientName":"Scan-Tomate","quantity":2,"unit":"Stk."},
+                                                                                                                                        {"ingredientName":"scan-tomate","quantity":1,"unit":"Stk."},
+                                                                                                                                        {"ingredientName":"Scan-Banane","quantity":3,"unit":"Stk."}
+                                                                                                                                ]}
+                                                                                                                                """))
+                                                                .andExpect(status().isCreated())
+                                                                .andExpect(jsonPath("$.length()").value(2))
+                                                                .andExpect(jsonPath("$[?(@.ingredientName == 'Scan-Tomate')].quantity").value(3.0))
+                                                                .andReturn()
+                                                                .getResponse()
+                                                                .getContentAsString();
+
+                                JsonNode items = objectMapper.readTree(response);
+                                org.assertj.core.api.Assertions.assertThat(items.get(0).get("purchasedAt").stringValue())
+                                                                .isEqualTo(items.get(1).get("purchasedAt").stringValue());
+                }
+
         private long addCartItem(String ingredientName, double quantity, String unit) throws Exception {
                 String response = mockMvc.perform(post("/api/shopping-list")
                                                 .contentType(MediaType.APPLICATION_JSON)

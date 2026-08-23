@@ -22,6 +22,7 @@ import { StarRatingComponent } from './shared/star-rating.component';
 import { CreatorFeedComponent } from './features/creators/creator-feed.component';
 import { CreatorPlanComponent } from './features/creators/creator-plan.component';
 import { CreatorProfileComponent } from './features/creators/creator-profile.component';
+import { IngredientScanComponent } from './features/ingredient-scan/ingredient-scan.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -40,6 +41,7 @@ import { CreatorProfileComponent } from './features/creators/creator-profile.com
         CreatorFeedComponent,
         CreatorProfileComponent,
         CreatorPlanComponent,
+        IngredientScanComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,

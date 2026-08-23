@@ -15,6 +15,7 @@ import { AuthGuard } from './core/auth.guard';
 import { CreatorFeedComponent } from './features/creators/creator-feed.component';
 import { CreatorPlanComponent } from './features/creators/creator-plan.component';
 import { CreatorProfileComponent } from './features/creators/creator-profile.component';
+import { IngredientScanComponent } from './features/ingredient-scan/ingredient-scan.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: DashboardComponent },
@@ -31,6 +32,7 @@ const routes: Routes = [
   { path: 'creators', component: CreatorFeedComponent },
   { path: 'creators/:creatorId', component: CreatorProfileComponent },
   { path: 'creators/:creatorId/plans/:planId', component: CreatorPlanComponent },
+  { path: 'ingredient-scan', component: IngredientScanComponent },
   {
     path: 'plans/:planId/shopping-list',
     component: ShoppingListComponent,

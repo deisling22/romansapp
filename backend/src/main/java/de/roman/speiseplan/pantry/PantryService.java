@@ -70,6 +70,26 @@ public class PantryService {
     }
 
     @Transactional
+    public List<PantryItemDto> addBatch(AddPantryBatchRequest request) {
+        Instant purchasedAt = Instant.now();
+        Map<String, PantryItem> pantryItems = new LinkedHashMap<>();
+        for (AddPantryItemRequest item : request.items()) {
+            String ingredientName = item.ingredientName().trim();
+            String unit = item.unit().trim();
+            String key = ingredientName.toLowerCase(Locale.ROOT) + "|" + unit.toLowerCase(Locale.ROOT);
+            PantryItem existing = pantryItems.get(key);
+            if (existing == null) {
+                pantryItems.put(key, new PantryItem(ingredientName, item.quantity(), unit, purchasedAt));
+            } else {
+                existing.setQuantity(existing.getQuantity() + item.quantity());
+            }
+        }
+        return pantryItemRepository.saveAll(pantryItems.values()).stream()
+                .map(PantryItemDto::from)
+                .toList();
+    }
+
+    @Transactional
     public void deleteItem(Long itemId) {
         if (!pantryItemRepository.existsById(itemId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vorrat wurde nicht gefunden.");

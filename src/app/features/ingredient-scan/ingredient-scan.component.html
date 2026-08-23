@@ -1,0 +1,89 @@
+<main class="scan-screen">
+  <a class="scan-back" routerLink="/">‹ Übersicht</a>
+  <header class="scan-header">
+    <p class="scan-eyebrow">Lokal auf deinem Gerät</p>
+    <h1>Zutaten scannen</h1>
+    <p>Fotografiere deine Lebensmittel. Die Vorschläge werden vor dem Speichern von dir geprüft.</p>
+  </header>
+
+  <section class="capture-panel" aria-labelledby="capture-heading">
+    <h2 id="capture-heading">Bild auswählen</h2>
+    <div class="capture-actions">
+      <label class="capture-button primary">
+        Kamera öffnen
+        <input #cameraInput type="file" accept="image/*" capture="environment" (change)="selectImage($event)" />
+      </label>
+      <label class="capture-button secondary">
+        Aus Mediathek
+        <input #libraryInput type="file" accept="image/*" (change)="selectImage($event)" />
+      </label>
+    </div>
+    <p class="privacy-note">Das Bild wird nicht hochgeladen. Die Erkennung läuft mit TensorFlow.js in deinem Browser.</p>
+  </section>
+
+  @if (imageUrl) {
+    <section class="image-stage" aria-label="Ausgewähltes Bild">
+      <img #scanImage [src]="imageUrl" alt="Zu analysierende Zutaten" />
+      <button type="button" [disabled]="analyzing" (click)="analyze(scanImage)">
+        {{ analyzing ? 'Modell analysiert ...' : analyzed ? 'Erneut analysieren' : 'Zutaten erkennen' }}
+      </button>
+    </section>
+  }
+
+  @if (errorMessage) {
+    <p class="scan-status error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (analyzed || ingredients.length > 0) {
+    <section class="review-section" aria-labelledby="review-heading">
+      <div class="review-heading">
+        <div>
+          <p class="scan-eyebrow">Vor dem Speichern prüfen</p>
+          <h2 id="review-heading">Erkannte Zutaten</h2>
+        </div>
+        <span>{{ ingredients.length }}</span>
+      </div>
+
+      <div class="ingredient-list">
+        @for (ingredient of ingredients; track ingredient.id) {
+          <div class="ingredient-row">
+            <label>
+              <span>Zutat</span>
+              <input [(ngModel)]="ingredient.name" [name]="'name-' + ingredient.id" maxlength="120" />
+            </label>
+            <label>
+              <span>Menge</span>
+              <input
+                type="number"
+                min="0.01"
+                step="0.01"
+                [(ngModel)]="ingredient.quantity"
+                [name]="'quantity-' + ingredient.id" />
+            </label>
+            <label>
+              <span>Einheit</span>
+              <select [(ngModel)]="ingredient.unit" [name]="'unit-' + ingredient.id">
+                @for (unit of units; track unit) {
+                  <option [value]="unit">{{ unit }}</option>
+                }
+              </select>
+            </label>
+            <button
+              type="button"
+              class="remove-button"
+              [attr.aria-label]="ingredient.name + ' entfernen'"
+              (click)="removeIngredient(ingredient.id)">×</button>
+            @if (ingredient.confidence !== null) {
+              <small>{{ confidenceLabel(ingredient.confidence) }}</small>
+            }
+          </div>
+        }
+      </div>
+
+      <button type="button" class="add-button" (click)="addIngredient()">Zutat ergänzen</button>
+      <button type="button" class="save-button" [disabled]="saving" (click)="save()">
+        {{ saving ? 'Wird übernommen ...' : 'In den Vorrat übernehmen' }}
+      </button>
+    </section>
+  }
+</main>
