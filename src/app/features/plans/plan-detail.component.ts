@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { DashboardApiService } from '../../core/dashboard-api.service';
+import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { Dish } from '../../core/models';
 
 @Component({
@@ -17,10 +18,13 @@ export class PlanDetailComponent implements OnInit {
   loading = true;
   errorMessage = '';
   cookingDishId: number | null = null;
+  addingToCart = false;
 
   constructor(
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly dashboardApi: DashboardApiService,
+    private readonly shoppingListApi: ShoppingListApiService,
     readonly mealPlanApi: MealPlanApiService,
   ) {}
 
@@ -56,6 +60,23 @@ export class PlanDetailComponent implements OnInit {
       error: () => {
         this.errorMessage = 'Das Gericht konnte nicht als gekocht markiert werden.';
         this.cookingDishId = null;
+      },
+    });
+  }
+
+  addIngredientsToCart(): void {
+    if (this.addingToCart || this.dishes.length === 0) {
+      return;
+    }
+    this.addingToCart = true;
+    this.errorMessage = '';
+    this.shoppingListApi.generate(this.planId).subscribe({
+      next: () => {
+        void this.router.navigate(['/shopping-list']);
+      },
+      error: () => {
+        this.errorMessage = 'Die Zutaten konnten nicht in den Warenkorb gelegt werden.';
+        this.addingToCart = false;
       },
     });
   }

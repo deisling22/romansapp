@@ -59,6 +59,11 @@ class ShoppingListControllerTest {
         mockMvc.perform(get("/api/plans/{planId}/shopping-list", planId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].checked").value(true));
+
+        mockMvc.perform(get("/api/shopping-list"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + itemId + ")].ingredientName")
+                        .value("Einkaufslisten-Zutat"));
     }
 
     @Test

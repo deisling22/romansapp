@@ -34,6 +34,12 @@
     </section>
   }
 
-  <a class="secondary-action" [routerLink]="['/plans', planId, 'shopping-list']">Einkaufsliste</a>
+  <button
+    type="button"
+    class="secondary-action"
+    [disabled]="addingToCart || dishes.length === 0"
+    (click)="addIngredientsToCart()">
+    {{ addingToCart ? 'Wird hinzugefügt ...' : 'Zutaten in den Warenkorb' }}
+  </button>
   <a class="primary-action" [routerLink]="['/plans', planId, 'dishes', 'new']">Gericht hinzufügen</a>
 </main>

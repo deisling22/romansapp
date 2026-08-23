@@ -224,7 +224,7 @@ h1 {
 .primary-action {
   position: fixed;
   right: max(20px, calc((100vw - 720px) / 2));
-  bottom: 24px;
+  bottom: 76px;
   display: block;
   box-sizing: border-box;
   border-radius: 8px;
@@ -240,7 +240,7 @@ h1 {
 .secondary-action {
   position: fixed;
   left: max(20px, calc((100vw - 720px) / 2));
-  bottom: 24px;
+  bottom: 76px;
   display: block;
   box-sizing: border-box;
   border: 1px solid #26736f;
@@ -250,8 +250,34 @@ h1 {
   min-height: 52px;
   padding: 16px 20px;
   font-weight: 700;
+  font: inherit;
   text-align: center;
   text-decoration: none;
+}
+
+.secondary-action:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+@media (max-width: 639px) {
+  .screen {
+    padding-bottom: 164px;
+  }
+
+  .secondary-action,
+  .primary-action {
+    min-height: 64px;
+    padding: 10px 12px;
+  }
+
+  .secondary-action {
+    right: calc(50% + 5px);
+  }
+
+  .primary-action {
+    left: calc(50% + 5px);
+  }
 }
 
 
