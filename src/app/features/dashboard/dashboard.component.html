@@ -33,6 +33,31 @@
           }
         </div>
       </div>
+
+      @if (dashboard.nutritionTrackingEnabled) {
+        <div class="stat-grid nutrition-grid" aria-label="Weitere Nährwerte heute">
+          <div class="stat-card">
+            <span class="stat-label">Kohlenhydrate heute</span>
+            <span class="stat-value">{{ displayInteger(dashboard.carbsToday) }} g</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Fett heute</span>
+            <span class="stat-value">{{ displayInteger(dashboard.fatToday) }} g</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Vitamin A heute</span>
+            <span class="stat-value">{{ displayInteger(dashboard.vitaminAToday) }} µg</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Vitamin C heute</span>
+            <span class="stat-value">{{ displayInteger(dashboard.vitaminCToday) }} mg</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Vitamin D heute</span>
+            <span class="stat-value">{{ displayInteger(dashboard.vitaminDToday) }} µg</span>
+          </div>
+        </div>
+      }
       @if (dashboard.nextDish) {
         <article class="next-dish">
           <p class="eyebrow">Nächstes Gericht</p>

@@ -15,6 +15,7 @@ export class SettingsComponent implements OnInit {
     defaultPortionSize: [1, [Validators.required, Validators.min(1)]],
     bodyWeightKg: this.formBuilder.control<number | null>(null),
     bodyHeightCm: this.formBuilder.control<number | null>(null),
+    nutritionTrackingEnabled: [false],
   });
 
   loading = true;
@@ -35,6 +36,7 @@ export class SettingsComponent implements OnInit {
           defaultPortionSize: profile.defaultPortionSize,
           bodyWeightKg: profile.bodyWeightKg,
           bodyHeightCm: profile.bodyHeightCm,
+          nutritionTrackingEnabled: profile.nutritionTrackingEnabled,
         });
         this.loading = false;
       },

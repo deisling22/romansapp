@@ -5,6 +5,14 @@ import { environment } from '../../environments/environment';
 import { DishCatalogEntry, DishDetail, DishIngredientEntry, DishRatingSummary, Ingredient, PrepStep } from './models';
 import { toAbsoluteImageUrl } from './image-url';
 
+export interface NutritionUpdate {
+  carbsGrams: number | null;
+  fatGrams: number | null;
+  vitaminAMcg: number | null;
+  vitaminCMg: number | null;
+  vitaminDMcg: number | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DishApiService {
   private readonly apiUrl = environment.apiUrl;
@@ -35,6 +43,10 @@ export class DishApiService {
 
   setFavorite(dishId: number, favorite: boolean): Observable<{ favorite: boolean }> {
     return this.http.put<{ favorite: boolean }>(`${this.apiUrl}/dishes/${dishId}/favorite`, { favorite });
+  }
+
+  updateNutrition(dishId: number, nutrition: NutritionUpdate): Observable<NutritionUpdate> {
+    return this.http.put<NutritionUpdate>(`${this.apiUrl}/dishes/${dishId}/nutrition`, nutrition);
   }
 
   addImage(dishId: number, image: File): Observable<{ imageUrl: string }> {

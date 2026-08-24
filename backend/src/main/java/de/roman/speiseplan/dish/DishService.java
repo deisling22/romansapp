@@ -105,6 +105,11 @@ public class DishService {
                 splitTags(dish.getTags()),
                 DishNutritionCalculator.caloriesPerServing(dishIngredients, dish.getServings()),
                 DishNutritionCalculator.proteinPerServing(dishIngredients, dish.getServings()),
+                dish.getCarbsGrams(),
+                dish.getFatGrams(),
+                dish.getVitaminAMcg(),
+                dish.getVitaminCMg(),
+                dish.getVitaminDMcg(),
                 images.stream().map(DishImage::getImageUrl).toList(),
                 steps.stream()
                         .map(step -> new PrepStepDto(step.getId(), step.getStepOrder(), step.getText(), step.getTimerSeconds()))
@@ -120,6 +125,19 @@ public class DishService {
                 summary == null ? 0 : summary.getRatingCount().intValue(),
                 myRating,
                 userEmail != null && dishFavoriteRepository.existsByDishIdAndUserEmail(dishId, userEmail));
+    }
+
+    @Transactional
+    public NutritionDto updateNutrition(Long dishId, NutritionUpdateRequest request) {
+        Dish dish = requireDish(dishId);
+        dish.updateNutrition(
+                request.carbsGrams(),
+                request.fatGrams(),
+                request.vitaminAMcg(),
+                request.vitaminCMg(),
+                request.vitaminDMcg());
+        return new NutritionDto(
+                dish.getCarbsGrams(), dish.getFatGrams(), dish.getVitaminAMcg(), dish.getVitaminCMg(), dish.getVitaminDMcg());
     }
 
     @Transactional

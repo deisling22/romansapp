@@ -53,6 +53,16 @@ h1 {
   gap: 12px;
 }
 
+.nutrition-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 520px) {
+  .nutrition-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .stat-card {
   display: grid;
   gap: 4px;

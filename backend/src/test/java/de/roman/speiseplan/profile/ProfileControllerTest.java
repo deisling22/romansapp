@@ -27,11 +27,12 @@ class ProfileControllerTest {
     void getAndUpdateProfile() throws Exception {
         mockMvc.perform(get("/api/profile")).andExpect(status().isOk());
 
-        String body = objectMapper.writeValueAsString(new ProfileUpdateRequest(1.5, 82.0, 181.0));
+        String body = objectMapper.writeValueAsString(new ProfileUpdateRequest(1.5, 82.0, 181.0, true));
         mockMvc.perform(put("/api/profile").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.defaultPortionSize").value(1.5))
                 .andExpect(jsonPath("$.bodyWeightKg").value(82.0))
-                .andExpect(jsonPath("$.bodyHeightCm").value(181.0));
+                .andExpect(jsonPath("$.bodyHeightCm").value(181.0))
+                .andExpect(jsonPath("$.nutritionTrackingEnabled").value(true));
     }
 }

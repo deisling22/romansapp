@@ -6,5 +6,6 @@ import jakarta.validation.constraints.NotNull;
 public record ProfileUpdateRequest(
         @NotNull @DecimalMin(value = "0.1") Double defaultPortionSize,
         @DecimalMin(value = "1") Double bodyWeightKg,
-        @DecimalMin(value = "1") Double bodyHeightCm) {
+        @DecimalMin(value = "1") Double bodyHeightCm,
+        @NotNull Boolean nutritionTrackingEnabled) {
 }

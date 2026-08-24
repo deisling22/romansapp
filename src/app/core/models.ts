@@ -75,6 +75,11 @@ export interface DishDetail {
   tags: string[];
   caloriesPerServing: number;
   proteinPerServing: number;
+  carbsGrams: number | null;
+  fatGrams: number | null;
+  vitaminAMcg: number | null;
+  vitaminCMg: number | null;
+  vitaminDMcg: number | null;
   galleryImageUrls: string[];
   steps: PrepStep[];
   ingredients: DishIngredientEntry[];
@@ -113,6 +118,12 @@ export interface DashboardData {
   proteinToday: number;
   proteinGoal: number | null;
   proteinPercent: number | null;
+  nutritionTrackingEnabled: boolean;
+  carbsToday: number;
+  fatToday: number;
+  vitaminAToday: number;
+  vitaminCToday: number;
+  vitaminDToday: number;
   nextDish: NextDish | null;
   cartItemCount: number;
   pantryItemCount: number;
@@ -122,6 +133,7 @@ export interface Profile {
   defaultPortionSize: number;
   bodyWeightKg: number | null;
   bodyHeightCm: number | null;
+  nutritionTrackingEnabled: boolean;
 }
 
 export interface ShoppingListItem {

@@ -23,6 +23,16 @@ export class DishDetailComponent implements OnInit {
     quantityGrams: [100, [Validators.required, Validators.min(1)]],
   });
 
+  readonly nutritionForm = this.formBuilder.group({
+    carbsGrams: this.formBuilder.control<number | null>(null),
+    fatGrams: this.formBuilder.control<number | null>(null),
+    vitaminAMcg: this.formBuilder.control<number | null>(null),
+    vitaminCMg: this.formBuilder.control<number | null>(null),
+    vitaminDMcg: this.formBuilder.control<number | null>(null),
+  });
+
+  savingNutrition = false;
+
   dishId = 0;
   dish: DishDetail | null = null;
   ingredients: Ingredient[] = [];
@@ -156,6 +166,13 @@ export class DishDetailComponent implements OnInit {
       next: (dish) => {
         this.dish = dish;
         this.selectedServings = dish.servings;
+        this.nutritionForm.setValue({
+          carbsGrams: dish.carbsGrams,
+          fatGrams: dish.fatGrams,
+          vitaminAMcg: dish.vitaminAMcg,
+          vitaminCMg: dish.vitaminCMg,
+          vitaminDMcg: dish.vitaminDMcg,
+        });
         this.loading = false;
       },
       error: () => {
@@ -220,6 +237,25 @@ export class DishDetailComponent implements OnInit {
       error: () => {
         this.errorMessage = 'Das Kochbuch konnte nicht aktualisiert werden.';
         this.savingFavorite = false;
+      },
+    });
+  }
+
+  saveNutrition(): void {
+    if (this.savingNutrition) {
+      return;
+    }
+    this.savingNutrition = true;
+    this.dishApi.updateNutrition(this.dishId, this.nutritionForm.getRawValue()).subscribe({
+      next: (nutrition) => {
+        if (this.dish) {
+          Object.assign(this.dish, nutrition);
+        }
+        this.savingNutrition = false;
+      },
+      error: () => {
+        this.errorMessage = 'Die Nährwerte konnten nicht gespeichert werden.';
+        this.savingNutrition = false;
       },
     });
   }

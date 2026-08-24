@@ -67,6 +67,11 @@ public class DashboardService {
 
         double caloriesToday = 0;
         double proteinToday = 0;
+        double carbsToday = 0;
+        double fatToday = 0;
+        double vitaminAToday = 0;
+        double vitaminCToday = 0;
+        double vitaminDToday = 0;
         for (PlanEntry entry : cookedToday) {
             Dish dish = entry.getDish();
             List<DishIngredient> ingredients = ingredientsByDish.getOrDefault(dish.getId(), List.of());
@@ -74,6 +79,11 @@ public class DashboardService {
             double perServingProtein = DishNutritionCalculator.proteinPerServing(ingredients, dish.getServings());
             caloriesToday += perServingCalories * profile.defaultPortionSize();
             proteinToday += perServingProtein * profile.defaultPortionSize();
+            carbsToday += orZero(dish.getCarbsGrams()) * profile.defaultPortionSize();
+            fatToday += orZero(dish.getFatGrams()) * profile.defaultPortionSize();
+            vitaminAToday += orZero(dish.getVitaminAMcg()) * profile.defaultPortionSize();
+            vitaminCToday += orZero(dish.getVitaminCMg()) * profile.defaultPortionSize();
+            vitaminDToday += orZero(dish.getVitaminDMcg()) * profile.defaultPortionSize();
         }
 
         Double proteinGoal = profile.bodyWeightKg() == null ? null : profile.bodyWeightKg() * 2;
@@ -106,9 +116,19 @@ public class DashboardService {
             proteinToday,
             proteinGoal,
             proteinPercent,
+            profile.nutritionTrackingEnabled(),
+            carbsToday,
+            fatToday,
+            vitaminAToday,
+            vitaminCToday,
+            vitaminDToday,
             nextDish,
             shoppingListService.countItems(),
             pantryService.countItems());
+    }
+
+    private static double orZero(Double value) {
+        return value == null ? 0 : value;
     }
 
     @Transactional

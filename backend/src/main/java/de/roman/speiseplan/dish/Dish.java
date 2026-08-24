@@ -33,6 +33,21 @@ public class Dish {
     @Column(length = 255)
     private String tags;
 
+    @Column(name = "carbs_grams")
+    private Double carbsGrams;
+
+    @Column(name = "fat_grams")
+    private Double fatGrams;
+
+    @Column(name = "vitamin_a_mcg")
+    private Double vitaminAMcg;
+
+    @Column(name = "vitamin_c_mg")
+    private Double vitaminCMg;
+
+    @Column(name = "vitamin_d_mcg")
+    private Double vitaminDMcg;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -103,6 +118,35 @@ public class Dish {
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+
+    public Double getCarbsGrams() {
+        return carbsGrams;
+    }
+
+    public Double getFatGrams() {
+        return fatGrams;
+    }
+
+    public Double getVitaminAMcg() {
+        return vitaminAMcg;
+    }
+
+    public Double getVitaminCMg() {
+        return vitaminCMg;
+    }
+
+    public Double getVitaminDMcg() {
+        return vitaminDMcg;
+    }
+
+    public void updateNutrition(
+            Double carbsGrams, Double fatGrams, Double vitaminAMcg, Double vitaminCMg, Double vitaminDMcg) {
+        this.carbsGrams = carbsGrams;
+        this.fatGrams = fatGrams;
+        this.vitaminAMcg = vitaminAMcg;
+        this.vitaminCMg = vitaminCMg;
+        this.vitaminDMcg = vitaminDMcg;
     }
 
     public Instant getCreatedAt() {

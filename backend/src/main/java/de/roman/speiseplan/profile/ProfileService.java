@@ -22,6 +22,7 @@ public class ProfileService {
         profile.setDefaultPortionSize(request.defaultPortionSize());
         profile.setBodyWeightKg(request.bodyWeightKg());
         profile.setBodyHeightCm(request.bodyHeightCm());
+        profile.setNutritionTrackingEnabled(request.nutritionTrackingEnabled());
         return toDto(userProfileRepository.save(profile));
     }
 
@@ -32,6 +33,10 @@ public class ProfileService {
     }
 
     private ProfileDto toDto(UserProfile profile) {
-        return new ProfileDto(profile.getDefaultPortionSize(), profile.getBodyWeightKg(), profile.getBodyHeightCm());
+        return new ProfileDto(
+                profile.getDefaultPortionSize(),
+                profile.getBodyWeightKg(),
+                profile.getBodyHeightCm(),
+                profile.isNutritionTrackingEnabled());
     }
 }

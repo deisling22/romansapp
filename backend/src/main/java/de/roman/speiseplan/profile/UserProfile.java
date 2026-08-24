@@ -22,6 +22,9 @@ public class UserProfile {
     @Column(name = "body_height_cm")
     private Double bodyHeightCm;
 
+    @Column(name = "nutrition_tracking_enabled", nullable = false)
+    private boolean nutritionTrackingEnabled = false;
+
     protected UserProfile() {
     }
 
@@ -51,5 +54,13 @@ public class UserProfile {
 
     public void setBodyHeightCm(Double bodyHeightCm) {
         this.bodyHeightCm = bodyHeightCm;
+    }
+
+    public boolean isNutritionTrackingEnabled() {
+        return nutritionTrackingEnabled;
+    }
+
+    public void setNutritionTrackingEnabled(boolean nutritionTrackingEnabled) {
+        this.nutritionTrackingEnabled = nutritionTrackingEnabled;
     }
 }

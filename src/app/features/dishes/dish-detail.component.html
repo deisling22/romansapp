@@ -38,6 +38,12 @@
         <span>{{ dish.servings }} {{ dish.servings === 1 ? 'Portion' : 'Portionen' }}</span>
         <span>{{ dish.caloriesPerServing }} kcal / Portion</span>
         <span>{{ dish.proteinPerServing }} g Protein / Portion</span>
+        @if (dish.carbsGrams !== null) {
+          <span>{{ dish.carbsGrams }} g Kohlenhydrate / Portion</span>
+        }
+        @if (dish.fatGrams !== null) {
+          <span>{{ dish.fatGrams }} g Fett / Portion</span>
+        }
       </div>
       <div class="rating-block">
         <app-star-rating [average]="dish.averageRating" [count]="dish.ratingCount"></app-star-rating>
@@ -164,6 +170,23 @@
           <input id="quantityGrams" type="number" min="1" formControlName="quantityGrams" />
           <button type="submit" [disabled]="savingIngredient">
             {{ savingIngredient ? 'Wird gespeichert ...' : 'Hinzufügen' }}
+          </button>
+        </form>
+
+        <form class="nutrition-form" [formGroup]="nutritionForm" (ngSubmit)="saveNutrition()" novalidate>
+          <p class="nutrition-hint">Optionale Angaben pro Portion, für Vitamin- und Nährwert-Tracking im Dashboard.</p>
+          <label for="carbsGrams">Kohlenhydrate (g)</label>
+          <input id="carbsGrams" type="number" min="0" step="0.1" formControlName="carbsGrams" />
+          <label for="fatGrams">Fett (g)</label>
+          <input id="fatGrams" type="number" min="0" step="0.1" formControlName="fatGrams" />
+          <label for="vitaminAMcg">Vitamin A (µg)</label>
+          <input id="vitaminAMcg" type="number" min="0" step="0.1" formControlName="vitaminAMcg" />
+          <label for="vitaminCMg">Vitamin C (mg)</label>
+          <input id="vitaminCMg" type="number" min="0" step="0.1" formControlName="vitaminCMg" />
+          <label for="vitaminDMcg">Vitamin D (µg)</label>
+          <input id="vitaminDMcg" type="number" min="0" step="0.1" formControlName="vitaminDMcg" />
+          <button type="submit" [disabled]="savingNutrition">
+            {{ savingNutrition ? 'Wird gespeichert ...' : 'Nährwerte speichern' }}
           </button>
         </form>
       </details>

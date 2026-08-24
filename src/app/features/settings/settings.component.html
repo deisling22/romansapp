@@ -17,6 +17,10 @@
       <input id="bodyWeightKg" type="number" min="0" formControlName="bodyWeightKg" />
       <label for="bodyHeightCm">Körpergröße (cm)</label>
       <input id="bodyHeightCm" type="number" min="0" formControlName="bodyHeightCm" />
+      <label class="checkbox-label" for="nutritionTrackingEnabled">
+        <input id="nutritionTrackingEnabled" type="checkbox" formControlName="nutritionTrackingEnabled" />
+        Vitamine &amp; weitere Makronährstoffe (Kohlenhydrate, Fett) zusätzlich verfolgen
+      </label>
       @if (errorMessage) {
         <p class="field-error" role="alert">{{ errorMessage }}</p>
       }

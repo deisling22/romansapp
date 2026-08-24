@@ -71,6 +71,11 @@ public class DishController {
         return new ImageResponse(dishService.addImage(dishId, image));
     }
 
+    @PutMapping("/{dishId}/nutrition")
+    public NutritionDto updateNutrition(@PathVariable Long dishId, @Valid @RequestBody NutritionUpdateRequest request) {
+        return dishService.updateNutrition(dishId, request);
+    }
+
     @PostMapping("/{dishId}/steps")
     @ResponseStatus(HttpStatus.CREATED)
     public PrepStepDto addStep(@PathVariable Long dishId, @Valid @RequestBody AddPrepStepRequest request) {
