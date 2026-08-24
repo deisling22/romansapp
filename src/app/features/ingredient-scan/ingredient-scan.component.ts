@@ -62,7 +62,8 @@ export class IngredientScanComponent implements OnDestroy {
     this.analyzing = true;
     this.errorMessage = '';
     try {
-      await image.decode();
+      // decode() is only a warm-up; Chrome can reject it even for valid, fully loaded images
+      await image.decode().catch(() => undefined);
       this.ingredients = await this.recognition.recognize(image);
       this.analyzed = true;
       if (this.ingredients.length === 0) {
