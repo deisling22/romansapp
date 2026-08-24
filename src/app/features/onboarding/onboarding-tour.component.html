@@ -1,0 +1,27 @@
+<div class="onboarding-overlay" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+  <div class="onboarding-card">
+    <button type="button" class="skip-link" (click)="skip()">Überspringen</button>
+
+    <span class="step-icon" aria-hidden="true">{{ step.icon }}</span>
+    <h1 id="onboarding-title">{{ step.title }}</h1>
+    <p>{{ step.description }}</p>
+
+    <nav class="step-dots" aria-label="Fortschritt">
+      @for (dot of steps; track $index) {
+        <button
+          type="button"
+          class="dot"
+          [class.active]="$index === stepIndex"
+          [attr.aria-label]="'Schritt ' + ($index + 1)"
+          (click)="goToStep($index)"></button>
+      }
+    </nav>
+
+    <div class="step-actions">
+      @if (stepIndex > 0) {
+        <button type="button" class="secondary" (click)="back()">Zurück</button>
+      }
+      <button type="button" class="primary" (click)="next()">{{ isLastStep ? 'Los geht\'s' : 'Weiter' }}</button>
+    </div>
+  </div>
+</div>

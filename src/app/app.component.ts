@@ -7,6 +7,7 @@ import { NotificationService } from './core/notification.service';
 import { RecipeSyncService } from './core/recipe-sync.service';
 import { CreatorNotificationService } from './core/creator-notification.service';
 import { GamificationService } from './core/gamification.service';
+import { OnboardingService } from './core/onboarding.service';
 
 @Component({
     selector: 'app-root',
@@ -22,6 +23,7 @@ export class AppComponent {
   constructor(
     readonly connectivity: ConnectivityService,
     readonly notifications: NotificationService,
+    readonly onboarding: OnboardingService,
     private readonly swUpdate: SwUpdate,
     // injected eagerly so its online-listener is registered as soon as the app starts
     private readonly shoppingListOutbox: ShoppingListOutboxService,

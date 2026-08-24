@@ -24,6 +24,7 @@ import { CreatorPlanComponent } from './features/creators/creator-plan.component
 import { CreatorProfileComponent } from './features/creators/creator-profile.component';
 import { IngredientScanComponent } from './features/ingredient-scan/ingredient-scan.component';
 import { ProgressComponent } from './features/progress/progress.component';
+import { OnboardingTourComponent } from './features/onboarding/onboarding-tour.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -44,6 +45,7 @@ import { ProgressComponent } from './features/progress/progress.component';
         CreatorPlanComponent,
         IngredientScanComponent,
         ProgressComponent,
+        OnboardingTourComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,

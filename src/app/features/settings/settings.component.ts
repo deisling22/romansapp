@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ProfileApiService } from '../../core/profile-api.service';
+import { OnboardingService } from '../../core/onboarding.service';
 
 @Component({
     selector: 'app-settings',
@@ -24,6 +25,7 @@ export class SettingsComponent implements OnInit {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly profileApi: ProfileApiService,
+    private readonly onboarding: OnboardingService,
   ) {}
 
   ngOnInit(): void {
@@ -62,5 +64,9 @@ export class SettingsComponent implements OnInit {
         this.saving = false;
       },
     });
+  }
+
+  showOnboarding(): void {
+    this.onboarding.restart();
   }
 }

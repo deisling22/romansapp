@@ -87,3 +87,21 @@ button:disabled {
   cursor: wait;
   opacity: 0.65;
 }
+
+.onboarding-replay {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid #d7e5dd;
+}
+
+.onboarding-replay .secondary {
+  min-height: 48px;
+  border: 1px solid #aac9ba;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #16342f;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0 16px;
+}

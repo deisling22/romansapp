@@ -26,4 +26,9 @@
       <button type="submit" [disabled]="saving">{{ saving ? 'Wird gespeichert ...' : 'Speichern' }}</button>
     </form>
   }
+
+  <section class="onboarding-replay">
+    <p class="eyebrow">Hilfe</p>
+    <button type="button" class="secondary" (click)="showOnboarding()">Einführung erneut anzeigen</button>
+  </section>
 </main>

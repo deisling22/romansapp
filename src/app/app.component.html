@@ -1,5 +1,9 @@
 <router-outlet></router-outlet>
 
+@if (onboarding.visible$ | async) {
+  <app-onboarding-tour></app-onboarding-tour>
+}
+
 @if (notifications.notification$ | async; as notification) {
   <div class="app-toast" [class.success]="notification.type === 'success'" role="status" aria-live="polite">
     <span>{{ notification.message }}</span>
