@@ -37,7 +37,7 @@ public class CreatorService {
         return creatorRepository.findAll().stream()
                 .map(creator -> new CreatorSummaryDto(
                         creator.getId(), creator.getName(), creator.getHandle(), creator.getBio(),
-                        creator.getAvatarUrl(), creator.getReelImageUrl(),
+                        creator.getAvatarUrl(), creator.getReelImageUrl(), creator.getReelVideoUrl(),
                         mealPlanRepository.findByCreatorIdOrderByCreatedAtAsc(creator.getId()).size()))
                 .toList();
     }

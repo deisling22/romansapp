@@ -17,4 +17,6 @@ public interface PlanEntryRepository extends JpaRepository<PlanEntry, Long> {
     Optional<PlanEntry> findFirstByPlanCreatorIsNullAndCookedFalseOrderByPlanIdAscSortOrderAsc();
 
     List<PlanEntry> findByPlanCreatorIsNullAndCookedTrueAndCookedAtBetween(Instant start, Instant end);
+
+    long countByPlanCreatorIdAndCreatedAtAfter(Long creatorId, Instant createdAt);
 }

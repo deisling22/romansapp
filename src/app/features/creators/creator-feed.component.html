@@ -22,7 +22,19 @@
           class="creator-reel"
           [routerLink]="['/creators', creator.id]"
           [attr.aria-label]="'Profil von ' + creator.name + ' öffnen'">
-          <img class="reel-image" [src]="creator.reelImageUrl" [alt]="creator.name + ' beim Kochen'" />
+          @if (creator.reelVideoUrl) {
+            <video
+              class="reel-image"
+              [src]="creator.reelVideoUrl"
+              [poster]="creator.reelImageUrl"
+              autoplay
+              muted
+              loop
+              playsinline
+              aria-hidden="true"></video>
+          } @else {
+            <img class="reel-image" [src]="creator.reelImageUrl" [alt]="creator.name + ' beim Kochen'" />
+          }
           <span class="reel-shade" aria-hidden="true"></span>
           <span class="reel-content">
             <img class="reel-avatar" [src]="creator.avatarUrl" alt="" />

@@ -11,6 +11,7 @@ export interface CreatorSummary {
   bio: string;
   avatarUrl: string;
   reelImageUrl: string;
+  reelVideoUrl: string | null;
   planCount: number;
 }
 

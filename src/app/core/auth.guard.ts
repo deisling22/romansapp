@@ -4,6 +4,7 @@ import { Observable, catchError, map, of } from 'rxjs';
 import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
 import { RecipeSyncService } from './recipe-sync.service';
+import { CreatorNotificationService } from './creator-notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -12,6 +13,7 @@ export class AuthGuard implements CanActivate {
     private readonly router: Router,
     private readonly notifications: NotificationService,
     private readonly recipeSync: RecipeSyncService,
+    private readonly creatorNotifications: CreatorNotificationService,
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
@@ -26,6 +28,7 @@ export class AuthGuard implements CanActivate {
         if (token) {
           this.notifications.show('Anmeldung erfolgreich.', 'success');
           void this.recipeSync.sync();
+          this.creatorNotifications.refresh();
           return this.router.createUrlTree(['/account']);
         }
         return true;

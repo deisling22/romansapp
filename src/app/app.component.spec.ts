@@ -6,6 +6,7 @@ import { ConnectivityService } from './core/connectivity.service';
 import { ShoppingListOutboxService } from './core/shopping-list-outbox.service';
 import { AppComponent } from './app.component';
 import { RecipeSyncService } from './core/recipe-sync.service';
+import { CreatorNotificationService } from './core/creator-notification.service';
 
 describe('AppComponent', () => {
   beforeEach(() => TestBed.configureTestingModule({
@@ -16,6 +17,7 @@ describe('AppComponent', () => {
       { provide: SwUpdate, useValue: { isEnabled: false, versionUpdates: EMPTY } },
       { provide: ShoppingListOutboxService, useValue: {} },
       { provide: RecipeSyncService, useValue: {} },
+      { provide: CreatorNotificationService, useValue: {} },
     ],
   }));
 

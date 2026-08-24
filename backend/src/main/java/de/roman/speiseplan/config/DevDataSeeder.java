@@ -35,6 +35,8 @@ public class DevDataSeeder {
             PrepStepRepository prepStepRepository) {
         return arguments -> {
             if (mealPlanRepository.count() > 0) {
+                seedAdditionalCreatorPlans(
+                    creatorRepository, mealPlanRepository, dishRepository, planEntryRepository);
                 return;
             }
 
@@ -159,8 +161,45 @@ public class DevDataSeeder {
                 seedCreatorPlan("Aylins bunter Familientisch", aylin,
                     List.of(weekDishes.get(3), quickDishes.get(3), quickDishes.get(4), quickDishes.get(9)),
                     mealPlanRepository, planEntryRepository);
+                seedAdditionalCreatorPlans(
+                    creatorRepository, mealPlanRepository, dishRepository, planEntryRepository);
         };
     }
+
+            private void seedAdditionalCreatorPlans(
+                CreatorRepository creatorRepository,
+                MealPlanRepository mealPlanRepository,
+                DishRepository dishRepository,
+                PlanEntryRepository planEntryRepository) {
+            List<Dish> dishes = dishRepository.findAll();
+            if (dishes.size() < 4) {
+                return;
+            }
+            seedCreatorPlanIfMissing("Leas Ofenwoche", "leasofenkueche", dishes.subList(0, 4),
+                creatorRepository, mealPlanRepository, planEntryRepository);
+            seedCreatorPlanIfMissing("Noahs Meal-Prep-Favoriten", "noahmealprep", dishes.subList(0, 4),
+                creatorRepository, mealPlanRepository, planEntryRepository);
+            seedCreatorPlanIfMissing("Sofias mediterrane Woche", "sofiasmediterran", dishes.subList(0, 4),
+                creatorRepository, mealPlanRepository, planEntryRepository);
+            seedCreatorPlanIfMissing("Emils grüne Küche", "emilkochtgruen", dishes.subList(0, 4),
+                creatorRepository, mealPlanRepository, planEntryRepository);
+            seedCreatorPlanIfMissing("Ninas Familienfavoriten", "ninasfamilienzeit", dishes.subList(0, 4),
+                creatorRepository, mealPlanRepository, planEntryRepository);
+            }
+
+            private void seedCreatorPlanIfMissing(
+                String planName,
+                String creatorHandle,
+                List<Dish> dishes,
+                CreatorRepository creatorRepository,
+                MealPlanRepository mealPlanRepository,
+                PlanEntryRepository planEntryRepository) {
+            creatorRepository.findByHandle(creatorHandle).ifPresent(creator -> {
+                if (mealPlanRepository.findByCreatorIdOrderByCreatedAtAsc(creator.getId()).isEmpty()) {
+                    seedCreatorPlan(planName, creator, dishes, mealPlanRepository, planEntryRepository);
+                }
+            });
+            }
 
             private List<Dish> seedRecipes(
                 MealPlan plan,

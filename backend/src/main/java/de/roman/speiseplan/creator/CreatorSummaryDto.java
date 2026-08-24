@@ -7,5 +7,6 @@ public record CreatorSummaryDto(
         String bio,
         String avatarUrl,
         String reelImageUrl,
+        String reelVideoUrl,
         long planCount) {
 }

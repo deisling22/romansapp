@@ -14,6 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import de.roman.speiseplan.auth.TokenService;
+import de.roman.speiseplan.plan.MealPlan;
+import de.roman.speiseplan.plan.MealPlanRepository;
+import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -24,11 +29,20 @@ class CreatorControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+        @Autowired
+        private TokenService tokenService;
+
+        @Autowired
+        private CreatorRepository creatorRepository;
+
+        @Autowired
+        private MealPlanRepository mealPlanRepository;
+
     @Test
     void creatorFeedProfilesAndPlanCopyAreAvailable() throws Exception {
         String creatorsResponse = mockMvc.perform(get("/api/creators"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$.length()").value(8))
                 .andExpect(jsonPath("$[0].planCount").value(1))
                 .andReturn()
                 .getResponse()
@@ -75,5 +89,36 @@ class CreatorControllerTest {
                 assertThat(plan.get("name").stringValue()).isEqualTo(planName + " (Kopie)"));
         assertThat(userPlans).noneSatisfy(plan ->
                 assertThat(plan.get("name").stringValue()).isEqualTo(planName));
+    }
+
+    @Test
+        @Transactional
+    void subscriptionRequiresLoginAndReportsNewCreatorPlan() throws Exception {
+        Creator creator = creatorRepository.findByHandle("leasofenkueche").orElseThrow();
+        String token = tokenService.issueToken(Map.of("email", "creator-fan@example.com"));
+
+        mockMvc.perform(post("/api/creator-subscriptions/{creatorId}", creator.getId()))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(post("/api/creator-subscriptions/{creatorId}", creator.getId())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(get("/api/creator-subscriptions/{creatorId}", creator.getId())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.subscribed").value(true));
+
+        mealPlanRepository.saveAndFlush(new MealPlan("Ganz neuer Creator-Plan", creator));
+
+        mockMvc.perform(get("/api/creator-subscriptions/notifications")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].creatorName").value("Lea Winter"))
+                .andExpect(jsonPath("$[0].newPlanCount").value(1));
+
+        mockMvc.perform(get("/api/creator-subscriptions/notifications")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 }

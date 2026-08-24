@@ -18,6 +18,18 @@
           <button type="button" class="share-button" (click)="shareCreator()">Teilen</button>
         </div>
         <p>{{ creator.bio }}</p>
+        @if (auth.getToken()) {
+          <button
+            type="button"
+            class="subscribe-button"
+            [class.active]="subscribed"
+            [disabled]="subscriptionLoading"
+            (click)="toggleSubscription()">
+            {{ subscriptionLoading ? 'Wird gespeichert ...' : subscribed ? 'Abonniert' : 'Abonnieren' }}
+          </button>
+        } @else {
+          <a class="subscribe-login" routerLink="/login">Anmelden zum Abonnieren</a>
+        }
       </div>
     </header>
 

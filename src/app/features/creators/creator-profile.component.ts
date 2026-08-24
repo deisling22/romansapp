@@ -4,6 +4,8 @@ import { CreatorApiService } from '../../core/creator-api.service';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { CreatorDetail } from '../../core/models';
 import { ShareService } from '../../core/share.service';
+import { AuthService } from '../../core/auth.service';
+import { NotificationService } from '../../core/notification.service';
 
 @Component({
   selector: 'app-creator-profile',
@@ -17,10 +19,14 @@ export class CreatorProfileComponent implements OnInit {
   loading = true;
   errorMessage = '';
   shareMessage = '';
+  subscribed = false;
+  subscriptionLoading = false;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly creatorApi: CreatorApiService,
+    readonly auth: AuthService,
+    private readonly notifications: NotificationService,
     private readonly shareService: ShareService,
     readonly mealPlanApi: MealPlanApiService,
   ) {}
@@ -31,11 +37,47 @@ export class CreatorProfileComponent implements OnInit {
       next: (creator) => {
         this.creator = creator;
         this.loading = false;
+        if (this.auth.getToken()) {
+          this.loadSubscription(creator.id);
+        }
       },
       error: () => {
         this.errorMessage = 'Das Creator-Profil konnte nicht geladen werden.';
         this.loading = false;
       },
+    });
+  }
+
+  toggleSubscription(): void {
+    if (!this.creator || this.subscriptionLoading) {
+      return;
+    }
+    this.subscriptionLoading = true;
+    const request = this.subscribed
+      ? this.creatorApi.unsubscribe(this.creator.id)
+      : this.creatorApi.subscribe(this.creator.id);
+    request.subscribe({
+      next: () => {
+        this.subscribed = !this.subscribed;
+        this.subscriptionLoading = false;
+        this.notifications.show(
+          this.subscribed
+            ? `${this.creator!.name} wurde abonniert.`
+            : `Abo von ${this.creator!.name} wurde beendet.`,
+          'success',
+        );
+      },
+      error: () => {
+        this.errorMessage = 'Das Abonnement konnte nicht geändert werden.';
+        this.subscriptionLoading = false;
+      },
+    });
+  }
+
+  private loadSubscription(creatorId: number): void {
+    this.creatorApi.getSubscription(creatorId).subscribe({
+      next: ({ subscribed }) => (this.subscribed = subscribed),
+      error: () => (this.subscribed = false),
     });
   }
 

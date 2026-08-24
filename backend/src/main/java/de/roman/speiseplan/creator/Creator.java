@@ -29,6 +29,9 @@ public class Creator {
     @Column(name = "reel_image_url", nullable = false, length = 500)
     private String reelImageUrl;
 
+    @Column(name = "reel_video_url", length = 500)
+    private String reelVideoUrl;
+
     protected Creator() {
     }
 
@@ -62,5 +65,9 @@ public class Creator {
 
     public String getReelImageUrl() {
         return reelImageUrl;
+    }
+
+    public String getReelVideoUrl() {
+        return reelVideoUrl;
     }
 }

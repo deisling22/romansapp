@@ -25,4 +25,30 @@ export class CreatorApiService {
   copyPlan(creatorId: number, planId: number): Observable<MealPlan> {
     return this.http.post<MealPlan>(`${this.apiUrl}/creators/${creatorId}/plans/${planId}/copy`, {});
   }
+
+  getSubscription(creatorId: number): Observable<{ subscribed: boolean }> {
+    return this.http.get<{ subscribed: boolean }>(`${this.apiUrl}/creator-subscriptions/${creatorId}`);
+  }
+
+  subscribe(creatorId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/creator-subscriptions/${creatorId}`, {});
+  }
+
+  unsubscribe(creatorId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/creator-subscriptions/${creatorId}`);
+  }
+
+  pollNotifications(): Observable<Array<{
+    creatorId: number;
+    creatorName: string;
+    newPlanCount: number;
+    newDishCount: number;
+  }>> {
+    return this.http.get<Array<{
+      creatorId: number;
+      creatorName: string;
+      newPlanCount: number;
+      newDishCount: number;
+    }>>(`${this.apiUrl}/creator-subscriptions/notifications`);
+  }
 }

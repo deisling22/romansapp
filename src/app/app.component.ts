@@ -5,6 +5,7 @@ import { ConnectivityService } from './core/connectivity.service';
 import { ShoppingListOutboxService } from './core/shopping-list-outbox.service';
 import { NotificationService } from './core/notification.service';
 import { RecipeSyncService } from './core/recipe-sync.service';
+import { CreatorNotificationService } from './core/creator-notification.service';
 
 @Component({
     selector: 'app-root',
@@ -24,6 +25,7 @@ export class AppComponent {
     // injected eagerly so its online-listener is registered as soon as the app starts
     private readonly shoppingListOutbox: ShoppingListOutboxService,
     private readonly recipeSync: RecipeSyncService,
+    private readonly creatorNotifications: CreatorNotificationService,
   ) {
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates
