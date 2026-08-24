@@ -25,20 +25,23 @@
   <a routerLink="/pantry" role="menuitem" (click)="closeMenu()">Vorratsschrank</a>
   <a routerLink="/ingredient-scan" role="menuitem" (click)="closeMenu()">Zutaten scannen</a>
   <a routerLink="/creators" role="menuitem" (click)="closeMenu()">Creator</a>
+  <a routerLink="/progress" role="menuitem" (click)="closeMenu()">Fortschritt & Abzeichen</a>
   <a routerLink="/settings" role="menuitem" (click)="closeMenu()">Einstellungen</a>
   <a routerLink="/account" role="menuitem" (click)="closeMenu()">Konto & Anmeldung</a>
 </div>
 
 <nav class="bottom-nav" aria-label="Hauptnavigation">
-  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-    <span>Übersicht</span>
-  </a>
-  <a routerLink="/plans" routerLinkActive="active">
-    <span>Pläne</span>
-  </a>
-  <a routerLink="/dishes" routerLinkActive="active">
-    <span>Gerichte</span>
-  </a>
+  <div class="nav-main">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <span>Übersicht</span>
+    </a>
+    <a routerLink="/plans" routerLinkActive="active">
+      <span>Pläne</span>
+    </a>
+    <a routerLink="/dishes" routerLinkActive="active">
+      <span>Gerichte</span>
+    </a>
+  </div>
   <button
     type="button"
     class="menu-trigger"

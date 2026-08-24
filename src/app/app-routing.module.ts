@@ -16,12 +16,14 @@ import { CreatorFeedComponent } from './features/creators/creator-feed.component
 import { CreatorPlanComponent } from './features/creators/creator-plan.component';
 import { CreatorProfileComponent } from './features/creators/creator-profile.component';
 import { IngredientScanComponent } from './features/ingredient-scan/ingredient-scan.component';
+import { ProgressComponent } from './features/progress/progress.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: DashboardComponent },
   { path: 'settings', component: SettingsComponent },
   { path: 'login', component: LoginComponent },
   { path: 'account', component: AccountComponent, canActivate: [AuthGuard] },
+  { path: 'progress', component: ProgressComponent, canActivate: [AuthGuard] },
   { path: 'dishes', component: DishCatalogComponent },
   { path: 'dishes/:dishId', component: DishDetailComponent },
   { path: 'plans', component: PlanListComponent },

@@ -8,6 +8,7 @@ import { PantryApiService } from '../../core/pantry-api.service';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { DishDetail, DishIngredientEntry, Ingredient, PantryItem, ShoppingListItem } from '../../core/models';
 import { ShareService } from '../../core/share.service';
+import { GamificationService } from '../../core/gamification.service';
 
 @Component({
     selector: 'app-dish-detail',
@@ -50,6 +51,7 @@ export class DishDetailComponent implements OnInit {
     private readonly pantryApi: PantryApiService,
     private readonly shoppingListApi: ShoppingListApiService,
     private readonly shareService: ShareService,
+    private readonly gamification: GamificationService,
     readonly dishApi: DishApiService,
   ) {}
 
@@ -190,6 +192,7 @@ export class DishDetailComponent implements OnInit {
 
     this.dishApi.rateDish(this.dishId, stars).subscribe({
       next: (summary) => {
+        void this.gamification.record('RATE_RECIPE', String(this.dishId));
         if (this.dish) {
           this.dish.averageRating = summary.averageRating;
           this.dish.ratingCount = summary.ratingCount;

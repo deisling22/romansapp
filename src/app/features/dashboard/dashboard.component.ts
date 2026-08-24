@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DashboardApiService } from '../../core/dashboard-api.service';
 import { DashboardData } from '../../core/models';
 import { toAbsoluteImageUrl } from '../../core/image-url';
+import { GamificationService } from '../../core/gamification.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -16,7 +17,10 @@ export class DashboardComponent implements OnInit {
   errorMessage = '';
   cooking = false;
 
-  constructor(readonly dashboardApi: DashboardApiService) {}
+  constructor(
+    readonly dashboardApi: DashboardApiService,
+    private readonly gamification: GamificationService,
+  ) {}
 
   imageUrl(path: string): string {
     return toAbsoluteImageUrl(path);
@@ -34,6 +38,7 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
     this.dashboardApi.getDashboard().subscribe({
       next: (dashboard) => {
+        void this.gamification.record('COOK_DISH', String(this.dashboard!.nextDish!.dishId));
         this.dashboard = dashboard;
         this.loading = false;
       },

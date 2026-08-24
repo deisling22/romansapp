@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, CanDeactivateFn } from '@angular/router';
-import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { ShoppingListItem } from '../../core/models';
 import { ConnectivityService } from '../../core/connectivity.service';
 import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.service';
 import { NotificationService } from '../../core/notification.service';
+import { GamificationService } from '../../core/gamification.service';
 
 const CART_REMINDER_DELAY_MS = 60_000;
 
@@ -37,6 +38,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     readonly connectivity: ConnectivityService,
     private readonly outbox: ShoppingListOutboxService,
     private readonly notifications: NotificationService,
+    private readonly gamification: GamificationService,
   ) {}
 
   ngOnInit(): void {
@@ -191,6 +193,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
 
     return forkJoin(checkedItems.map((item) => this.shoppingListApi.updateItem(item.id, true))).pipe(
       switchMap(() => this.shoppingListApi.checkout()),
+      tap(() => void this.gamification.record('COMPLETE_SHOPPING', this.planId ? String(this.planId) : undefined)),
       map(() => true),
       catchError(() => {
         this.errorMessage = 'Die gekauften Artikel konnten noch nicht in den Vorrat übernommen werden.';

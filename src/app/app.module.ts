@@ -23,6 +23,7 @@ import { CreatorFeedComponent } from './features/creators/creator-feed.component
 import { CreatorPlanComponent } from './features/creators/creator-plan.component';
 import { CreatorProfileComponent } from './features/creators/creator-profile.component';
 import { IngredientScanComponent } from './features/ingredient-scan/ingredient-scan.component';
+import { ProgressComponent } from './features/progress/progress.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -42,6 +43,7 @@ import { IngredientScanComponent } from './features/ingredient-scan/ingredient-s
         CreatorProfileComponent,
         CreatorPlanComponent,
         IngredientScanComponent,
+        ProgressComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,

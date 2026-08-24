@@ -3,6 +3,7 @@ import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { MealPlan } from '../../core/models';
 import { LocalMealPlan } from '../../core/offline-db';
 import { RecipeSyncService } from '../../core/recipe-sync.service';
+import { GamificationService } from '../../core/gamification.service';
 
 @Component({
     selector: 'app-plan-list',
@@ -22,6 +23,7 @@ export class PlanListComponent implements OnInit {
   constructor(
     private readonly mealPlanApi: MealPlanApiService,
     private readonly recipeSync: RecipeSyncService,
+    private readonly gamification: GamificationService,
   ) {}
 
   ngOnInit(): void {
@@ -51,7 +53,8 @@ export class PlanListComponent implements OnInit {
 
     this.creating = true;
     try {
-      await this.recipeSync.createPlan(name);
+      const plan = await this.recipeSync.createPlan(name);
+      await this.gamification.record('CREATE_PLAN', plan.clientId);
       this.newPlanName = '';
       await this.loadLocalPlans();
     } catch {

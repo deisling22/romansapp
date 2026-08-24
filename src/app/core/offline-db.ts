@@ -25,10 +25,30 @@ export interface LocalDish {
   syncedAt?: number;
 }
 
+export type GamificationEventType =
+  | 'COOK_DISH'
+  | 'CREATE_RECIPE'
+  | 'CREATE_PLAN'
+  | 'COMPLETE_PLAN'
+  | 'TRY_NEW_DISH'
+  | 'COMPLETE_SHOPPING'
+  | 'RATE_RECIPE'
+  | 'PANTRY_MEAL'
+  | 'OFFLINE_RECIPE_SYNCED'
+  | 'CREATOR_RECIPE_COOKED';
+
+export interface QueuedGamificationEvent {
+  eventId: string;
+  type: GamificationEventType;
+  referenceId?: string;
+  occurredAt: string;
+}
+
 export class OfflineDatabase extends Dexie {
   shoppingListOutbox!: Table<QueuedShoppingListUpdate, number>;
   mealPlans!: Table<LocalMealPlan, string>;
   dishes!: Table<LocalDish, string>;
+  gamificationOutbox!: Table<QueuedGamificationEvent, string>;
 
   constructor() {
     super('speiseplan-offline');
@@ -39,6 +59,12 @@ export class OfflineDatabase extends Dexie {
       shoppingListOutbox: 'itemId, queuedAt',
       mealPlans: 'clientId, serverId, updatedAt',
       dishes: 'clientId, planClientId, serverId, updatedAt',
+    });
+    this.version(3).stores({
+      shoppingListOutbox: 'itemId, queuedAt',
+      mealPlans: 'clientId, serverId, updatedAt',
+      dishes: 'clientId, planClientId, serverId, updatedAt',
+      gamificationOutbox: 'eventId, occurredAt, type',
     });
   }
 }

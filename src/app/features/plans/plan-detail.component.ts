@@ -6,6 +6,7 @@ import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { Dish } from '../../core/models';
 import { ShareService } from '../../core/share.service';
 import { RecipeSyncService } from '../../core/recipe-sync.service';
+import { GamificationService } from '../../core/gamification.service';
 
 @Component({
     selector: 'app-plan-detail',
@@ -33,6 +34,7 @@ export class PlanDetailComponent implements OnInit, OnDestroy {
     private readonly shoppingListApi: ShoppingListApiService,
     private readonly shareService: ShareService,
     private readonly recipeSync: RecipeSyncService,
+    private readonly gamification: GamificationService,
     readonly mealPlanApi: MealPlanApiService,
   ) {}
 
@@ -110,6 +112,7 @@ export class PlanDetailComponent implements OnInit, OnDestroy {
     this.cookingDishId = dish.id;
     this.dashboardApi.markCooked(dish.planEntryId).subscribe({
       next: () => {
+        void this.gamification.record('COOK_DISH', String(dish.id));
         this.cookingDishId = null;
         this.load();
       },

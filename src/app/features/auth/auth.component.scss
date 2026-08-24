@@ -59,6 +59,35 @@ button {
   object-fit: cover;
 }
 
+.avatar-frame {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 14px;
+  place-items: center;
+  border: 4px solid #cbd9d1;
+  border-radius: 50%;
+}
+.avatar-placeholder { display: grid; place-items: center; background: #e8f1eb; color: #26736f; font: 1.6rem Georgia, serif; }
+.avatar-frame[data-frame='HERB'], .frame-options [data-frame='HERB'] { border-color: #56945e; box-shadow: 0 0 0 3px #dcefdc; }
+.avatar-frame[data-frame='EMBER'], .frame-options [data-frame='EMBER'] { border-color: #d65d36; box-shadow: 0 0 0 3px #ffd8ba; }
+.avatar-frame[data-frame='GOLD'], .frame-options [data-frame='GOLD'] { border-color: #d8a52d; box-shadow: 0 0 0 3px #fff1b3; }
+.avatar-frame[data-frame='AURORA'], .frame-options [data-frame='AURORA'] { border-color: #2a8f88; box-shadow: 0 0 0 3px #f0a3a0; }
+.progress-link { display: block; margin-top: 18px; color: #26736f; font-weight: 800; }
+.profile-title { margin: -3px 0 8px !important; color: #b55738 !important; font-size: .82rem; font-weight: 800; }
+.frame-picker { margin-top: 24px; border-top: 1px solid #d7e5dd; padding-top: 18px; }
+.frame-picker h2 { margin: 0 0 12px; color: #16342f; font: 1.2rem Georgia, serif; }
+.frame-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.frame-options button { display: grid; gap: 3px; min-height: 60px; border: 2px solid #cbd9d1; background: #fff; color: #16342f; text-align: left; }
+.frame-options button.selected { background: #edf5f0; }
+.frame-options button:disabled { cursor: not-allowed; opacity: .45; }
+.frame-options small { color: #637a74; font-size: .7rem; }
+.title-heading { margin-top: 20px !important; }
+.title-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.title-options button { min-height: 38px; border: 1px solid #b9ccc1; background: #fff; color: #16342f; padding: 7px 10px; }
+.title-options button.selected { border-color: #e06c47; background: #fff0e9; }
+.title-options button:disabled { opacity: .45; }
+
 .user-details {
   margin: 16px 0 0;
 

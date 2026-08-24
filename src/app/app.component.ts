@@ -6,6 +6,7 @@ import { ShoppingListOutboxService } from './core/shopping-list-outbox.service';
 import { NotificationService } from './core/notification.service';
 import { RecipeSyncService } from './core/recipe-sync.service';
 import { CreatorNotificationService } from './core/creator-notification.service';
+import { GamificationService } from './core/gamification.service';
 
 @Component({
     selector: 'app-root',
@@ -26,6 +27,7 @@ export class AppComponent {
     private readonly shoppingListOutbox: ShoppingListOutboxService,
     private readonly recipeSync: RecipeSyncService,
     private readonly creatorNotifications: CreatorNotificationService,
+    private readonly gamification: GamificationService,
   ) {
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates

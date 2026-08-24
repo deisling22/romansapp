@@ -1,6 +1,6 @@
 :host {
   display: block;
-  padding-bottom: 72px;
+  padding-bottom: 88px;
 }
 
 .app-toast {
@@ -84,21 +84,34 @@
 
 .bottom-nav {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
   z-index: 10;
-  display: grid;
-  grid-auto-flow: column;
-  border-top: 1px solid #d7e5dd;
-  background: #ffffff;
+  display: flex;
+  width: min(560px, calc(100vw - 24px));
+  gap: 10px;
+  transform: translateX(-50%);
 }
 
-.bottom-nav a {
+.nav-main {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  min-width: 0;
+  border: 1px solid #d7e5dd;
+  border-radius: 32px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(25, 61, 54, 0.16);
+  padding: 5px;
+}
+
+.nav-main a {
   display: grid;
   place-items: center;
-  min-height: 60px;
-  padding: 8px 4px;
+  min-height: 52px;
+  border-radius: 26px;
+  padding: 7px 5px;
   color: #6b827d;
   font-size: 0.78rem;
   font-weight: 700;
@@ -106,14 +119,21 @@
   text-decoration: none;
 }
 
-.bottom-nav a.active {
-  color: #26736f;
+.nav-main a.active {
+  background: #e7efea;
+  color: #193d36;
 }
 
 .menu-trigger {
-  min-height: 60px;
+  display: grid;
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  place-items: center;
   border: 0;
+  border-radius: 50%;
   background: #e06c47;
+  box-shadow: 0 8px 24px rgba(104, 46, 28, 0.22);
   color: #ffffff;
   cursor: pointer;
   font: inherit;
@@ -121,15 +141,15 @@
 
 .menu-trigger span {
   display: block;
-  font-size: 2rem;
-  font-weight: 400;
+  font-size: 2.25rem;
+  font-weight: 300;
   line-height: 1;
 }
 
 .quick-menu {
   position: fixed;
   right: 12px;
-  bottom: 72px;
+  bottom: 90px;
   z-index: 11;
   display: grid;
   min-width: 206px;

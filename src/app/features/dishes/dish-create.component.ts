@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { RecipeSyncService } from '../../core/recipe-sync.service';
+import { GamificationService } from '../../core/gamification.service';
 
 @Component({
     selector: 'app-dish-create',
@@ -29,6 +30,7 @@ export class DishCreateComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly mealPlanApi: MealPlanApiService,
     private readonly recipeSync: RecipeSyncService,
+    private readonly gamification: GamificationService,
   ) {}
 
   ngOnInit(): void {
@@ -77,7 +79,10 @@ export class DishCreateComponent implements OnInit, OnDestroy {
       return;
     }
     this.mealPlanApi.createDish(this.planId, this.form.controls.name.value.trim(), this.image).subscribe({
-      next: () => this.router.navigate(['/plans', this.planId]),
+      next: (dish) => {
+        void this.gamification.record('CREATE_RECIPE', String(dish.id));
+        void this.router.navigate(['/plans', this.planId]);
+      },
       error: () => {
         this.errorMessage = 'Das Gericht konnte nicht gespeichert werden. Bitte versuche es erneut.';
         this.submitting = false;
@@ -87,11 +92,12 @@ export class DishCreateComponent implements OnInit, OnDestroy {
 
   private async saveLocally(): Promise<void> {
     try {
-      await this.recipeSync.addDish(
+      const dish = await this.recipeSync.addDish(
         this.localClientId,
         this.form.controls.name.value.trim(),
         this.image!,
       );
+      await this.gamification.record('CREATE_RECIPE', dish.clientId);
       await this.router.navigate(['/local-plans', this.localClientId]);
     } catch {
       this.errorMessage = 'Das Gericht konnte nicht lokal gespeichert werden.';

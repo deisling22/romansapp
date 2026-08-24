@@ -1,7 +1,11 @@
 <main class="screen">
   <section *ngIf="user; else loadingAccount" class="auth-panel" aria-labelledby="account-title">
-    <img *ngIf="user.pictureUrl" class="avatar" [src]="user.pictureUrl" alt="" />
+    <div class="avatar-frame" [attr.data-frame]="progress?.selectedFrame ?? 'CLASSIC'">
+      <img *ngIf="user.pictureUrl" class="avatar" [src]="user.pictureUrl" alt="" />
+      <span *ngIf="!user.pictureUrl" class="avatar avatar-placeholder">{{ user.firstName.charAt(0) }}</span>
+    </div>
     <p class="eyebrow">Angemeldet mit Google</p>
+    <p *ngIf="progress" class="profile-title">{{ selectedTitleName }}</p>
     <h1 id="account-title">Hallo {{ user.firstName }} {{ user.lastName }}</h1>
     <dl class="user-details">
       <div>
@@ -17,6 +21,30 @@
         <dd>{{ user.email }}</dd>
       </div>
     </dl>
+    <a class="progress-link" routerLink="/progress">Level {{ progress?.level ?? 1 }} · Fortschritt ansehen</a>
+    <section *ngIf="progress" class="frame-picker" aria-labelledby="frame-title">
+      <h2 id="frame-title">Profilrahmen</h2>
+      <div class="frame-options">
+        <button *ngFor="let frame of progress.frames" type="button"
+          [disabled]="!frame.unlocked || savingFrame"
+          [class.selected]="frame.id === progress.selectedFrame"
+          [attr.data-frame]="frame.id"
+          (click)="selectFrame(frame.id)">
+          <span>{{ frame.name }}</span>
+          <small>{{ frame.unlocked ? 'Level ' + frame.requiredLevel : 'Gesperrt bis Level ' + frame.requiredLevel }}</small>
+        </button>
+      </div>
+      <h2 class="title-heading">Profiltitel</h2>
+      <div class="title-options">
+        <button *ngFor="let title of progress.titles" type="button"
+          [disabled]="!title.unlocked || savingFrame"
+          [class.selected]="title.id === progress.selectedTitle"
+          (click)="selectTitle(title.id)">
+          {{ title.name }}
+          <small *ngIf="!title.unlocked">Level {{ title.requiredLevel }}</small>
+        </button>
+      </div>
+    </section>
   </section>
   <ng-template #loadingAccount>
     <section class="auth-panel" aria-labelledby="account-title">

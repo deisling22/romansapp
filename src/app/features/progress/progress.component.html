@@ -1,0 +1,94 @@
+<main class="progress-screen">
+  <header class="page-header">
+    <p class="eyebrow">Deine Küche, dein Weg</p>
+    <h1>Fortschritt</h1>
+  </header>
+
+  <p *ngIf="loading" class="status">Fortschritt wird geladen …</p>
+  <p *ngIf="errorMessage" class="status error">{{ errorMessage }}</p>
+
+  <ng-container *ngIf="progress as data">
+    <section class="level-band" aria-labelledby="level-title">
+      <div class="level-number">
+        <span>Level</span>
+        <strong>{{ data.level }}</strong>
+      </div>
+      <div class="level-copy">
+        <h2 id="level-title">{{ data.xp }} XP gesammelt</h2>
+        <progress [value]="data.currentLevelXp" [max]="data.nextLevelXp"></progress>
+        <span>{{ data.currentLevelXp }} / {{ data.nextLevelXp }} XP bis zum nächsten Level</span>
+      </div>
+    </section>
+
+    <section class="stat-strip" aria-label="Kochstatistik">
+      <div><strong>{{ data.currentStreak }}</strong><span>Tage am Stück</span></div>
+      <div><strong>{{ data.bestStreak }}</strong><span>Bester Streak</span></div>
+      <div><strong>{{ data.cookedDishes }}</strong><span>Gerichte gekocht</span></div>
+      <div><strong>{{ data.uniqueDishes }}</strong><span>Verschiedene Gerichte</span></div>
+    </section>
+
+    <p class="shield-status" [class.used]="!data.streakShieldAvailable">
+      Streak-Schutz: {{ data.streakShieldAvailable ? 'für diesen Monat verfügbar' : 'diesen Monat bereits eingesetzt' }}
+    </p>
+
+    <section class="section-block" aria-labelledby="daily-title">
+      <div class="section-heading"><p class="eyebrow">Heute</p><h2 id="daily-title">Tagesziele</h2></div>
+      <div class="goal-list compact-goals">
+        <article *ngFor="let goal of data.dailyGoals" [class.complete]="goal.completed">
+          <div><strong>{{ goal.name }}</strong></div>
+          <progress [value]="goal.progress" [max]="goal.target"></progress>
+          <b>{{ goal.progress }} / {{ goal.target }}</b>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-block" aria-labelledby="goals-title">
+      <div class="section-heading">
+        <p class="eyebrow">Diese Woche</p>
+        <h2 id="goals-title">Ziele</h2>
+      </div>
+      <div class="goal-list">
+        <article *ngFor="let goal of data.weeklyGoals" [class.complete]="goal.completed">
+          <div><strong>{{ goal.name }}</strong><span>+{{ goal.bonusXp }} Bonus-XP</span></div>
+          <progress [value]="goal.progress" [max]="goal.target"></progress>
+          <b>{{ goal.progress }} / {{ goal.target }}</b>
+        </article>
+      </div>
+    </section>
+
+    <section class="challenge-grid" aria-label="Challenges">
+      <article class="season-challenge">
+        <p class="eyebrow">Saisonal</p>
+        <h2>{{ data.seasonalChallenge.name }}</h2>
+        <progress [value]="data.seasonalChallenge.progress" [max]="data.seasonalChallenge.target"></progress>
+        <span>{{ data.seasonalChallenge.progress }} von {{ data.seasonalChallenge.target }}</span>
+      </article>
+      <article class="household-challenge">
+        <p class="eyebrow">Gemeinsam</p>
+        <h2>{{ data.householdGoal.name }}</h2>
+        <progress [value]="data.householdGoal.progress" [max]="data.householdGoal.target"></progress>
+        <span>{{ data.householdGoal.progress }} von {{ data.householdGoal.target }}</span>
+      </article>
+      <article class="creator-challenge">
+        <p class="eyebrow">Creator</p>
+        <h2>{{ data.creatorChallenge.name }}</h2>
+        <progress [value]="data.creatorChallenge.progress" [max]="data.creatorChallenge.target"></progress>
+        <span>{{ data.creatorChallenge.progress }} von {{ data.creatorChallenge.target }}</span>
+      </article>
+    </section>
+
+    <section class="section-block" aria-labelledby="badges-title">
+      <div class="section-heading">
+        <p class="eyebrow">Sammlung</p>
+        <h2 id="badges-title">Abzeichen</h2>
+      </div>
+      <div class="badge-grid">
+        <article *ngFor="let badge of data.achievements" [class.locked]="!badge.unlocked" [attr.data-tier]="badge.tier">
+          <span class="badge-mark" aria-hidden="true">{{ badge.unlocked ? '◆' : '◇' }}</span>
+          <div><strong>{{ badge.name }}</strong><p>{{ badge.description }}</p></div>
+          <small>{{ badge.progress }} / {{ badge.target }}</small>
+        </article>
+      </div>
+    </section>
+  </ng-container>
+</main>
