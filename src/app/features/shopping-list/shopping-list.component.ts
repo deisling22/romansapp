@@ -1,10 +1,13 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, CanDeactivateFn } from '@angular/router';
 import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { ShoppingListItem } from '../../core/models';
 import { ConnectivityService } from '../../core/connectivity.service';
 import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.service';
+import { NotificationService } from '../../core/notification.service';
+
+const CART_REMINDER_DELAY_MS = 60_000;
 
 @Component({
     selector: 'app-shopping-list',
@@ -13,7 +16,7 @@ import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.servi
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
-export class ShoppingListComponent implements OnInit {
+export class ShoppingListComponent implements OnInit, OnDestroy {
   planId = 0;
   hasPlanContext = false;
   items: ShoppingListItem[] = [];
@@ -26,12 +29,14 @@ export class ShoppingListComponent implements OnInit {
   newUnit = 'Stk.';
   adding = false;
   deletingItemId: number | null = null;
+  private readonly reminderTimers = new Map<number, ReturnType<typeof setTimeout>>();
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly shoppingListApi: ShoppingListApiService,
     readonly connectivity: ConnectivityService,
     private readonly outbox: ShoppingListOutboxService,
+    private readonly notifications: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -39,6 +44,13 @@ export class ShoppingListComponent implements OnInit {
     this.hasPlanContext = planId !== null;
     this.planId = Number(planId);
     this.load();
+  }
+
+  ngOnDestroy(): void {
+    for (const timer of this.reminderTimers.values()) {
+      clearTimeout(timer);
+    }
+    this.reminderTimers.clear();
   }
 
   get openItems(): ShoppingListItem[] {
@@ -115,6 +127,11 @@ export class ShoppingListComponent implements OnInit {
     this.successMessage = checked
       ? `${item.ingredientName} liegt jetzt im Wagen.`
       : `${item.ingredientName} steht wieder auf der Liste.`;
+    if (checked) {
+      this.scheduleReminder(item);
+    } else {
+      this.cancelReminder(item.id);
+    }
 
     if (!this.connectivity.isOnline) {
       void this.outbox.queue(item.id, checked);
@@ -135,6 +152,7 @@ export class ShoppingListComponent implements OnInit {
     this.deletingItemId = item.id;
     this.shoppingListApi.deleteItem(item.id).subscribe({
       next: () => {
+        this.cancelReminder(item.id);
         this.items = this.items.filter((entry) => entry.id !== item.id);
         this.successMessage = `${item.ingredientName} wurde entfernt.`;
         this.deletingItemId = null;
@@ -144,6 +162,25 @@ export class ShoppingListComponent implements OnInit {
         this.deletingItemId = null;
       },
     });
+  }
+
+  private scheduleReminder(item: ShoppingListItem): void {
+    this.cancelReminder(item.id);
+    const timer = setTimeout(() => {
+      this.reminderTimers.delete(item.id);
+      if (this.items.some((entry) => entry.id === item.id && entry.checked)) {
+        this.notifications.show(`${item.ingredientName} liegt seit einer Minute im Warenkorb.`);
+      }
+    }, CART_REMINDER_DELAY_MS);
+    this.reminderTimers.set(item.id, timer);
+  }
+
+  private cancelReminder(itemId: number): void {
+    const timer = this.reminderTimers.get(itemId);
+    if (timer !== undefined) {
+      clearTimeout(timer);
+      this.reminderTimers.delete(itemId);
+    }
   }
 
   prepareForExit(): Observable<boolean> {

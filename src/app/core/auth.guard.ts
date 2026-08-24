@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, UrlTree } from '@angular/router';
 import { Observable, catchError, map, of } from 'rxjs';
 import { AuthService } from './auth.service';
+import { NotificationService } from './notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
     private readonly router: Router,
+    private readonly notifications: NotificationService,
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
@@ -18,7 +20,13 @@ export class AuthGuard implements CanActivate {
       this.authService.setToken(token);
     }
     return this.authService.getCurrentUser().pipe(
-      map(() => (token ? this.router.createUrlTree(['/account']) : true)),
+      map(() => {
+        if (token) {
+          this.notifications.show('Anmeldung erfolgreich.', 'success');
+          return this.router.createUrlTree(['/account']);
+        }
+        return true;
+      }),
       catchError(() => of(this.router.createUrlTree(['/login']))),
     );
   }

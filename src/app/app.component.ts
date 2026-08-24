@@ -3,6 +3,7 @@ import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter } from 'rxjs/operators';
 import { ConnectivityService } from './core/connectivity.service';
 import { ShoppingListOutboxService } from './core/shopping-list-outbox.service';
+import { NotificationService } from './core/notification.service';
 
 @Component({
     selector: 'app-root',
@@ -17,6 +18,7 @@ export class AppComponent {
 
   constructor(
     readonly connectivity: ConnectivityService,
+    readonly notifications: NotificationService,
     private readonly swUpdate: SwUpdate,
     // injected eagerly so its online-listener is registered as soon as the app starts
     private readonly shoppingListOutbox: ShoppingListOutboxService,

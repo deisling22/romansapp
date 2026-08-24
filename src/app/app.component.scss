@@ -3,6 +3,47 @@
   padding-bottom: 72px;
 }
 
+.app-toast {
+  position: fixed;
+  right: 16px;
+  bottom: 76px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 12px 14px;
+  border-left: 4px solid #e0a83d;
+  border-radius: 6px;
+  background: #193d36;
+  box-shadow: 0 10px 24px rgba(25, 61, 54, 0.24);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.app-toast.success {
+  border-left-color: #7fc39a;
+}
+
+.app-toast span {
+  flex: 1;
+}
+
+.app-toast button {
+  display: grid;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.35rem;
+}
+
 .offline-banner,
 .update-banner {
   position: fixed;

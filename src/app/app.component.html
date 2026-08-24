@@ -1,5 +1,12 @@
 <router-outlet></router-outlet>
 
+@if (notifications.notification$ | async; as notification) {
+  <div class="app-toast" [class.success]="notification.type === 'success'" role="status" aria-live="polite">
+    <span>{{ notification.message }}</span>
+    <button type="button" aria-label="Benachrichtigung schließen" (click)="notifications.dismiss()">×</button>
+  </div>
+}
+
 @if ((connectivity.online$ | async) === false) {
   <p class="offline-banner" role="status">
     Offline – Änderungen werden synchronisiert, sobald du wieder online bist.
