@@ -45,7 +45,6 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
     this.dashboardApi.getDashboard().subscribe({
       next: (dashboard) => {
-        void this.gamification.record('COOK_DISH', String(this.dashboard!.nextDish!.dishId));
         this.dashboard = dashboard;
         this.loading = false;
       },
