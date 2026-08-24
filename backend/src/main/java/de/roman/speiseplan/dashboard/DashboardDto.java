@@ -11,6 +11,9 @@ public record DashboardDto(
         double vitaminAToday,
         double vitaminCToday,
         double vitaminDToday,
+        double vitaminKToday,
+        double vitaminB12Today,
+        double folateToday,
         NextDishDto nextDish,
         long cartItemCount,
         long pantryItemCount) {

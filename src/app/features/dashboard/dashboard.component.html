@@ -56,6 +56,18 @@
             <span class="stat-label">Vitamin D heute</span>
             <span class="stat-value">{{ displayInteger(dashboard.vitaminDToday) }} µg</span>
           </div>
+          <div class="stat-card">
+            <span class="stat-label">Vitamin K heute</span>
+            <span class="stat-value">{{ displayInteger(dashboard.vitaminKToday) }} µg</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Vitamin B12 heute</span>
+            <span class="stat-value">{{ displayInteger(dashboard.vitaminB12Today) }} µg</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Folat heute</span>
+            <span class="stat-value">{{ displayInteger(dashboard.folateToday) }} µg</span>
+          </div>
         </div>
       }
       @if (dashboard.nextDish) {

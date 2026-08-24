@@ -86,7 +86,7 @@ class DashboardControllerTest {
         mockMvc.perform(put("/api/dishes/{dishId}/nutrition", dishId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new NutritionUpdateRequest(40.0, 10.0, 500.0, 60.0, 5.0))))
+                                new NutritionUpdateRequest(40.0, 10.0, 500.0, 60.0, 5.0, 20.0, 1.2, 150.0))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.carbsGrams").value(40.0));
 
@@ -105,6 +105,9 @@ class DashboardControllerTest {
         double carbsBefore = objectMapper.readTree(before).get("carbsToday").asDouble();
         double fatBefore = objectMapper.readTree(before).get("fatToday").asDouble();
         double vitaminCBefore = objectMapper.readTree(before).get("vitaminCToday").asDouble();
+        double vitaminKBefore = objectMapper.readTree(before).get("vitaminKToday").asDouble();
+        double vitaminB12Before = objectMapper.readTree(before).get("vitaminB12Today").asDouble();
+        double folateBefore = objectMapper.readTree(before).get("folateToday").asDouble();
 
         mockMvc.perform(patch("/api/plan-entries/{id}/cook", planEntryId))
                 .andExpect(status().isOk());
@@ -117,10 +120,16 @@ class DashboardControllerTest {
         double carbsAfter = objectMapper.readTree(after).get("carbsToday").asDouble();
         double fatAfter = objectMapper.readTree(after).get("fatToday").asDouble();
         double vitaminCAfter = objectMapper.readTree(after).get("vitaminCToday").asDouble();
+        double vitaminKAfter = objectMapper.readTree(after).get("vitaminKToday").asDouble();
+        double vitaminB12After = objectMapper.readTree(after).get("vitaminB12Today").asDouble();
+        double folateAfter = objectMapper.readTree(after).get("folateToday").asDouble();
 
         org.assertj.core.api.Assertions.assertThat(carbsAfter - carbsBefore).isEqualTo(40.0);
         org.assertj.core.api.Assertions.assertThat(fatAfter - fatBefore).isEqualTo(10.0);
         org.assertj.core.api.Assertions.assertThat(vitaminCAfter - vitaminCBefore).isEqualTo(60.0);
+        org.assertj.core.api.Assertions.assertThat(vitaminKAfter - vitaminKBefore).isEqualTo(20.0);
+        org.assertj.core.api.Assertions.assertThat(vitaminB12After - vitaminB12Before).isEqualTo(1.2);
+        org.assertj.core.api.Assertions.assertThat(folateAfter - folateBefore).isEqualTo(150.0);
     }
 
     @Test

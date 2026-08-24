@@ -48,6 +48,15 @@ public class Dish {
     @Column(name = "vitamin_d_mcg")
     private Double vitaminDMcg;
 
+    @Column(name = "vitamin_k_mcg")
+    private Double vitaminKMcg;
+
+    @Column(name = "vitamin_b12_mcg")
+    private Double vitaminB12Mcg;
+
+    @Column(name = "folate_mcg")
+    private Double folateMcg;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -140,13 +149,35 @@ public class Dish {
         return vitaminDMcg;
     }
 
+    public Double getVitaminKMcg() {
+        return vitaminKMcg;
+    }
+
+    public Double getVitaminB12Mcg() {
+        return vitaminB12Mcg;
+    }
+
+    public Double getFolateMcg() {
+        return folateMcg;
+    }
+
     public void updateNutrition(
-            Double carbsGrams, Double fatGrams, Double vitaminAMcg, Double vitaminCMg, Double vitaminDMcg) {
+            Double carbsGrams,
+            Double fatGrams,
+            Double vitaminAMcg,
+            Double vitaminCMg,
+            Double vitaminDMcg,
+            Double vitaminKMcg,
+            Double vitaminB12Mcg,
+            Double folateMcg) {
         this.carbsGrams = carbsGrams;
         this.fatGrams = fatGrams;
         this.vitaminAMcg = vitaminAMcg;
         this.vitaminCMg = vitaminCMg;
         this.vitaminDMcg = vitaminDMcg;
+        this.vitaminKMcg = vitaminKMcg;
+        this.vitaminB12Mcg = vitaminB12Mcg;
+        this.folateMcg = folateMcg;
     }
 
     public Instant getCreatedAt() {

@@ -80,6 +80,9 @@ export interface DishDetail {
   vitaminAMcg: number | null;
   vitaminCMg: number | null;
   vitaminDMcg: number | null;
+  vitaminKMcg: number | null;
+  vitaminB12Mcg: number | null;
+  folateMcg: number | null;
   galleryImageUrls: string[];
   steps: PrepStep[];
   ingredients: DishIngredientEntry[];
@@ -124,6 +127,9 @@ export interface DashboardData {
   vitaminAToday: number;
   vitaminCToday: number;
   vitaminDToday: number;
+  vitaminKToday: number;
+  vitaminB12Today: number;
+  folateToday: number;
   nextDish: NextDish | null;
   cartItemCount: number;
   pantryItemCount: number;

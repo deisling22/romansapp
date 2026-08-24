@@ -29,6 +29,9 @@ export class DishDetailComponent implements OnInit {
     vitaminAMcg: this.formBuilder.control<number | null>(null),
     vitaminCMg: this.formBuilder.control<number | null>(null),
     vitaminDMcg: this.formBuilder.control<number | null>(null),
+    vitaminKMcg: this.formBuilder.control<number | null>(null),
+    vitaminB12Mcg: this.formBuilder.control<number | null>(null),
+    folateMcg: this.formBuilder.control<number | null>(null),
   });
 
   savingNutrition = false;
@@ -172,6 +175,9 @@ export class DishDetailComponent implements OnInit {
           vitaminAMcg: dish.vitaminAMcg,
           vitaminCMg: dish.vitaminCMg,
           vitaminDMcg: dish.vitaminDMcg,
+          vitaminKMcg: dish.vitaminKMcg,
+          vitaminB12Mcg: dish.vitaminB12Mcg,
+          folateMcg: dish.folateMcg,
         });
         this.loading = false;
       },

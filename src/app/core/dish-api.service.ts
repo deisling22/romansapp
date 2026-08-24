@@ -11,6 +11,9 @@ export interface NutritionUpdate {
   vitaminAMcg: number | null;
   vitaminCMg: number | null;
   vitaminDMcg: number | null;
+  vitaminKMcg: number | null;
+  vitaminB12Mcg: number | null;
+  folateMcg: number | null;
 }
 
 @Injectable({ providedIn: 'root' })

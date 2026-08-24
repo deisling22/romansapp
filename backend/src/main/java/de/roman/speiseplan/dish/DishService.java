@@ -110,6 +110,9 @@ public class DishService {
                 dish.getVitaminAMcg(),
                 dish.getVitaminCMg(),
                 dish.getVitaminDMcg(),
+                dish.getVitaminKMcg(),
+                dish.getVitaminB12Mcg(),
+                dish.getFolateMcg(),
                 images.stream().map(DishImage::getImageUrl).toList(),
                 steps.stream()
                         .map(step -> new PrepStepDto(step.getId(), step.getStepOrder(), step.getText(), step.getTimerSeconds()))
@@ -135,9 +138,19 @@ public class DishService {
                 request.fatGrams(),
                 request.vitaminAMcg(),
                 request.vitaminCMg(),
-                request.vitaminDMcg());
+                request.vitaminDMcg(),
+                request.vitaminKMcg(),
+                request.vitaminB12Mcg(),
+                request.folateMcg());
         return new NutritionDto(
-                dish.getCarbsGrams(), dish.getFatGrams(), dish.getVitaminAMcg(), dish.getVitaminCMg(), dish.getVitaminDMcg());
+                dish.getCarbsGrams(),
+                dish.getFatGrams(),
+                dish.getVitaminAMcg(),
+                dish.getVitaminCMg(),
+                dish.getVitaminDMcg(),
+                dish.getVitaminKMcg(),
+                dish.getVitaminB12Mcg(),
+                dish.getFolateMcg());
     }
 
     @Transactional

@@ -72,6 +72,9 @@ public class DashboardService {
         double vitaminAToday = 0;
         double vitaminCToday = 0;
         double vitaminDToday = 0;
+        double vitaminKToday = 0;
+        double vitaminB12Today = 0;
+        double folateToday = 0;
         for (PlanEntry entry : cookedToday) {
             Dish dish = entry.getDish();
             List<DishIngredient> ingredients = ingredientsByDish.getOrDefault(dish.getId(), List.of());
@@ -84,6 +87,9 @@ public class DashboardService {
             vitaminAToday += orZero(dish.getVitaminAMcg()) * profile.defaultPortionSize();
             vitaminCToday += orZero(dish.getVitaminCMg()) * profile.defaultPortionSize();
             vitaminDToday += orZero(dish.getVitaminDMcg()) * profile.defaultPortionSize();
+            vitaminKToday += orZero(dish.getVitaminKMcg()) * profile.defaultPortionSize();
+            vitaminB12Today += orZero(dish.getVitaminB12Mcg()) * profile.defaultPortionSize();
+            folateToday += orZero(dish.getFolateMcg()) * profile.defaultPortionSize();
         }
 
         Double proteinGoal = profile.bodyWeightKg() == null ? null : profile.bodyWeightKg() * 2;
@@ -122,6 +128,9 @@ public class DashboardService {
             vitaminAToday,
             vitaminCToday,
             vitaminDToday,
+            vitaminKToday,
+            vitaminB12Today,
+            folateToday,
             nextDish,
             shoppingListService.countItems(),
             pantryService.countItems());

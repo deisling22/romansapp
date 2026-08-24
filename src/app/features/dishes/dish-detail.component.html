@@ -185,6 +185,12 @@
           <input id="vitaminCMg" type="number" min="0" step="0.1" formControlName="vitaminCMg" />
           <label for="vitaminDMcg">Vitamin D (µg)</label>
           <input id="vitaminDMcg" type="number" min="0" step="0.1" formControlName="vitaminDMcg" />
+          <label for="vitaminKMcg">Vitamin K (µg)</label>
+          <input id="vitaminKMcg" type="number" min="0" step="0.1" formControlName="vitaminKMcg" />
+          <label for="vitaminB12Mcg">Vitamin B12 (µg)</label>
+          <input id="vitaminB12Mcg" type="number" min="0" step="0.1" formControlName="vitaminB12Mcg" />
+          <label for="folateMcg">Folat / B9 (µg)</label>
+          <input id="folateMcg" type="number" min="0" step="0.1" formControlName="folateMcg" />
           <button type="submit" [disabled]="savingNutrition">
             {{ savingNutrition ? 'Wird gespeichert ...' : 'Nährwerte speichern' }}
           </button>
