@@ -81,8 +81,21 @@ export class IngredientRecognitionService {
         import('@tensorflow/tfjs-backend-webgl'),
         import('@tensorflow-models/coco-ssd'),
       ]).then(async ([tensorflow, _cpuBackend, _webglBackend, cocoSsd]) => {
-        await tensorflow.setBackend('webgl');
-        await tensorflow.ready();
+          let webglReady = false;
+          try {
+            if (await tensorflow.setBackend('webgl')) {
+              await tensorflow.ready();
+              webglReady = true;
+            }
+          } catch {
+            webglReady = false;
+          }
+          if (!webglReady) {
+            if (!(await tensorflow.setBackend('cpu'))) {
+              throw new Error('TensorFlow konnte kein unterstütztes Backend initialisieren.');
+            }
+            await tensorflow.ready();
+          }
         return cocoSsd.load({
           base: 'lite_mobilenet_v2',
           modelUrl: 'assets/models/coco-ssd/model.json',

@@ -62,6 +62,7 @@ export class IngredientScanComponent implements OnDestroy {
     this.analyzing = true;
     this.errorMessage = '';
     try {
+      await image.decode();
       this.ingredients = await this.recognition.recognize(image);
       this.analyzed = true;
       if (this.ingredients.length === 0) {
