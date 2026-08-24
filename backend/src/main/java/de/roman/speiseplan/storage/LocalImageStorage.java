@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,6 +49,35 @@ public class LocalImageStorage {
         Path target = uploadDirectory.resolve(filename);
         try (InputStream inputStream = image.getInputStream()) {
             Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Das Bild konnte nicht gespeichert werden.", exception);
+        }
+        return "/uploads/" + filename;
+    }
+
+    public String storeDataUrl(String dataUrl) {
+        int separator = dataUrl.indexOf(',');
+        if (separator < 0 || !dataUrl.startsWith("data:")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Das Bildformat ist ungültig.");
+        }
+        String contentType = dataUrl.substring(5, dataUrl.indexOf(';'));
+        String extension = EXTENSIONS.get(contentType);
+        if (extension == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bitte verwende ein JPEG-, PNG- oder WebP-Bild.");
+        }
+        byte[] bytes;
+        try {
+            bytes = Base64.getDecoder().decode(dataUrl.substring(separator + 1));
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Das Bildformat ist ungültig.", exception);
+        }
+        if (bytes.length == 0 || bytes.length > MAX_FILE_SIZE) {
+            throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "Das Bild darf maximal 10 MB groß sein.");
+        }
+        String filename = UUID.randomUUID() + extension;
+        try {
+            Files.write(uploadDirectory.resolve(filename), bytes);
         } catch (IOException exception) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Das Bild konnte nicht gespeichert werden.", exception);

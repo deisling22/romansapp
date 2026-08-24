@@ -5,6 +5,7 @@ import { EMPTY, of } from 'rxjs';
 import { ConnectivityService } from './core/connectivity.service';
 import { ShoppingListOutboxService } from './core/shopping-list-outbox.service';
 import { AppComponent } from './app.component';
+import { RecipeSyncService } from './core/recipe-sync.service';
 
 describe('AppComponent', () => {
   beforeEach(() => TestBed.configureTestingModule({
@@ -14,6 +15,7 @@ describe('AppComponent', () => {
       { provide: ConnectivityService, useValue: { online$: of(true), isOnline: true } },
       { provide: SwUpdate, useValue: { isEnabled: false, versionUpdates: EMPTY } },
       { provide: ShoppingListOutboxService, useValue: {} },
+      { provide: RecipeSyncService, useValue: {} },
     ],
   }));
 

@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
+import { RecipeSyncService } from '../../core/recipe-sync.service';
 
 @Component({
     selector: 'app-dish-create',
@@ -16,6 +17,7 @@ export class DishCreateComponent implements OnInit, OnDestroy {
   });
 
   planId = 0;
+  localClientId = '';
   image: File | null = null;
   previewUrl: string | null = null;
   submitting = false;
@@ -26,10 +28,16 @@ export class DishCreateComponent implements OnInit, OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly mealPlanApi: MealPlanApiService,
+    private readonly recipeSync: RecipeSyncService,
   ) {}
 
   ngOnInit(): void {
+    this.localClientId = this.route.snapshot.paramMap.get('clientId') ?? '';
     this.planId = Number(this.route.snapshot.paramMap.get('planId'));
+  }
+
+  get backLink(): unknown[] {
+    return this.localClientId ? ['/local-plans', this.localClientId] : ['/plans', this.planId];
   }
 
   ngOnDestroy(): void {
@@ -64,6 +72,10 @@ export class DishCreateComponent implements OnInit, OnDestroy {
 
     this.submitting = true;
     this.errorMessage = '';
+    if (this.localClientId) {
+      void this.saveLocally();
+      return;
+    }
     this.mealPlanApi.createDish(this.planId, this.form.controls.name.value.trim(), this.image).subscribe({
       next: () => this.router.navigate(['/plans', this.planId]),
       error: () => {
@@ -71,5 +83,19 @@ export class DishCreateComponent implements OnInit, OnDestroy {
         this.submitting = false;
       },
     });
+  }
+
+  private async saveLocally(): Promise<void> {
+    try {
+      await this.recipeSync.addDish(
+        this.localClientId,
+        this.form.controls.name.value.trim(),
+        this.image!,
+      );
+      await this.router.navigate(['/local-plans', this.localClientId]);
+    } catch {
+      this.errorMessage = 'Das Gericht konnte nicht lokal gespeichert werden.';
+      this.submitting = false;
+    }
   }
 }

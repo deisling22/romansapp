@@ -25,6 +25,8 @@ const routes: Routes = [
   { path: 'dishes', component: DishCatalogComponent },
   { path: 'dishes/:dishId', component: DishDetailComponent },
   { path: 'plans', component: PlanListComponent },
+  { path: 'local-plans/:clientId', component: PlanDetailComponent },
+  { path: 'local-plans/:clientId/dishes/new', component: DishCreateComponent },
   { path: 'plans/:planId', component: PlanDetailComponent },
   { path: 'plans/:planId/dishes/new', component: DishCreateComponent },
   { path: 'shopping-list', component: ShoppingListComponent, canDeactivate: [pendingCartCheckoutGuard] },

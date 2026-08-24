@@ -1,6 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { MealPlan } from '../../core/models';
+import { LocalMealPlan } from '../../core/offline-db';
+import { RecipeSyncService } from '../../core/recipe-sync.service';
 
 @Component({
     selector: 'app-plan-list',
@@ -11,12 +13,16 @@ import { MealPlan } from '../../core/models';
 })
 export class PlanListComponent implements OnInit {
   plans: MealPlan[] = [];
+  localPlans: LocalMealPlan[] = [];
   loading = true;
   errorMessage = '';
   newPlanName = '';
   creating = false;
 
-  constructor(private readonly mealPlanApi: MealPlanApiService) {}
+  constructor(
+    private readonly mealPlanApi: MealPlanApiService,
+    private readonly recipeSync: RecipeSyncService,
+  ) {}
 
   ngOnInit(): void {
     this.load();
@@ -24,36 +30,49 @@ export class PlanListComponent implements OnInit {
 
   load(): void {
     this.loading = true;
+    void this.loadLocalPlans();
     this.mealPlanApi.getPlans().subscribe({
       next: (plans) => {
         this.plans = plans;
         this.loading = false;
       },
       error: () => {
-        this.errorMessage = 'Die Pläne konnten nicht geladen werden. Ist das Backend gestartet?';
+        this.errorMessage = 'Serverpläne sind gerade nicht erreichbar. Lokale Pläne bleiben verfügbar.';
         this.loading = false;
       },
     });
   }
 
-  createPlan(): void {
+  async createPlan(): Promise<void> {
     const name = this.newPlanName.trim();
     if (!name || this.creating) {
       return;
     }
 
     this.creating = true;
-    this.mealPlanApi.createPlan(name).subscribe({
-      next: () => {
-        this.newPlanName = '';
-        this.creating = false;
-        this.load();
-      },
-      error: () => {
-        this.errorMessage = 'Der Plan konnte nicht erstellt werden.';
-        this.creating = false;
-      },
-    });
+    try {
+      await this.recipeSync.createPlan(name);
+      this.newPlanName = '';
+      await this.loadLocalPlans();
+    } catch {
+      this.errorMessage = 'Der Plan konnte nicht lokal gespeichert werden.';
+    } finally {
+      this.creating = false;
+    }
+  }
+
+  async deleteLocalPlan(plan: LocalMealPlan, event: Event): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!confirm(`Plan "${plan.name}" wirklich lokal löschen?`)) {
+      return;
+    }
+    await this.recipeSync.deletePlan(plan.clientId);
+    await this.loadLocalPlans();
+  }
+
+  private async loadLocalPlans(): Promise<void> {
+    this.localPlans = await this.recipeSync.listPlans();
   }
 
   copyPlan(plan: MealPlan, event: Event): void {

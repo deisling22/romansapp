@@ -4,6 +4,7 @@ import { filter } from 'rxjs/operators';
 import { ConnectivityService } from './core/connectivity.service';
 import { ShoppingListOutboxService } from './core/shopping-list-outbox.service';
 import { NotificationService } from './core/notification.service';
+import { RecipeSyncService } from './core/recipe-sync.service';
 
 @Component({
     selector: 'app-root',
@@ -22,6 +23,7 @@ export class AppComponent {
     private readonly swUpdate: SwUpdate,
     // injected eagerly so its online-listener is registered as soon as the app starts
     private readonly shoppingListOutbox: ShoppingListOutboxService,
+    private readonly recipeSync: RecipeSyncService,
   ) {
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates

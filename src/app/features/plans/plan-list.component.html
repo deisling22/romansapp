@@ -23,7 +23,27 @@
     <p class="status error" role="alert">{{ errorMessage }}</p>
   }
 
-  @if (!loading && !errorMessage) {
+  @if (localPlans.length > 0) {
+    <section class="plan-list" aria-label="Lokal gespeicherte Speisepläne">
+      @for (plan of localPlans; track plan.clientId) {
+        <a class="plan-row" [routerLink]="['/local-plans', plan.clientId]">
+          <span class="plan-mark">{{ plan.name.charAt(0) }}</span>
+          <span class="plan-copy">
+            <strong>{{ plan.name }}</strong>
+            <small>{{ plan.serverId ? 'Lokal und online gespeichert' : 'Nur lokal gespeichert' }}</small>
+          </span>
+          <span class="plan-actions">
+            @if (!plan.serverId) {
+              <button type="button" (click)="deleteLocalPlan(plan, $event)" title="Lokalen Plan löschen">✕</button>
+            }
+          </span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </a>
+      }
+    </section>
+  }
+
+  @if (!loading) {
     <section class="plan-list" aria-label="Vorhandene Speisepläne">
       @for (plan of plans; track plan) {
         <a class="plan-row" [routerLink]="['/plans', plan.id]">
@@ -39,7 +59,7 @@
           <span class="chevron" aria-hidden="true">›</span>
         </a>
       }
-      @if (plans.length === 0) {
+      @if (plans.length === 0 && localPlans.length === 0) {
         <p class="status">Noch keine Pläne vorhanden.</p>
       }
     </section>

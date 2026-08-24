@@ -38,6 +38,7 @@ public class SecurityConfig {
                         new BearerTokenAuthenticationFilter(tokenService), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").authenticated()
+                        .requestMatchers("/api/sync/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/dishes/*/ratings").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/dishes/*/favorite").authenticated()
                         .anyRequest().permitAll())

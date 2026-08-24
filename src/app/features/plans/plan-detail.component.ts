@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { DashboardApiService } from '../../core/dashboard-api.service';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { Dish } from '../../core/models';
 import { ShareService } from '../../core/share.service';
+import { RecipeSyncService } from '../../core/recipe-sync.service';
 
 @Component({
     selector: 'app-plan-detail',
@@ -13,7 +14,7 @@ import { ShareService } from '../../core/share.service';
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
-export class PlanDetailComponent implements OnInit {
+export class PlanDetailComponent implements OnInit, OnDestroy {
   dishes: Dish[] = [];
   planId = 0;
   loading = true;
@@ -21,6 +22,9 @@ export class PlanDetailComponent implements OnInit {
   cookingDishId: number | null = null;
   addingToCart = false;
   shareMessage = '';
+  localClientId = '';
+  localPlanName = '';
+  private readonly localImageUrls: string[] = [];
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -28,15 +32,35 @@ export class PlanDetailComponent implements OnInit {
     private readonly dashboardApi: DashboardApiService,
     private readonly shoppingListApi: ShoppingListApiService,
     private readonly shareService: ShareService,
+    private readonly recipeSync: RecipeSyncService,
     readonly mealPlanApi: MealPlanApiService,
   ) {}
 
   ngOnInit(): void {
+    this.localClientId = this.route.snapshot.paramMap.get('clientId') ?? '';
+    if (this.localClientId) {
+      void this.loadLocal();
+      return;
+    }
     this.planId = Number(this.route.snapshot.paramMap.get('planId'));
     this.load();
   }
 
+  ngOnDestroy(): void {
+    for (const imageUrl of this.localImageUrls) {
+      URL.revokeObjectURL(imageUrl);
+    }
+  }
+
+  get isLocal(): boolean {
+    return Boolean(this.localClientId);
+  }
+
   load(): void {
+    if (this.isLocal) {
+      void this.loadLocal();
+      return;
+    }
     this.loading = true;
     this.mealPlanApi.getDishes(this.planId).subscribe({
       next: (dishes) => {
@@ -48,6 +72,35 @@ export class PlanDetailComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  private async loadLocal(): Promise<void> {
+    this.loading = true;
+    const [plan, localDishes] = await Promise.all([
+      this.recipeSync.getPlan(this.localClientId),
+      this.recipeSync.listDishes(this.localClientId),
+    ]);
+    if (!plan) {
+      this.errorMessage = 'Der lokale Plan wurde nicht gefunden.';
+      this.loading = false;
+      return;
+    }
+    this.localPlanName = plan.name;
+    this.dishes = localDishes.map((dish, index) => {
+      const imageUrl = dish.image ? URL.createObjectURL(dish.image) : dish.imageUrl ?? '';
+      if (dish.image) {
+        this.localImageUrls.push(imageUrl);
+      }
+      return {
+        id: -(index + 1),
+        name: dish.name,
+        imageUrl,
+        sortOrder: index,
+        planEntryId: 0,
+        cooked: false,
+      };
+    });
+    this.loading = false;
   }
 
   markCooked(dish: Dish): void {

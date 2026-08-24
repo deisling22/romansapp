@@ -3,7 +3,7 @@
   <header class="page-header compact">
     <p class="eyebrow">Dein Plan</p>
     <div class="share-heading">
-      <h1>Gerichte</h1>
+      <h1>{{ localPlanName || 'Gerichte' }}</h1>
       <button type="button" class="share-button" (click)="sharePlan()">Teilen</button>
     </div>
   </header>
@@ -25,14 +25,15 @@
         <article class="dish-card" [class.cooked]="dish.cooked">
           <img [src]="mealPlanApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
           <h2>{{ dish.name }}</h2>
-          <button
-            type="button"
-            class="cook-button"
-            [disabled]="dish.cooked || cookingDishId === dish.id"
-            (click)="markCooked(dish)"
-            >
-            {{ dish.cooked ? 'Gekocht' : cookingDishId === dish.id ? 'Wird gespeichert ...' : 'Als gekocht markieren' }}
-          </button>
+          @if (!isLocal) {
+            <button
+              type="button"
+              class="cook-button"
+              [disabled]="dish.cooked || cookingDishId === dish.id"
+              (click)="markCooked(dish)">
+              {{ dish.cooked ? 'Gekocht' : cookingDishId === dish.id ? 'Wird gespeichert ...' : 'Als gekocht markieren' }}
+            </button>
+          }
         </article>
       }
       @if (dishes.length === 0) {
@@ -41,12 +42,16 @@
     </section>
   }
 
-  <button
-    type="button"
-    class="secondary-action"
-    [disabled]="addingToCart || dishes.length === 0"
-    (click)="addIngredientsToCart()">
-    {{ addingToCart ? 'Wird hinzugefügt ...' : 'Zutaten in den Warenkorb' }}
-  </button>
-  <a class="primary-action" [routerLink]="['/plans', planId, 'dishes', 'new']">Gericht hinzufügen</a>
+  @if (!isLocal) {
+    <button
+      type="button"
+      class="secondary-action"
+      [disabled]="addingToCart || dishes.length === 0"
+      (click)="addIngredientsToCart()">
+      {{ addingToCart ? 'Wird hinzugefügt ...' : 'Zutaten in den Warenkorb' }}
+    </button>
+  }
+  <a class="primary-action" [routerLink]="isLocal
+      ? ['/local-plans', localClientId, 'dishes', 'new']
+      : ['/plans', planId, 'dishes', 'new']">Gericht hinzufügen</a>
 </main>

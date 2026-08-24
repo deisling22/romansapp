@@ -3,6 +3,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router, UrlTree } from '@angular/r
 import { Observable, catchError, map, of } from 'rxjs';
 import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
+import { RecipeSyncService } from './recipe-sync.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -10,6 +11,7 @@ export class AuthGuard implements CanActivate {
     private readonly authService: AuthService,
     private readonly router: Router,
     private readonly notifications: NotificationService,
+    private readonly recipeSync: RecipeSyncService,
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
@@ -23,6 +25,7 @@ export class AuthGuard implements CanActivate {
       map(() => {
         if (token) {
           this.notifications.show('Anmeldung erfolgreich.', 'success');
+          void this.recipeSync.sync();
           return this.router.createUrlTree(['/account']);
         }
         return true;
