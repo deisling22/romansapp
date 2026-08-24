@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1787575493827,
+  "timestamp": 1787580808612,
   "index": "/romansapp/index.html",
   "assetGroups": [
     {
@@ -11,15 +11,15 @@
         "ignoreVary": true
       },
       "urls": [
-        "/romansapp/chunk-B_OG7pmU.js",
-        "/romansapp/chunk-BcpLV8qr.js",
-        "/romansapp/chunk-C8iwgz39.js",
-        "/romansapp/chunk-DDYHZCrL.js",
-        "/romansapp/chunk-GGpL1Ep4.js",
-        "/romansapp/chunk-e2Bye8C2.js",
+        "/romansapp/chunk-B3iCqdgg.js",
+        "/romansapp/chunk-BAB32RX0.js",
+        "/romansapp/chunk-BHbI4SeR.js",
+        "/romansapp/chunk-E4lIakbS.js",
+        "/romansapp/chunk-Emc6Cnkp.js",
+        "/romansapp/chunk-Zsy54m-B.js",
         "/romansapp/favicon.ico",
         "/romansapp/index.html",
-        "/romansapp/main-CVVRIS3N.js",
+        "/romansapp/main-D47UKO2Q.js",
         "/romansapp/manifest.webmanifest",
         "/romansapp/polyfills-RV3JTMEC.js",
         "/romansapp/styles-MCYR27DI.css"
@@ -58,7 +58,9 @@
         "/romansapp/assets/icons/icon-384x384.png",
         "/romansapp/assets/icons/icon-512x512.png",
         "/romansapp/assets/icons/icon-72x72.png",
-        "/romansapp/assets/icons/icon-96x96.png"
+        "/romansapp/assets/icons/icon-96x96.png",
+        "/romansapp/assets/videos/creator-kitchen-3s.mp4",
+        "/romansapp/assets/videos/creator-table-3s.mp4"
       ],
       "patterns": []
     }
@@ -109,15 +111,17 @@
     "/romansapp/assets/models/coco-ssd/group1-shard4of5": "b8b8843bfd77fd5f488c76cde573775dfcc7f8bc",
     "/romansapp/assets/models/coco-ssd/group1-shard5of5": "3528069df60c4b919de2c22c2a0bb36abde8484c",
     "/romansapp/assets/models/coco-ssd/model.json": "a9a9244138f615ede4a437177453527b69c7aece",
-    "/romansapp/chunk-B_OG7pmU.js": "173895924531a51dd2278fe6358f702ea0a57f78",
-    "/romansapp/chunk-BcpLV8qr.js": "0c8759b8597f57da1a7ecb9a2d3315ffc0f90d67",
-    "/romansapp/chunk-C8iwgz39.js": "ba316967d2b93e4d4e1110f0107f7c924ed4758c",
-    "/romansapp/chunk-DDYHZCrL.js": "a741f1d08581fdff8f5ae38cf4785fea22e024c1",
-    "/romansapp/chunk-GGpL1Ep4.js": "b4d7d9d4140fa286a0777802bde87d1917de3faf",
-    "/romansapp/chunk-e2Bye8C2.js": "76ce8ed1f872f772078837f07074d121f630ae30",
+    "/romansapp/assets/videos/creator-kitchen-3s.mp4": "62588d07497bf1d4a8d106a12b5d6380870cef1e",
+    "/romansapp/assets/videos/creator-table-3s.mp4": "2209ff5f9e5b0e40ab14a812e5e8b2daed042561",
+    "/romansapp/chunk-B3iCqdgg.js": "3f20c33bbaa634cad760a05be7d152f7c59aa85a",
+    "/romansapp/chunk-BAB32RX0.js": "77f649f966358050b5a6bb721a071eb36a0700fc",
+    "/romansapp/chunk-BHbI4SeR.js": "bdc32794471b451e6191f642fe1225822e913576",
+    "/romansapp/chunk-E4lIakbS.js": "d6560d5be5a7a7b45441f2d28b5d4c3fc13fcd4e",
+    "/romansapp/chunk-Emc6Cnkp.js": "120230b87066216689cc11afab413b28fa890fc3",
+    "/romansapp/chunk-Zsy54m-B.js": "c14f0f92a57892c87beb5897594e694b292850ba",
     "/romansapp/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/romansapp/index.html": "408f1a74a93226bee7ed0352ea60a67333d28970",
-    "/romansapp/main-CVVRIS3N.js": "f0658d8fe5241ab3132bbd7a907faa0e2542602b",
+    "/romansapp/index.html": "e4e8fd2243b81bf4c845b78d970b1dd8a685bf8d",
+    "/romansapp/main-D47UKO2Q.js": "9c89d3811c7879553fd4e13fa4dc2ad09be10fff",
     "/romansapp/manifest.webmanifest": "511185f8ee4d6e527fec66e2eeffe6425e8ad565",
     "/romansapp/polyfills-RV3JTMEC.js": "e83dcd401293cfb45ad0988a17d1815b3bb09c33",
     "/romansapp/styles-MCYR27DI.css": "efd77613e1a2d62ce3ac682e0f2245ed4e3675f3"
