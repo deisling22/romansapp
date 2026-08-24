@@ -10,6 +10,8 @@ import de.roman.speiseplan.plan.PlanEntryRepository;
 import de.roman.speiseplan.pantry.PantryService;
 import de.roman.speiseplan.profile.ProfileDto;
 import de.roman.speiseplan.profile.ProfileService;
+import de.roman.speiseplan.recommendation.ContentType;
+import de.roman.speiseplan.recommendation.TrendScoringService;
 import de.roman.speiseplan.shopping.ShoppingListService;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -30,6 +32,7 @@ public class DashboardService {
     private final ProfileService profileService;
     private final ShoppingListService shoppingListService;
     private final PantryService pantryService;
+    private final TrendScoringService trendScoringService;
 
     public DashboardService(
             PlanEntryRepository planEntryRepository,
@@ -37,13 +40,15 @@ public class DashboardService {
             DishRatingRepository dishRatingRepository,
             ProfileService profileService,
             ShoppingListService shoppingListService,
-            PantryService pantryService) {
+            PantryService pantryService,
+            TrendScoringService trendScoringService) {
         this.planEntryRepository = planEntryRepository;
         this.dishIngredientRepository = dishIngredientRepository;
         this.dishRatingRepository = dishRatingRepository;
         this.profileService = profileService;
         this.shoppingListService = shoppingListService;
         this.pantryService = pantryService;
+        this.trendScoringService = trendScoringService;
     }
 
 
@@ -118,6 +123,7 @@ public class DashboardService {
         }
         pantryService.consume(dishIngredientRepository.findByDishId(entry.getDish().getId()));
         entry.markCooked(Instant.now());
+        trendScoringService.bump(ContentType.DISH, entry.getDish().getId(), 4);
     }
 
     private Map<Long, List<DishIngredient>> loadIngredients(List<Long> dishIds) {

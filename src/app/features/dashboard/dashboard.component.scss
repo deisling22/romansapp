@@ -219,3 +219,69 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+.for-you-block {
+  display: grid;
+  gap: 10px;
+}
+
+.for-you-block h2 {
+  margin: 0;
+  color: #16342f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
+}
+
+.for-you-strip {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-snap-type: x proximity;
+}
+
+.for-you-card,
+.for-you-creator-card {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 6px;
+  width: 128px;
+  color: #16342f;
+  text-decoration: none;
+  scroll-snap-align: start;
+}
+
+.for-you-card img,
+.for-you-creator-card img {
+  width: 128px;
+  height: 96px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #e9eee9;
+}
+
+.for-you-creator-card img {
+  width: 72px;
+  height: 72px;
+  justify-self: center;
+  border-radius: 50%;
+}
+
+.for-you-card span,
+.for-you-creator-card span {
+  overflow: hidden;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.for-you-creator-card {
+  text-align: center;
+}
+
+.for-you-creator-card small {
+  color: #6b827d;
+  font-size: 0.74rem;
+}
+

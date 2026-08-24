@@ -1,8 +1,9 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DashboardApiService } from '../../core/dashboard-api.service';
-import { DashboardData } from '../../core/models';
+import { DashboardData, Recommendations } from '../../core/models';
 import { toAbsoluteImageUrl } from '../../core/image-url';
 import { GamificationService } from '../../core/gamification.service';
+import { RecommendationApiService } from '../../core/recommendation-api.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -16,10 +17,12 @@ export class DashboardComponent implements OnInit {
   loading = true;
   errorMessage = '';
   cooking = false;
+  recommendations: Recommendations | null = null;
 
   constructor(
     readonly dashboardApi: DashboardApiService,
     private readonly gamification: GamificationService,
+    private readonly recommendationApi: RecommendationApiService,
   ) {}
 
   imageUrl(path: string): string {
@@ -32,6 +35,10 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this.recommendationApi.getRecommendations().subscribe({
+      next: (recommendations) => (this.recommendations = recommendations),
+      error: () => (this.recommendations = null),
+    });
   }
 
   load(): void {

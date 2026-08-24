@@ -1,5 +1,7 @@
 package de.roman.speiseplan.dish;
 
+import de.roman.speiseplan.recommendation.ContentType;
+import de.roman.speiseplan.recommendation.TrendScoringService;
 import de.roman.speiseplan.storage.LocalImageStorage;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +24,7 @@ public class DishService {
     private final DishRatingRepository dishRatingRepository;
         private final DishFavoriteRepository dishFavoriteRepository;
     private final LocalImageStorage imageStorage;
+    private final TrendScoringService trendScoringService;
 
     public DishService(
             DishRepository dishRepository,
@@ -31,7 +34,8 @@ public class DishService {
             IngredientRepository ingredientRepository,
             DishRatingRepository dishRatingRepository,
             DishFavoriteRepository dishFavoriteRepository,
-            LocalImageStorage imageStorage) {
+            LocalImageStorage imageStorage,
+            TrendScoringService trendScoringService) {
         this.dishRepository = dishRepository;
         this.dishIngredientRepository = dishIngredientRepository;
         this.dishImageRepository = dishImageRepository;
@@ -40,6 +44,7 @@ public class DishService {
         this.dishRatingRepository = dishRatingRepository;
         this.dishFavoriteRepository = dishFavoriteRepository;
         this.imageStorage = imageStorage;
+        this.trendScoringService = trendScoringService;
     }
 
     @Transactional(readOnly = true)
@@ -77,6 +82,7 @@ public class DishService {
     @Transactional(readOnly = true)
     public DishDetailDto getDishDetail(Long dishId, String userEmail) {
         Dish dish = requireDish(dishId);
+        trendScoringService.bump(ContentType.DISH, dishId, 1);
         List<DishIngredient> dishIngredients = dishIngredientRepository.findByDishId(dishId);
         List<DishImage> images = dishImageRepository.findByDishIdOrderBySortOrderAsc(dishId);
         List<PrepStep> steps = prepStepRepository.findByDishIdOrderByStepOrderAsc(dishId);
@@ -124,6 +130,7 @@ public class DishService {
                 .orElseGet(() -> new DishRating(dish, userEmail, stars));
         rating.setStars(stars);
         dishRatingRepository.save(rating);
+        trendScoringService.bump(ContentType.DISH, dishId, stars >= 4 ? 5 : stars == 3 ? 1 : -2);
 
         DishRatingRepository.DishRatingSummaryProjection summary =
                 loadRatingSummaries(List.of(dishId)).get(dishId);
@@ -142,8 +149,10 @@ public class DishService {
                 boolean exists = dishFavoriteRepository.existsByDishIdAndUserEmail(dishId, userEmail);
                 if (favorite && !exists) {
                         dishFavoriteRepository.save(new DishFavorite(dish, userEmail));
+                        trendScoringService.bump(ContentType.DISH, dishId, 6);
                 } else if (!favorite && exists) {
                         dishFavoriteRepository.deleteByDishIdAndUserEmail(dishId, userEmail);
+                        trendScoringService.bump(ContentType.DISH, dishId, -3);
                 }
                 return new DishFavoriteResponseDto(favorite);
         }

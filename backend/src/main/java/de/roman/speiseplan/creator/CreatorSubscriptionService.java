@@ -2,6 +2,8 @@ package de.roman.speiseplan.creator;
 
 import de.roman.speiseplan.plan.MealPlanRepository;
 import de.roman.speiseplan.plan.PlanEntryRepository;
+import de.roman.speiseplan.recommendation.ContentType;
+import de.roman.speiseplan.recommendation.TrendScoringService;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -15,16 +17,19 @@ public class CreatorSubscriptionService {
     private final CreatorSubscriptionRepository subscriptionRepository;
     private final MealPlanRepository mealPlanRepository;
     private final PlanEntryRepository planEntryRepository;
+    private final TrendScoringService trendScoringService;
 
     public CreatorSubscriptionService(
             CreatorRepository creatorRepository,
             CreatorSubscriptionRepository subscriptionRepository,
             MealPlanRepository mealPlanRepository,
-            PlanEntryRepository planEntryRepository) {
+            PlanEntryRepository planEntryRepository,
+            TrendScoringService trendScoringService) {
         this.creatorRepository = creatorRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.mealPlanRepository = mealPlanRepository;
         this.planEntryRepository = planEntryRepository;
+        this.trendScoringService = trendScoringService;
     }
 
     @Transactional(readOnly = true)
@@ -40,6 +45,7 @@ public class CreatorSubscriptionService {
         Creator creator = creatorRepository.findById(creatorId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Creator wurde nicht gefunden."));
         subscriptionRepository.save(new CreatorSubscription(ownerEmail, creator));
+        trendScoringService.bump(ContentType.CREATOR, creatorId, 8);
     }
 
     @Transactional

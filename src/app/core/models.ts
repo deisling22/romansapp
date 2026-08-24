@@ -139,3 +139,19 @@ export interface PantryItem {
   unit: string;
   purchasedAt: string;
 }
+
+export interface PlanRecommendation {
+  id: number;
+  name: string;
+  creatorId: number;
+  creatorName: string;
+  creatorHandle: string;
+  dishCount: number;
+  coverImageUrl: string;
+}
+
+export interface Recommendations {
+  dishes: DishCatalogEntry[];
+  creators: CreatorSummary[];
+  plans: PlanRecommendation[];
+}

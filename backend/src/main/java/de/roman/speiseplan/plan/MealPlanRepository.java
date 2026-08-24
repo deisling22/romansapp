@@ -12,6 +12,8 @@ public interface MealPlanRepository extends JpaRepository<MealPlan, Long> {
 
     List<MealPlan> findByCreatorIdOrderByCreatedAtAsc(Long creatorId);
 
+    List<MealPlan> findAllByCreatorIsNotNullOrderByCreatedAtAsc();
+
     List<MealPlan> findByOwnerEmailOrderByUpdatedAtAsc(String ownerEmail);
 
     Optional<MealPlan> findByOwnerEmailAndClientId(String ownerEmail, String clientId);

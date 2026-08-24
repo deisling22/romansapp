@@ -8,6 +8,8 @@ import de.roman.speiseplan.plan.MealPlanService;
 import de.roman.speiseplan.plan.PlanEntry;
 import de.roman.speiseplan.plan.PlanEntryRepository;
 import de.roman.speiseplan.plan.PlanSummaryDto;
+import de.roman.speiseplan.recommendation.ContentType;
+import de.roman.speiseplan.recommendation.TrendScoringService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,16 +22,19 @@ public class CreatorService {
     private final MealPlanRepository mealPlanRepository;
     private final PlanEntryRepository planEntryRepository;
     private final MealPlanService mealPlanService;
+    private final TrendScoringService trendScoringService;
 
     public CreatorService(
             CreatorRepository creatorRepository,
             MealPlanRepository mealPlanRepository,
             PlanEntryRepository planEntryRepository,
-            MealPlanService mealPlanService) {
+            MealPlanService mealPlanService,
+            TrendScoringService trendScoringService) {
         this.creatorRepository = creatorRepository;
         this.mealPlanRepository = mealPlanRepository;
         this.planEntryRepository = planEntryRepository;
         this.mealPlanService = mealPlanService;
+        this.trendScoringService = trendScoringService;
     }
 
     @Transactional(readOnly = true)
@@ -45,6 +50,7 @@ public class CreatorService {
     @Transactional(readOnly = true)
     public CreatorDetailDto getCreator(Long creatorId) {
         Creator creator = requireCreator(creatorId);
+        trendScoringService.bump(ContentType.CREATOR, creatorId, 1);
         List<CreatorPlanDto> plans = mealPlanRepository.findByCreatorIdOrderByCreatedAtAsc(creatorId).stream()
                 .map(this::toPlanDto)
                 .toList();
@@ -56,6 +62,7 @@ public class CreatorService {
     @Transactional(readOnly = true)
     public List<DishDto> getPlanDishes(Long creatorId, Long planId) {
         requireCreatorPlan(creatorId, planId);
+        trendScoringService.bump(ContentType.PLAN, planId, 1);
         return planEntryRepository.findByPlanIdOrderBySortOrderAsc(planId).stream()
                 .map(this::toDishDto)
                 .toList();
@@ -64,6 +71,8 @@ public class CreatorService {
     @Transactional
     public PlanSummaryDto copyPlan(Long creatorId, Long planId) {
         requireCreatorPlan(creatorId, planId);
+        trendScoringService.bump(ContentType.PLAN, planId, 6);
+        trendScoringService.bump(ContentType.CREATOR, creatorId, 3);
         return mealPlanService.copyPlan(planId);
     }
 

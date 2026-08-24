@@ -78,6 +78,55 @@
           <span class="widget-arrow" aria-hidden="true">›</span>
         </a>
       </section>
+
+      @if (recommendations?.dishes?.length) {
+        <section class="for-you-block" aria-labelledby="for-you-dishes-title">
+          <p class="eyebrow">Für dich</p>
+          <h2 id="for-you-dishes-title">Gerichte, die dir gefallen könnten</h2>
+          <div class="for-you-strip">
+            @for (dish of recommendations!.dishes; track dish.id) {
+              <a class="for-you-card" [routerLink]="['/dishes', dish.id]">
+                <img [src]="imageUrl(dish.imageUrl)" [alt]="dish.name" />
+                <span>{{ dish.name }}</span>
+              </a>
+            }
+          </div>
+        </section>
+      }
+
+      @if (recommendations?.creators?.length) {
+        <section class="for-you-block" aria-labelledby="for-you-creators-title">
+          <p class="eyebrow">Neu für dich</p>
+          <h2 id="for-you-creators-title">Creator, die zu dir passen</h2>
+          <div class="for-you-strip">
+            @for (creator of recommendations!.creators; track creator.id) {
+              <a class="for-you-creator-card" [routerLink]="['/creators', creator.id]">
+                <img [src]="creator.avatarUrl" [alt]="creator.name" />
+                <span>{{ creator.name }}</span>
+                <small>&#64;{{ creator.handle }}</small>
+              </a>
+            }
+          </div>
+        </section>
+      }
+
+      @if (recommendations?.plans?.length) {
+        <section class="for-you-block" aria-labelledby="for-you-plans-title">
+          <p class="eyebrow">Beliebt gerade</p>
+          <h2 id="for-you-plans-title">Pläne zum Nachkochen</h2>
+          <div class="for-you-strip">
+            @for (plan of recommendations!.plans; track plan.id) {
+              <a class="for-you-card" [routerLink]="['/creators', plan.creatorId, 'plans', plan.id]">
+                @if (plan.coverImageUrl) {
+                  <img [src]="imageUrl(plan.coverImageUrl)" [alt]="plan.name" />
+                }
+                <span>{{ plan.name }}</span>
+                <small>&#64;{{ plan.creatorHandle }}</small>
+              </a>
+            }
+          </div>
+        </section>
+      }
     </section>
   }
 </main>
