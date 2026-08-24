@@ -96,7 +96,16 @@ export class IngredientRecognitionService {
             }
             await tensorflow.ready();
           }
-        return cocoSsd.load({
+        // coco-ssd is CommonJS; production bundling can expose it either directly or under `.default`.
+        const cocoSsdModule = cocoSsd as unknown as {
+          load?: typeof cocoSsd.load;
+          default?: { load: typeof cocoSsd.load };
+        };
+        const load = cocoSsdModule.load ?? cocoSsdModule.default?.load;
+        if (!load) {
+          throw new Error('coco-ssd Modul konnte nicht geladen werden.');
+        }
+        return load({
           base: 'lite_mobilenet_v2',
           modelUrl: 'assets/models/coco-ssd/model.json',
         });

@@ -68,7 +68,8 @@ export class IngredientScanComponent implements OnDestroy {
       if (this.ingredients.length === 0) {
         this.errorMessage = 'Keine unterstützte Zutat sicher erkannt. Ergänze sie unten manuell.';
       }
-    } catch {
+    } catch (error) {
+      console.error('Ingredient scan failed', error);
       this.errorMessage = 'Das lokale KI-Modell konnte nicht gestartet werden. Versuche es erneut.';
     } finally {
       this.analyzing = false;
