@@ -2,6 +2,7 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { ConnectivityService } from '../../core/connectivity.service';
+import { GamificationService } from '../../core/gamification.service';
 import { ShoppingListItem } from '../../core/models';
 import { NotificationService } from '../../core/notification.service';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
@@ -20,7 +21,9 @@ describe('ShoppingListComponent reminders', () => {
     const connectivity = { isOnline: true } as ConnectivityService;
     const outbox = jasmine.createSpyObj<ShoppingListOutboxService>('ShoppingListOutboxService', ['queue']);
     notifications = jasmine.createSpyObj<NotificationService>('NotificationService', ['show']);
-    component = new ShoppingListComponent(route, api, connectivity, outbox, notifications);
+    const gamification = jasmine.createSpyObj<GamificationService>('GamificationService', ['record']);
+    gamification.record.and.resolveTo();
+    component = new ShoppingListComponent(route, api, connectivity, outbox, notifications, gamification);
     item = { id: 7, ingredientName: 'Milch', quantity: 1, unit: 'l', checked: false };
     component.items = [item];
   });

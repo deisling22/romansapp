@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { forkJoin, switchMap } from 'rxjs';
@@ -17,7 +17,7 @@ import { GamificationService } from '../../core/gamification.service';
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
-export class DishDetailComponent implements OnInit {
+export class DishDetailComponent implements OnInit, OnDestroy {
   readonly ingredientForm = this.formBuilder.nonNullable.group({
     ingredientId: [0, [Validators.required, Validators.min(1)]],
     quantityGrams: [100, [Validators.required, Validators.min(1)]],
@@ -88,6 +88,10 @@ export class DishDetailComponent implements OnInit {
       next: (items) => (this.cartItems = items),
     });
     this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.stopTimer();
   }
 
   availableQuantity(ingredient: DishIngredientEntry): number {

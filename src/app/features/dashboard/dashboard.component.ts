@@ -60,9 +60,11 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
+    const dishId = this.dashboard.nextDish.dishId;
     this.cooking = true;
     this.dashboardApi.markCooked(this.dashboard.nextDish.planEntryId).subscribe({
       next: (dashboard) => {
+        void this.gamification.record('COOK_DISH', String(dishId));
         this.dashboard = dashboard;
         this.cooking = false;
       },
