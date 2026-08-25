@@ -18,6 +18,9 @@
   @if (errorMessage) {
     <p class="status error" role="alert">{{ errorMessage }}</p>
   }
+  @if (successMessage) {
+    <p class="status success" role="status">{{ successMessage }}</p>
+  }
 
   @if (!loading && !errorMessage) {
     <section class="dish-grid" aria-label="Gerichte im Plan">

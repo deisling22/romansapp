@@ -22,6 +22,7 @@ export class PlanDetailComponent implements OnInit, OnDestroy {
   errorMessage = '';
   cookingDishId: number | null = null;
   addingToCart = false;
+  successMessage = '';
   shareMessage = '';
   localClientId = '';
   localPlanName = '';
@@ -129,8 +130,15 @@ export class PlanDetailComponent implements OnInit, OnDestroy {
     }
     this.addingToCart = true;
     this.errorMessage = '';
+    this.successMessage = '';
     this.shoppingListApi.generate(this.planId).subscribe({
-      next: () => {
+      next: (items) => {
+        this.addingToCart = false;
+        // generate() only returns items still missing after pantry stock, so an empty result means nothing new to buy.
+        if (items.length === 0) {
+          this.successMessage = 'Alle Zutaten sind bereits im Vorrat oder im Warenkorb.';
+          return;
+        }
         void this.router.navigate(['/shopping-list']);
       },
       error: () => {

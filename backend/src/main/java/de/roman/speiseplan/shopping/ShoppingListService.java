@@ -2,10 +2,13 @@ package de.roman.speiseplan.shopping;
 
 import de.roman.speiseplan.dish.DishIngredient;
 import de.roman.speiseplan.dish.DishIngredientRepository;
+import de.roman.speiseplan.pantry.PantryItem;
+import de.roman.speiseplan.pantry.PantryItemRepository;
 import de.roman.speiseplan.plan.MealPlan;
 import de.roman.speiseplan.plan.MealPlanRepository;
 import de.roman.speiseplan.plan.PlanEntry;
 import de.roman.speiseplan.plan.PlanEntryRepository;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,16 +23,19 @@ public class ShoppingListService {
     private final MealPlanRepository mealPlanRepository;
     private final PlanEntryRepository planEntryRepository;
     private final DishIngredientRepository dishIngredientRepository;
+    private final PantryItemRepository pantryItemRepository;
 
     public ShoppingListService(
             ShoppingListItemRepository shoppingListItemRepository,
             MealPlanRepository mealPlanRepository,
             PlanEntryRepository planEntryRepository,
-            DishIngredientRepository dishIngredientRepository) {
+            DishIngredientRepository dishIngredientRepository,
+            PantryItemRepository pantryItemRepository) {
         this.shoppingListItemRepository = shoppingListItemRepository;
         this.mealPlanRepository = mealPlanRepository;
         this.planEntryRepository = planEntryRepository;
         this.dishIngredientRepository = dishIngredientRepository;
+        this.pantryItemRepository = pantryItemRepository;
     }
 
     @Transactional(readOnly = true)
@@ -88,10 +94,23 @@ public class ShoppingListService {
                             plan, existing.getIngredientName(), existing.getQuantity() + addition.getQuantity(), unit));
         }
 
-        return aggregated.values().stream()
-            .map(item -> mergeItem(plan, item.getIngredientName(), item.getQuantity(), item.getUnit()))
-            .map(ShoppingListItemDto::from)
-            .toList();
+        // Only top up items still missing after pantry stock is subtracted, so re-running generate() is idempotent.
+        List<ShoppingListItemDto> updated = new ArrayList<>();
+        for (ShoppingListItem need : aggregated.values()) {
+            double pantryStock = pantryItemRepository
+                    .findByIngredientNameIgnoreCaseAndUnitIgnoreCaseOrderByPurchasedAtAsc(
+                            need.getIngredientName(), need.getUnit())
+                    .stream()
+                    .mapToDouble(PantryItem::getQuantity)
+                    .sum();
+            double stillNeeded = need.getQuantity() - pantryStock;
+            if (stillNeeded <= 0) {
+                continue;
+            }
+            updated.add(ShoppingListItemDto.from(
+                    ensureQuantity(plan, need.getIngredientName(), need.getUnit(), stillNeeded)));
+        }
+        return updated;
     }
 
     @Transactional
@@ -130,6 +149,22 @@ public class ShoppingListService {
         target.addQuantity(combinedQuantity - target.getQuantity());
         if (matches.size() > 1) {
             shoppingListItemRepository.deleteAll(matches.subList(1, matches.size()));
+        }
+        return target;
+    }
+
+    private ShoppingListItem ensureQuantity(MealPlan plan, String ingredientName, String unit, double desiredQuantity) {
+        List<ShoppingListItem> matches = shoppingListItemRepository
+                .findByIngredientNameIgnoreCaseAndUnitIgnoreCaseOrderByIdAsc(ingredientName, unit);
+        if (matches.isEmpty()) {
+            return shoppingListItemRepository.save(new ShoppingListItem(plan, ingredientName, desiredQuantity, unit));
+        }
+        ShoppingListItem target = matches.getFirst();
+        if (matches.size() > 1) {
+            shoppingListItemRepository.deleteAll(matches.subList(1, matches.size()));
+        }
+        if (target.getQuantity() < desiredQuantity) {
+            target.addQuantity(desiredQuantity - target.getQuantity());
         }
         return target;
     }

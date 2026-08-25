@@ -215,6 +215,25 @@ h1 {
   line-height: 1.4;
 }
 
+.finish-shopping {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  min-height: 46px;
+  border: 0;
+  border-radius: 8px;
+  background: #26736f;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.finish-shopping:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 @keyframes item-reveal {
   from {
     opacity: 0;

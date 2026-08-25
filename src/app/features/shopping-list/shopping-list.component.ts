@@ -30,6 +30,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   newUnit = 'Stk.';
   adding = false;
   deletingItemId: number | null = null;
+  finishingCheckout = false;
   private readonly reminderTimers = new Map<number, ReturnType<typeof setTimeout>>();
 
   constructor(
@@ -200,6 +201,29 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
         return of(false);
       }),
     );
+  }
+
+  finishShopping(): void {
+    if (this.finishingCheckout || this.checkedItems.length === 0) {
+      return;
+    }
+    const movedCount = this.checkedItems.length;
+    const wasOnline = this.connectivity.isOnline;
+    this.finishingCheckout = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.prepareForExit().subscribe((success) => {
+      this.finishingCheckout = false;
+      if (!success) {
+        return;
+      }
+      if (!wasOnline) {
+        this.successMessage = 'Offline gespeichert – wird automatisch in den Vorrat gebucht, sobald du wieder online bist.';
+        return;
+      }
+      this.successMessage = `${movedCount} ${movedCount === 1 ? 'Artikel wurde' : 'Artikel wurden'} in den Vorratsschrank gebucht.`;
+      this.load();
+    });
   }
 }
 

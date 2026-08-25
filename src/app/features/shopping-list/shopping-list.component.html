@@ -99,7 +99,10 @@
             </li>
           }
         </ul>
-        <p class="checkout-note">Beim Verlassen des Warenkorbs wandern diese Artikel in den Vorratsschrank.</p>
+        <p class="checkout-note">Beim Verlassen des Warenkorbs wandern diese Artikel automatisch in den Vorratsschrank.</p>
+        <button type="button" class="finish-shopping" [disabled]="finishingCheckout" (click)="finishShopping()">
+          {{ finishingCheckout ? 'Wird gebucht ...' : 'Einkauf abschließen' }}
+        </button>
       </section>
     }
   }
