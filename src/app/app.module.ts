@@ -23,6 +23,7 @@ import { CreatorFeedComponent } from './features/creators/creator-feed.component
 import { CreatorPlanComponent } from './features/creators/creator-plan.component';
 import { CreatorProfileComponent } from './features/creators/creator-profile.component';
 import { IngredientScanComponent } from './features/ingredient-scan/ingredient-scan.component';
+import { RecipeScanComponent } from './features/recipe-scan/recipe-scan.component';
 import { ProgressComponent } from './features/progress/progress.component';
 import { OnboardingTourComponent } from './features/onboarding/onboarding-tour.component';
 
@@ -44,6 +45,7 @@ import { OnboardingTourComponent } from './features/onboarding/onboarding-tour.c
         CreatorProfileComponent,
         CreatorPlanComponent,
         IngredientScanComponent,
+        RecipeScanComponent,
         ProgressComponent,
         OnboardingTourComponent,
     ],

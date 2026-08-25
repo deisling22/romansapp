@@ -131,6 +131,16 @@ public class DishService {
     }
 
     @Transactional
+    public DishDetailsDto updateDetails(Long dishId, DishDetailsUpdateRequest request) {
+        Dish dish = requireDish(dishId);
+        dish.setDescription(blankToNull(request.description()));
+        dish.setPrepMinutes(request.prepMinutes());
+        dish.setServings(request.servings());
+        dish.setTags(joinTags(request.tags()));
+        return new DishDetailsDto(dish.getDescription(), dish.getPrepMinutes(), dish.getServings(), splitTags(dish.getTags()));
+    }
+
+    @Transactional
     public NutritionDto updateNutrition(Long dishId, NutritionUpdateRequest request) {
         Dish dish = requireDish(dishId);
         dish.updateNutrition(
@@ -242,5 +252,16 @@ public class DishService {
                 .map(String::trim)
                 .filter(tag -> !tag.isEmpty())
                 .toList();
+    }
+
+    private static String joinTags(List<String> tags) {
+        if (tags == null) {
+            return null;
+        }
+        String joined = tags.stream()
+                .map(String::trim)
+                .filter(tag -> !tag.isEmpty())
+                .collect(Collectors.joining(","));
+        return joined.isEmpty() ? null : joined;
     }
 }

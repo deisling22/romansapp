@@ -66,6 +66,29 @@ class DishControllerTest {
     }
 
     @Test
+    void detailsCanBeUpdatedAndAreVisibleInDetail() throws Exception {
+        long planId = createPlan("Details-Test-Plan");
+        long dishId = createDish(planId, "Details-Test-Gericht");
+
+        mockMvc.perform(put("/api/dishes/{dishId}/details", dishId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new DishDetailsUpdateRequest(
+                                "Schnelles Gericht aus dem Scan.", 25, 4, java.util.List.of("schnell", "vegetarisch")))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Schnelles Gericht aus dem Scan."))
+                .andExpect(jsonPath("$.prepMinutes").value(25))
+                .andExpect(jsonPath("$.servings").value(4))
+                .andExpect(jsonPath("$.tags.length()").value(2));
+
+        mockMvc.perform(get("/api/dishes/{dishId}", dishId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Schnelles Gericht aus dem Scan."))
+                .andExpect(jsonPath("$.prepMinutes").value(25))
+                .andExpect(jsonPath("$.servings").value(4))
+                .andExpect(jsonPath("$.tags", org.hamcrest.Matchers.containsInAnyOrder("schnell", "vegetarisch")));
+    }
+
+    @Test
     void searchFiltersByNameAndTag() throws Exception {
         mockMvc.perform(get("/api/dishes").param("search", "pasta"))
                 .andExpect(status().isOk())

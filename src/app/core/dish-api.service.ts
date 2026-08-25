@@ -16,6 +16,13 @@ export interface NutritionUpdate {
   folateMcg: number | null;
 }
 
+export interface DishDetailsUpdate {
+  description: string | null;
+  prepMinutes: number | null;
+  servings: number;
+  tags: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class DishApiService {
   private readonly apiUrl = environment.apiUrl;
@@ -50,6 +57,10 @@ export class DishApiService {
 
   updateNutrition(dishId: number, nutrition: NutritionUpdate): Observable<NutritionUpdate> {
     return this.http.put<NutritionUpdate>(`${this.apiUrl}/dishes/${dishId}/nutrition`, nutrition);
+  }
+
+  updateDetails(dishId: number, details: DishDetailsUpdate): Observable<DishDetailsUpdate> {
+    return this.http.put<DishDetailsUpdate>(`${this.apiUrl}/dishes/${dishId}/details`, details);
   }
 
   addImage(dishId: number, image: File): Observable<{ imageUrl: string }> {

@@ -43,6 +43,7 @@
   }
 
   @if (!isLocal) {
+    <a class="scan-recipe-link" [routerLink]="['/plans', planId, 'dishes', 'scan']">Rezept scannen</a>
     <button
       type="button"
       class="secondary-action"

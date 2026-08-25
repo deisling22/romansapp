@@ -16,6 +16,7 @@ import { CreatorFeedComponent } from './features/creators/creator-feed.component
 import { CreatorPlanComponent } from './features/creators/creator-plan.component';
 import { CreatorProfileComponent } from './features/creators/creator-profile.component';
 import { IngredientScanComponent } from './features/ingredient-scan/ingredient-scan.component';
+import { RecipeScanComponent } from './features/recipe-scan/recipe-scan.component';
 import { ProgressComponent } from './features/progress/progress.component';
 
 const routes: Routes = [
@@ -31,6 +32,7 @@ const routes: Routes = [
   { path: 'local-plans/:clientId/dishes/new', component: DishCreateComponent },
   { path: 'plans/:planId', component: PlanDetailComponent },
   { path: 'plans/:planId/dishes/new', component: DishCreateComponent },
+  { path: 'plans/:planId/dishes/scan', component: RecipeScanComponent },
   { path: 'shopping-list', component: ShoppingListComponent, canDeactivate: [pendingCartCheckoutGuard] },
   { path: 'pantry', component: PantryComponent },
   { path: 'creators', component: CreatorFeedComponent },

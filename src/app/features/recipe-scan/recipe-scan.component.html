@@ -1,0 +1,183 @@
+<main class="scan-screen">
+  <a class="scan-back" [routerLink]="backLink">‹ Zurück zum Plan</a>
+  <header class="scan-header">
+    <p class="scan-eyebrow">Lokal auf deinem Gerät</p>
+    <h1>Rezept scannen</h1>
+    <p>Fotografiere ein Rezept. Die erkannten Angaben werden vor dem Speichern von dir geprüft.</p>
+  </header>
+
+  <section class="capture-panel" aria-labelledby="capture-heading">
+    <h2 id="capture-heading">Bild auswählen</h2>
+    <div class="capture-actions">
+      <label class="capture-button primary">
+        Kamera öffnen
+        <input type="file" accept="image/*" capture="environment" (change)="selectImage($event)" />
+      </label>
+      <label class="capture-button secondary">
+        Aus Mediathek
+        <input type="file" accept="image/*" (change)="selectImage($event)" />
+      </label>
+    </div>
+    <p class="privacy-note">Das Bild wird nicht hochgeladen. Die Texterkennung läuft mit Tesseract.js in deinem Browser.</p>
+  </section>
+
+  @if (imageUrl) {
+    <section class="image-stage" aria-label="Ausgewähltes Bild">
+      <img [src]="imageUrl" alt="Zu analysierendes Rezept" />
+      <button type="button" [disabled]="analyzing" (click)="analyze()">
+        {{ analyzing ? 'Text wird erkannt ...' : analyzed ? 'Erneut analysieren' : 'Rezept erkennen' }}
+      </button>
+    </section>
+  }
+
+  @if (errorMessage) {
+    <p class="scan-status error" role="alert">{{ errorMessage }}</p>
+  }
+
+  @if (analyzed) {
+    <section class="review-section" aria-labelledby="review-heading">
+      <div class="review-heading">
+        <div>
+          <p class="scan-eyebrow">Vor dem Speichern prüfen</p>
+          <h2 id="review-heading">Erkanntes Rezept</h2>
+        </div>
+      </div>
+
+      <label>
+        <span>Name</span>
+        <input type="text" [(ngModel)]="name" name="name" maxlength="120" />
+      </label>
+      <label>
+        <span>Beschreibung</span>
+        <textarea [(ngModel)]="description" name="description" rows="3" maxlength="2000"></textarea>
+      </label>
+
+      <div class="meta-row">
+        <label>
+          <span>Zubereitungszeit (Min.)</span>
+          <input type="number" min="1" [(ngModel)]="prepMinutes" name="prepMinutes" />
+        </label>
+        <label>
+          <span>Portionen</span>
+          <input type="number" min="1" [(ngModel)]="servings" name="servings" />
+        </label>
+      </div>
+
+      <label>
+        <span>Tags (kommagetrennt)</span>
+        <input type="text" [(ngModel)]="tagsText" name="tagsText" placeholder="z. B. vegetarisch, schnell" />
+      </label>
+
+      <h3 class="section-title">Zutaten</h3>
+      <div class="ingredient-list">
+        @for (ingredient of ingredients; track ingredient.id) {
+          <div class="ingredient-row">
+            <label>
+              <span>Zutat</span>
+              <input [(ngModel)]="ingredient.name" [name]="'ingredient-name-' + ingredient.id" maxlength="120" />
+            </label>
+            <label>
+              <span>Menge</span>
+              <input
+                type="number"
+                min="0.01"
+                step="0.01"
+                [(ngModel)]="ingredient.quantity"
+                [name]="'ingredient-quantity-' + ingredient.id" />
+            </label>
+            <label>
+              <span>Einheit</span>
+              <select [(ngModel)]="ingredient.unit" [name]="'ingredient-unit-' + ingredient.id">
+                @for (unit of units; track unit) {
+                  <option [value]="unit">{{ unit }}</option>
+                }
+              </select>
+            </label>
+            <button
+              type="button"
+              class="remove-button"
+              [attr.aria-label]="'Zutat ' + ingredient.name + ' entfernen'"
+              (click)="removeIngredient(ingredient.id)">×</button>
+          </div>
+        }
+      </div>
+      <button type="button" class="add-button" (click)="addIngredient()">Zutat ergänzen</button>
+
+      <h3 class="section-title">Zubereitungsschritte</h3>
+      <div class="step-list">
+        @for (step of steps; track step.id; let index = $index) {
+          <div class="step-row">
+            <span class="step-index">{{ index + 1 }}</span>
+            <label>
+              <span>Schritt</span>
+              <textarea [(ngModel)]="step.text" [name]="'step-text-' + step.id" rows="2"></textarea>
+            </label>
+            <label>
+              <span>Timer (s)</span>
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="step.timerSeconds"
+                [name]="'step-timer-' + step.id" />
+            </label>
+            <button
+              type="button"
+              class="remove-button"
+              [attr.aria-label]="'Schritt ' + (index + 1) + ' entfernen'"
+              (click)="removeStep(step.id)">×</button>
+          </div>
+        }
+      </div>
+      <button type="button" class="add-button" (click)="addStep()">Schritt ergänzen</button>
+
+      <details class="nutrition-details">
+        <summary>Nährwerte (optional)</summary>
+        <div class="nutrition-grid">
+          <label>
+            <span>Kohlenhydrate (g)</span>
+            <input type="number" min="0" step="0.1" [(ngModel)]="nutrition.carbsGrams" name="carbsGrams" />
+          </label>
+          <label>
+            <span>Fett (g)</span>
+            <input type="number" min="0" step="0.1" [(ngModel)]="nutrition.fatGrams" name="fatGrams" />
+          </label>
+          <label>
+            <span>Vitamin A (µg)</span>
+            <input type="number" min="0" step="0.1" [(ngModel)]="nutrition.vitaminAMcg" name="vitaminAMcg" />
+          </label>
+          <label>
+            <span>Vitamin C (mg)</span>
+            <input type="number" min="0" step="0.1" [(ngModel)]="nutrition.vitaminCMg" name="vitaminCMg" />
+          </label>
+          <label>
+            <span>Vitamin D (µg)</span>
+            <input type="number" min="0" step="0.1" [(ngModel)]="nutrition.vitaminDMcg" name="vitaminDMcg" />
+          </label>
+          <label>
+            <span>Vitamin K (µg)</span>
+            <input type="number" min="0" step="0.1" [(ngModel)]="nutrition.vitaminKMcg" name="vitaminKMcg" />
+          </label>
+          <label>
+            <span>Vitamin B12 (µg)</span>
+            <input type="number" min="0" step="0.1" [(ngModel)]="nutrition.vitaminB12Mcg" name="vitaminB12Mcg" />
+          </label>
+          <label>
+            <span>Folat / B9 (µg)</span>
+            <input type="number" min="0" step="0.1" [(ngModel)]="nutrition.folateMcg" name="folateMcg" />
+          </label>
+        </div>
+      </details>
+
+      @if (rawText) {
+        <details class="raw-text-details">
+          <summary>Erkannter Rohtext</summary>
+          <pre>{{ rawText }}</pre>
+        </details>
+      }
+
+      <button type="button" class="save-button" [disabled]="saving" (click)="save()">
+        {{ saving ? 'Wird gespeichert ...' : 'Gericht speichern' }}
+      </button>
+    </section>
+  }
+</main>

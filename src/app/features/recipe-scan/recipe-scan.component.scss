@@ -1,0 +1,436 @@
+:host {
+  display: block;
+}
+
+.scan-screen {
+  box-sizing: border-box;
+  width: min(100%, 760px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 28px 20px 112px;
+}
+
+.scan-back {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #26736f;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.scan-header {
+  margin-bottom: 26px;
+}
+
+.scan-eyebrow {
+  margin: 0 0 7px;
+  color: #26736f;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 10px;
+  color: #16342f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.35rem;
+  line-height: 1.05;
+}
+
+.scan-header > p:last-child,
+.privacy-note {
+  color: #54716d;
+  line-height: 1.5;
+}
+
+.capture-panel {
+  padding: 20px 0 24px;
+  border-top: 1px solid #d7e5dd;
+  border-bottom: 1px solid #d7e5dd;
+}
+
+.capture-panel h2,
+.review-heading h2 {
+  margin-bottom: 14px;
+  color: #16342f;
+  font-size: 1.1rem;
+}
+
+.capture-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.capture-button {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-height: 50px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 800;
+  text-align: center;
+}
+
+.capture-button.primary {
+  background: #e06c47;
+  color: #ffffff;
+}
+
+.capture-button.secondary {
+  border: 1px solid #26736f;
+  background: #ffffff;
+  color: #26736f;
+}
+
+.capture-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.privacy-note {
+  margin: 14px 0 0;
+  font-size: 0.82rem;
+}
+
+.image-stage {
+  position: relative;
+  margin: 22px 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #17231f;
+}
+
+.image-stage img {
+  display: block;
+  width: 100%;
+  max-height: 460px;
+  object-fit: contain;
+}
+
+.image-stage button {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  background: #26736f;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.image-stage button:disabled,
+.save-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.review-section {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.review-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.review-heading span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e4f0d4;
+  color: #204e43;
+  font-weight: 800;
+}
+
+.review-section > label {
+  display: grid;
+  gap: 5px;
+}
+
+.review-section > label > span {
+  color: #244b43;
+  font-weight: 700;
+}
+
+.review-section > input[type='text'],
+.review-section input[type='text'],
+.review-section input[type='number'],
+.review-section textarea,
+.review-section select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #aac9ba;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px 12px;
+  color: #16342f;
+  font: inherit;
+}
+
+.review-section > label > textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+.meta-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.section-title {
+  margin: 8px 0 -4px;
+  color: #16342f;
+  font-size: 1.05rem;
+}
+
+.ingredient-list,
+.step-list {
+  display: grid;
+  gap: 12px;
+}
+
+.ingredient-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(84px, 0.8fr) minmax(100px, 1fr) 36px;
+  gap: 8px;
+  align-items: end;
+  border-bottom: 1px solid #d7e5dd;
+  padding-bottom: 16px;
+}
+
+.ingredient-row label {
+  display: grid;
+  gap: 5px;
+}
+
+.ingredient-row label > span {
+  color: #54716d;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.ingredient-row input,
+.ingredient-row select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #aac9ba;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #16342f;
+  font: inherit;
+  padding: 8px 10px;
+}
+
+.step-row {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  border-bottom: 1px solid #d7e5dd;
+  padding-bottom: 16px;
+}
+
+.step-index {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin-top: 20px;
+  border-radius: 50%;
+  background: #e4f0d4;
+  color: #204e43;
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+.step-row label {
+  display: grid;
+  gap: 5px;
+}
+
+.step-row label:first-of-type {
+  flex: 1 1 220px;
+}
+
+.step-row label:nth-of-type(2) {
+  flex: 0 1 100px;
+}
+
+.step-row label > span {
+  color: #54716d;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.step-row input,
+.step-row textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #aac9ba;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #16342f;
+  font: inherit;
+  padding: 8px 10px;
+}
+
+.step-row textarea {
+  min-height: 52px;
+  resize: vertical;
+}
+
+.step-row .remove-button {
+  flex: 0 0 auto;
+  align-self: flex-end;
+}
+
+.remove-button {
+  width: 36px;
+  height: 44px;
+  border: 1px solid #dbc1b8;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #a33d2d;
+  cursor: pointer;
+  font-size: 1.35rem;
+}
+
+.add-button,
+.save-button {
+  min-height: 50px;
+  margin-top: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.add-button {
+  width: 100%;
+  border: 1px dashed #26736f;
+  background: #edf4ef;
+  color: #26736f;
+}
+
+.save-button {
+  width: 100%;
+  margin-top: 16px;
+  border: 0;
+  background: #e06c47;
+  color: #ffffff;
+}
+
+.nutrition-details,
+.raw-text-details {
+  margin-top: 8px;
+  border-top: 1px solid #d7e5dd;
+  padding-top: 14px;
+}
+
+.nutrition-details summary,
+.raw-text-details summary {
+  color: #26736f;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.nutrition-details[open] summary,
+.raw-text-details[open] summary {
+  margin-bottom: 14px;
+}
+
+.nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nutrition-grid label {
+  display: grid;
+  gap: 5px;
+}
+
+.nutrition-grid label > span {
+  color: #244b43;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.nutrition-grid input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #aac9ba;
+  border-radius: 6px;
+  background: #ffffff;
+  padding: 8px 10px;
+  color: #16342f;
+  font: inherit;
+}
+
+.raw-text-details pre {
+  max-height: 220px;
+  overflow: auto;
+  margin: 0;
+  border: 1px solid #d7e5dd;
+  border-radius: 8px;
+  background: #f5fbf4;
+  padding: 12px;
+  color: #4e6661;
+  font-size: 0.78rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.scan-status {
+  margin-top: 18px;
+  border-left: 3px solid #94b8a5;
+  color: #4e6661;
+  padding: 12px 14px;
+}
+
+.scan-status.error {
+  border-color: #b54636;
+  color: #8d2d21;
+}
+
+@media (max-width: 560px) {
+  .ingredient-row {
+    grid-template-columns: minmax(0, 1fr) 88px 36px;
+  }
+
+  .ingredient-row label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .meta-row,
+  .nutrition-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
