@@ -8,14 +8,30 @@
 
   <section class="capture-panel" aria-labelledby="capture-heading">
     <h2 id="capture-heading">Bild auswählen</h2>
-    <div class="capture-actions">
-      <label class="capture-button primary">
-        Kamera öffnen
-        <input type="file" accept="image/*" capture="environment" (change)="selectImage($event)" />
+
+    @if (!hasRoutePlanId) {
+      <label class="plan-picker">
+        <span>Plan</span>
+        <select [(ngModel)]="planId" name="planId" [disabled]="loadingPlans">
+          <option [value]="0" disabled>Plan wählen ...</option>
+          @for (plan of plans; track plan.id) {
+            <option [value]="plan.id">{{ plan.name }}</option>
+          }
+        </select>
       </label>
-      <label class="capture-button secondary">
+      @if (!loadingPlans && plans.length === 0) {
+        <p class="privacy-note">Du hast noch keinen Plan. <a routerLink="/plans">Erstelle zuerst einen Plan.</a></p>
+      }
+    }
+
+    <div class="capture-actions">
+      <label class="capture-button primary" [class.disabled]="!planId">
+        Kamera öffnen
+        <input type="file" accept="image/*" capture="environment" [disabled]="!planId" (change)="selectImage($event)" />
+      </label>
+      <label class="capture-button secondary" [class.disabled]="!planId">
         Aus Mediathek
-        <input type="file" accept="image/*" (change)="selectImage($event)" />
+        <input type="file" accept="image/*" [disabled]="!planId" (change)="selectImage($event)" />
       </label>
     </div>
     <p class="privacy-note">Das Bild wird nicht hochgeladen. Die Texterkennung läuft mit Tesseract.js in deinem Browser.</p>

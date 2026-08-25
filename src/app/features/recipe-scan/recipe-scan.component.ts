@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { DishApiService } from '../../core/dish-api.service';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { GamificationService } from '../../core/gamification.service';
-import { Ingredient } from '../../core/models';
+import { Ingredient, MealPlan } from '../../core/models';
 import { RecipeOcrService } from './recipe-ocr.service';
 import { ParsedIngredient, ParsedNutrition, ParsedStep, parseRecipeText } from './recipe-parser';
 
@@ -37,6 +37,9 @@ export class RecipeScanComponent implements OnInit, OnDestroy {
   ];
 
   planId = 0;
+  hasRoutePlanId = false;
+  plans: MealPlan[] = [];
+  loadingPlans = false;
   imageUrl = '';
   imageFile: File | null = null;
   analyzing = false;
@@ -76,7 +79,24 @@ export class RecipeScanComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.planId = Number(this.route.snapshot.paramMap.get('planId'));
+    const routePlanId = Number(this.route.snapshot.paramMap.get('planId'));
+    if (routePlanId) {
+      this.planId = routePlanId;
+      this.hasRoutePlanId = true;
+    } else {
+      this.loadingPlans = true;
+      this.mealPlanApi.getPlans().subscribe({
+        next: (plans) => {
+          this.plans = plans;
+          this.loadingPlans = false;
+        },
+        error: () => {
+          this.errorMessage = 'Deine Pläne konnten nicht geladen werden.';
+          this.loadingPlans = false;
+        },
+      });
+    }
+
     this.dishApi.getIngredients().subscribe({
       next: (ingredients) => (this.knownIngredients = ingredients),
       error: () => undefined,
@@ -88,13 +108,17 @@ export class RecipeScanComponent implements OnInit, OnDestroy {
   }
 
   get backLink(): unknown[] {
-    return ['/plans', this.planId];
+    return this.hasRoutePlanId ? ['/plans', this.planId] : ['/'];
   }
 
   selectImage(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
+    if (!this.planId) {
+      this.errorMessage = 'Bitte wähle zuerst einen Plan aus.';
+      return;
+    }
     if (!file) {
       return;
     }
@@ -162,8 +186,10 @@ export class RecipeScanComponent implements OnInit, OnDestroy {
 
   async save(): Promise<void> {
     const name = this.name.trim();
-    if (!name || !this.imageFile || this.saving) {
-      if (!name) {
+    if (!this.planId || !name || !this.imageFile || this.saving) {
+      if (!this.planId) {
+        this.errorMessage = 'Bitte wähle zuerst einen Plan aus.';
+      } else if (!name) {
         this.errorMessage = 'Bitte gib einen Namen für das Gericht ein.';
       } else if (!this.imageFile) {
         this.errorMessage = 'Bitte füge ein Foto hinzu.';

@@ -13,8 +13,12 @@ export class RecipeOcrService {
 
   private loadWorker(): Promise<Worker> {
     if (!this.workerPromise) {
-      this.workerPromise = import('tesseract.js')
-        .then(({ createWorker }) => createWorker('deu'))
+      // The top-level 'tesseract.js' entry relies on package.json "browser" field remapping
+      // to swap out its Node.js worker (worker_threads) for the browser one; Angular's esbuild
+      // builder does not honor that remap, so the Node worker ends up in the browser bundle and
+      // crashes at runtime. Importing the prebuilt browser bundle directly avoids that entirely.
+      this.workerPromise = import('tesseract.js/dist/tesseract.esm.min.js')
+        .then(({ default: Tesseract }) => Tesseract.createWorker('deu'))
         .catch((error: unknown) => {
           this.workerPromise = null;
           throw error;
