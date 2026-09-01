@@ -2,6 +2,8 @@ package de.roman.speiseplan.dashboard;
 
 public record DashboardDto(
         double caloriesToday,
+        Double calorieGoal,
+        Integer caloriePercent,
         double proteinToday,
         Double proteinGoal,
         Integer proteinPercent,

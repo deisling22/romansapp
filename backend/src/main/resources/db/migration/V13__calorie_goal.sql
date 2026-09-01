@@ -1,0 +1,1 @@
+ALTER TABLE user_profile ADD COLUMN calorie_goal DOUBLE PRECISION;

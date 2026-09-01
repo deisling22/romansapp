@@ -118,6 +118,8 @@ export interface NextDish {
 
 export interface DashboardData {
   caloriesToday: number;
+  calorieGoal: number | null;
+  caloriePercent: number | null;
   proteinToday: number;
   proteinGoal: number | null;
   proteinPercent: number | null;
@@ -140,6 +142,10 @@ export interface Profile {
   bodyWeightKg: number | null;
   bodyHeightCm: number | null;
   nutritionTrackingEnabled: boolean;
+  calorieGoal: number | null;
+  age: number | null;
+  sex: 'MALE' | 'FEMALE' | null;
+  activityLevel: number | null;
 }
 
 export interface ShoppingListItem {

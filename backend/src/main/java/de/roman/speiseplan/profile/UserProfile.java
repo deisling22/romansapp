@@ -25,6 +25,18 @@ public class UserProfile {
     @Column(name = "nutrition_tracking_enabled", nullable = false)
     private boolean nutritionTrackingEnabled = false;
 
+    @Column(name = "calorie_goal")
+    private Double calorieGoal;
+
+    @Column(name = "age")
+    private Integer age;
+
+    @Column(name = "sex")
+    private String sex;
+
+    @Column(name = "activity_level")
+    private Double activityLevel;
+
     protected UserProfile() {
     }
 
@@ -62,5 +74,37 @@ public class UserProfile {
 
     public void setNutritionTrackingEnabled(boolean nutritionTrackingEnabled) {
         this.nutritionTrackingEnabled = nutritionTrackingEnabled;
+    }
+
+    public Double getCalorieGoal() {
+        return calorieGoal;
+    }
+
+    public void setCalorieGoal(Double calorieGoal) {
+        this.calorieGoal = calorieGoal;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public Double getActivityLevel() {
+        return activityLevel;
+    }
+
+    public void setActivityLevel(Double activityLevel) {
+        this.activityLevel = activityLevel;
     }
 }

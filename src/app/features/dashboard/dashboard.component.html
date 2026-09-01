@@ -17,6 +17,16 @@
         <div class="stat-card">
           <span class="stat-label">Kalorien heute</span>
           <span class="stat-value">{{ displayInteger(dashboard.caloriesToday) }} kcal</span>
+          @if (dashboard.calorieGoal) {
+            <span class="stat-sub">
+              von {{ dashboard.calorieGoal | number:'1.0-0' }} kcal ({{ dashboard.caloriePercent }}%)
+            </span>
+            <progress
+              [value]="dashboard.caloriesToday"
+              [max]="dashboard.calorieGoal"
+              [attr.aria-label]="'Kalorienziel zu ' + dashboard.caloriePercent + ' Prozent erreicht'">
+            </progress>
+          }
         </div>
         <div class="stat-card">
           <span class="stat-label">Protein heute</span>

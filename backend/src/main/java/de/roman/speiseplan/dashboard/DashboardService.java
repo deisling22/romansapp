@@ -97,6 +97,11 @@ public class DashboardService {
                 ? null
                 : (int) Math.round(proteinToday / proteinGoal * 100);
 
+        Double calorieGoal = profile.calorieGoal();
+        Integer caloriePercent = calorieGoal == null || calorieGoal == 0
+                ? null
+                : (int) Math.round(caloriesToday / calorieGoal * 100);
+
         NextDishDto nextDish = planEntryRepository
             .findFirstByPlanCreatorIsNullAndCookedFalseOrderByPlanIdAscSortOrderAsc()
                 .map(entry -> {
@@ -119,6 +124,8 @@ public class DashboardService {
 
         return new DashboardDto(
             caloriesToday,
+            calorieGoal,
+            caloriePercent,
             proteinToday,
             proteinGoal,
             proteinPercent,

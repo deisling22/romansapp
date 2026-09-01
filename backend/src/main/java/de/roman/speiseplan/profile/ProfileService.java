@@ -23,6 +23,10 @@ public class ProfileService {
         profile.setBodyWeightKg(request.bodyWeightKg());
         profile.setBodyHeightCm(request.bodyHeightCm());
         profile.setNutritionTrackingEnabled(request.nutritionTrackingEnabled());
+        profile.setCalorieGoal(request.calorieGoal());
+        profile.setAge(request.age());
+        profile.setSex(request.sex());
+        profile.setActivityLevel(request.activityLevel());
         return toDto(userProfileRepository.save(profile));
     }
 
@@ -37,6 +41,10 @@ public class ProfileService {
                 profile.getDefaultPortionSize(),
                 profile.getBodyWeightKg(),
                 profile.getBodyHeightCm(),
-                profile.isNutritionTrackingEnabled());
+                profile.isNutritionTrackingEnabled(),
+                profile.getCalorieGoal(),
+                profile.getAge(),
+                profile.getSex(),
+                profile.getActivityLevel());
     }
 }

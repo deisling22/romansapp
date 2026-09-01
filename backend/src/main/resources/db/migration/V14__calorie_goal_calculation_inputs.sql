@@ -1,0 +1,3 @@
+ALTER TABLE user_profile ADD COLUMN age INTEGER;
+ALTER TABLE user_profile ADD COLUMN sex VARCHAR(10);
+ALTER TABLE user_profile ADD COLUMN activity_level DOUBLE PRECISION;

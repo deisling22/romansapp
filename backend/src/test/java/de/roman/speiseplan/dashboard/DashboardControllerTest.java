@@ -36,7 +36,7 @@ class DashboardControllerTest {
     void markingADishCookedAddsItsNutritionToTodaysDashboardTotals() throws Exception {
         mockMvc.perform(put("/api/profile")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new ProfileUpdateRequest(1.0, 100.0, 180.0, false))))
+                        .content(objectMapper.writeValueAsString(new ProfileUpdateRequest(1.0, 100.0, 180.0, false, null, null, null, null))))
                 .andExpect(status().isOk());
 
         long planId = createPlan("Dashboard-Test-Plan");
@@ -78,7 +78,7 @@ class DashboardControllerTest {
     void markingADishCookedAddsOptionalNutritionWhenTrackingIsEnabled() throws Exception {
         mockMvc.perform(put("/api/profile")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new ProfileUpdateRequest(1.0, 100.0, 180.0, true))))
+                        .content(objectMapper.writeValueAsString(new ProfileUpdateRequest(1.0, 100.0, 180.0, true, null, null, null, null))))
                 .andExpect(status().isOk());
 
         long planId = createPlan("Naehrwert-Test-Plan");
