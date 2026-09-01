@@ -85,6 +85,15 @@ export class IngredientScanComponent implements OnDestroy {
     this.ingredients = this.ingredients.filter((ingredient) => ingredient.id !== id);
   }
 
+  selectCandidate(ingredient: RecognizedIngredient, candidateName: string): void {
+    const candidate = ingredient.candidates.find((item) => item.name === candidateName);
+    if (!candidate) {
+      return;
+    }
+    ingredient.name = candidate.name;
+    ingredient.confidence = candidate.confidence;
+  }
+
   save(): void {
     const items = this.ingredients
       .map((ingredient) => ({

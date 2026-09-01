@@ -80,6 +80,18 @@
             @if (ingredient.confidence !== null) {
               <small>{{ confidenceLabel(ingredient.confidence) }}</small>
             }
+            @if (ingredient.candidates.length > 1) {
+              <label class="candidate-picker">
+                <span>Andere Vorschläge</span>
+                <select (change)="selectCandidate(ingredient, $any($event.target).value)">
+                  @for (candidate of ingredient.candidates; track candidate.name) {
+                    <option [value]="candidate.name" [selected]="candidate.name === ingredient.name">
+                      {{ candidate.name }} ({{ confidenceLabel(candidate.confidence) }})
+                    </option>
+                  }
+                </select>
+              </label>
+            }
           </div>
         }
       </div>

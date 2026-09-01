@@ -221,6 +221,31 @@ h1 {
   font-size: 0.72rem;
 }
 
+.candidate-picker {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.candidate-picker > span {
+  color: #54716d;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.candidate-picker select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #aac9ba;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #16342f;
+  font: inherit;
+  padding: 6px 10px;
+}
+
 .add-button,
 .save-button {
   min-height: 50px;
