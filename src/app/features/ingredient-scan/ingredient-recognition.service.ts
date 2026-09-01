@@ -105,10 +105,10 @@ export class IngredientRecognitionService {
         if (!load) {
           throw new Error('coco-ssd Modul konnte nicht geladen werden.');
         }
-        return load({
-          base: 'lite_mobilenet_v2',
-          modelUrl: 'assets/models/coco-ssd/model.json',
-        });
+        // 'mobilenet_v2' is the larger, more accurate coco-ssd base (vs. the previously
+        // bundled 'lite_mobilenet_v2'); no local modelUrl override, so it downloads from
+        // Google's tfjs-models CDN on first use and relies on normal HTTP caching afterwards.
+        return load({ base: 'mobilenet_v2' });
       }).catch((error: unknown) => {
         this.modelPromise = null;
         throw error;

@@ -35,14 +35,71 @@
       </label>
     </div>
     <p class="privacy-note">Das Bild wird nicht hochgeladen. Die Texterkennung läuft mit Tesseract.js in deinem Browser.</p>
+
+    <label class="checkbox-label" for="highAccuracy">
+      <input
+        id="highAccuracy"
+        type="checkbox"
+        [checked]="highAccuracy"
+        (change)="onHighAccuracyToggle($any($event.target).checked)" />
+      Bessere Texterkennung nutzen (genauer, aber langsamer)
+    </label>
+    @if (highAccuracy && !highAccuracyDownloaded) {
+      <p class="privacy-note download-hint">
+        Beim ersten Analysieren wird dafür einmalig ein genaueres Sprachmodell heruntergeladen
+        (ca. 30 MB). Es bleibt danach dauerhaft auf diesem Gerät gespeichert und muss nicht erneut
+        geladen werden.
+      </p>
+    }
+
+    <label class="checkbox-label" for="manualCrop">
+      <input
+        id="manualCrop"
+        type="checkbox"
+        [checked]="cropEnabled"
+        (change)="onCropToggle($any($event.target).checked)" />
+      Vor der Erkennung manuell zuschneiden (z. B. bei zweispaltigen Rezepten)
+    </label>
   </section>
 
-  @if (imageUrl) {
+  @if (cropping && imageUrl) {
+    <section class="crop-stage" aria-label="Bildausschnitt wählen">
+      <p class="privacy-note">Ziehe ein Rechteck um den Bereich, der erkannt werden soll, z. B. nur eine Spalte.</p>
+      <div
+        class="crop-frame"
+        (pointerdown)="onCropPointerDown($event)"
+        (pointermove)="onCropPointerMove($event)"
+        (pointerup)="onCropPointerUp()"
+        (pointercancel)="onCropPointerUp()">
+        <img #cropImage [src]="imageUrl" alt="Zuschneiden" />
+        @if (cropRect) {
+          <div
+            class="crop-box"
+            [style.left.%]="cropRect.left"
+            [style.top.%]="cropRect.top"
+            [style.width.%]="cropRect.width"
+            [style.height.%]="cropRect.height"></div>
+        }
+      </div>
+      <div class="crop-actions">
+        <button type="button" class="secondary" (click)="skipCrop()">Ganzes Bild verwenden</button>
+        <button type="button" [disabled]="!cropRect" (click)="confirmCrop()">Zuschnitt übernehmen</button>
+      </div>
+    </section>
+  }
+
+  @if (imageUrl && !cropping) {
     <section class="image-stage" aria-label="Ausgewähltes Bild">
       <img [src]="imageUrl" alt="Zu analysierendes Rezept" />
       <button type="button" [disabled]="analyzing" (click)="analyze()">
         {{ analyzing ? 'Text wird erkannt ...' : analyzed ? 'Erneut analysieren' : 'Rezept erkennen' }}
       </button>
+      @if (analyzing && progress) {
+        <div class="ocr-progress" role="status">
+          <progress [value]="progress.percent" max="100"></progress>
+          <span>{{ progress.label }} ({{ progress.percent }}%)</span>
+        </div>
+      }
     </section>
   }
 
