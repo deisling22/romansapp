@@ -19,7 +19,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @Profile("dev")
@@ -37,6 +39,8 @@ public class DevDataSeeder {
             if (mealPlanRepository.count() > 0) {
                 seedAdditionalCreatorPlans(
                     creatorRepository, mealPlanRepository, dishRepository, planEntryRepository);
+                seedRomansPlanIfMissing(mealPlanRepository, dishRepository, planEntryRepository,
+                    ingredientRepository, dishIngredientRepository, prepStepRepository);
                 return;
             }
 
@@ -163,8 +167,49 @@ public class DevDataSeeder {
                     mealPlanRepository, planEntryRepository);
                 seedAdditionalCreatorPlans(
                     creatorRepository, mealPlanRepository, dishRepository, planEntryRepository);
+                seedRomansPlanIfMissing(mealPlanRepository, dishRepository, planEntryRepository,
+                    ingredientRepository, dishIngredientRepository, prepStepRepository);
         };
     }
+
+            private void seedRomansPlanIfMissing(
+                MealPlanRepository mealPlanRepository,
+                DishRepository dishRepository,
+                PlanEntryRepository planEntryRepository,
+                IngredientRepository ingredientRepository,
+                DishIngredientRepository dishIngredientRepository,
+                PrepStepRepository prepStepRepository) {
+            boolean exists = mealPlanRepository.findAllByCreatorIsNullOrderByCreatedAtAsc().stream()
+                .anyMatch(plan -> RomansPlanSeedData.PLAN_NAME.equals(plan.getName()));
+            if (exists) {
+                return;
+            }
+            MealPlan plan = mealPlanRepository.save(new MealPlan(RomansPlanSeedData.PLAN_NAME));
+            Map<String, Ingredient> ingredientsByNameAndUnit = new HashMap<>();
+            int sortOrder = 0;
+            for (RomansPlanSeedData.RecipeData recipe : RomansPlanSeedData.RECIPES) {
+                Dish dish = new Dish(recipe.name(), recipe.imageUrl());
+                dish.setDescription(recipe.description());
+                dish.setPrepMinutes(recipe.prepMinutes());
+                dish.setServings(recipe.servings());
+                dish.setTags(recipe.tags());
+                dish = dishRepository.save(dish);
+
+                for (RomansPlanSeedData.IngredientData data : recipe.ingredients()) {
+                    Ingredient ingredient = ingredientsByNameAndUnit.computeIfAbsent(
+                        data.name() + "|" + data.unit(),
+                        key -> ingredientRepository.save(new Ingredient(
+                            data.name(), data.kcalPer100(), data.proteinPer100(), data.unit())));
+                    dishIngredientRepository.save(new DishIngredient(dish, ingredient, data.quantity()));
+                }
+
+                int stepOrder = 0;
+                for (RomansPlanSeedData.StepData step : recipe.steps()) {
+                    prepStepRepository.save(new PrepStep(dish, stepOrder++, step.text(), step.timerSeconds()));
+                }
+                planEntryRepository.save(new PlanEntry(plan, dish, sortOrder++));
+            }
+            }
 
             private void seedAdditionalCreatorPlans(
                 CreatorRepository creatorRepository,

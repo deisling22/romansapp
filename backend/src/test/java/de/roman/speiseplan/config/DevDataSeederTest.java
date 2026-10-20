@@ -2,6 +2,8 @@ package de.roman.speiseplan.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.roman.speiseplan.dish.DishIngredientRepository;
+import de.roman.speiseplan.dish.PrepStepRepository;
 import de.roman.speiseplan.plan.MealPlan;
 import de.roman.speiseplan.plan.MealPlanRepository;
 import de.roman.speiseplan.plan.PlanEntry;
@@ -20,6 +22,12 @@ class DevDataSeederTest {
 
     @Autowired
     private PlanEntryRepository planEntryRepository;
+
+    @Autowired
+    private DishIngredientRepository dishIngredientRepository;
+
+    @Autowired
+    private PrepStepRepository prepStepRepository;
 
     @Test
     void seedsTenDistinctQuickFamilyRecipesPerExamplePlan() {
@@ -54,6 +62,21 @@ class DevDataSeederTest {
                     assertThat(dish.getServings()).isEqualTo(4);
                     assertThat(dish.getTags()).contains("familie");
                 });
+    }
+
+    @Test
+    void seedsRomansPlanWithCompleteRecipes() {
+        List<PlanEntry> entries = entriesFor("Romans Plan");
+
+        assertThat(entries).hasSize(48);
+        assertThat(entries.stream().map(entry -> entry.getDish().getName()))
+            .doesNotHaveDuplicates()
+            .contains("Bratwurstsemmeln", "Milchreis", "Griechischer Bauernsalat");
+        assertThat(entries).allSatisfy(entry -> {
+            Long dishId = entry.getDish().getId();
+            assertThat(dishIngredientRepository.findByDishId(dishId)).isNotEmpty();
+            assertThat(prepStepRepository.findByDishIdOrderByStepOrderAsc(dishId)).hasSizeGreaterThanOrEqualTo(3);
+        });
     }
 
     private List<PlanEntry> entriesFor(String planName) {
