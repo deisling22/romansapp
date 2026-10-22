@@ -37,6 +37,12 @@ public class UserProfile {
     @Column(name = "activity_level")
     private Double activityLevel;
 
+    @Column(name = "household_size", nullable = false)
+    private int householdSize = 1;
+
+    @Column(name = "shopping_trips_per_week", nullable = false)
+    private int shoppingTripsPerWeek = 2;
+
     protected UserProfile() {
     }
 
@@ -106,5 +112,21 @@ public class UserProfile {
 
     public void setActivityLevel(Double activityLevel) {
         this.activityLevel = activityLevel;
+    }
+
+    public int getHouseholdSize() {
+        return householdSize;
+    }
+
+    public void setHouseholdSize(int householdSize) {
+        this.householdSize = householdSize;
+    }
+
+    public int getShoppingTripsPerWeek() {
+        return shoppingTripsPerWeek;
+    }
+
+    public void setShoppingTripsPerWeek(int shoppingTripsPerWeek) {
+        this.shoppingTripsPerWeek = shoppingTripsPerWeek;
     }
 }

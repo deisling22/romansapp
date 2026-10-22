@@ -12,6 +12,7 @@ import { DishDetailComponent } from './features/dishes/dish-detail.component';
 import { PlanDetailComponent } from './features/plans/plan-detail.component';
 import { PlanListComponent } from './features/plans/plan-list.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
+import { MealScheduleComponent } from './features/dashboard/meal-schedule.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { ShoppingListComponent } from './features/shopping-list/shopping-list.component';
 import { PantryComponent } from './features/pantry/pantry.component';
@@ -35,6 +36,7 @@ import { OnboardingTourComponent } from './features/onboarding/onboarding-tour.c
         DishCatalogComponent,
         DishDetailComponent,
         DashboardComponent,
+        MealScheduleComponent,
         SettingsComponent,
         ShoppingListComponent,
         PantryComponent,

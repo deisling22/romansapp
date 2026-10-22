@@ -6,6 +6,14 @@ Benachrichtigungen sollen angemeldete Benutzer auch erreichen, wenn die Web-App 
 die native iOS-App nicht geöffnet ist. Die erste Ausbaustufe mit In-App-Toasts und
 laufzeitgebundenen Erinnerungen bleibt als sofortiges Feedback erhalten.
 
+## Zwischenstand
+
+Bis Web Push/APNs umgesetzt sind, zeigt das Dashboard (`MealScheduleComponent`) einmal pro
+Tag einen In-App-Hinweis zu Vorbereitungen fuer morgen und fehlenden Zutaten. Spaetere
+Push-Inhalte: "Morgen: <Gericht> - X Zutaten fehlen", "Heute vorbereiten: ..." und eine
+Erinnerung am Abend vor dem naechsten Einkauf. Teil des kuenftigen Pro-Plans
+(siehe `00-projekt-uebersicht.md`).
+
 ## Fachliche Voraussetzungen
 
 - Benutzer dauerhaft in einer eigenen Backend-Tabelle speichern.

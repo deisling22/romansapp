@@ -3,10 +3,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { DashboardApiService } from '../../core/dashboard-api.service';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
-import { Dish } from '../../core/models';
+import { Dish, MEAL_SLOT_LABELS, MealPlan, MealSlot } from '../../core/models';
 import { ShareService } from '../../core/share.service';
 import { RecipeSyncService } from '../../core/recipe-sync.service';
 import { GamificationService } from '../../core/gamification.service';
+import { ScheduleApiService } from '../../core/schedule-api.service';
 
 @Component({
     selector: 'app-plan-detail',
@@ -26,6 +27,10 @@ export class PlanDetailComponent implements OnInit, OnDestroy {
   shareMessage = '';
   localClientId = '';
   localPlanName = '';
+  plan: MealPlan | null = null;
+  savingSettings = false;
+  readonly slotLabels = MEAL_SLOT_LABELS;
+  readonly slots = Object.keys(MEAL_SLOT_LABELS) as MealSlot[];
   private readonly localImageUrls: string[] = [];
 
   constructor(
@@ -36,6 +41,7 @@ export class PlanDetailComponent implements OnInit, OnDestroy {
     private readonly shareService: ShareService,
     private readonly recipeSync: RecipeSyncService,
     private readonly gamification: GamificationService,
+    private readonly scheduleApi: ScheduleApiService,
     readonly mealPlanApi: MealPlanApiService,
   ) {}
 
@@ -47,6 +53,39 @@ export class PlanDetailComponent implements OnInit, OnDestroy {
     }
     this.planId = Number(this.route.snapshot.paramMap.get('planId'));
     this.load();
+    this.mealPlanApi.getPlans().subscribe({
+      next: (plans) => (this.plan = plans.find((plan) => plan.id === this.planId) ?? null),
+    });
+  }
+
+  get roundComplete(): boolean {
+    return this.dishes.length > 0 && this.dishes.every((dish) => dish.cooked);
+  }
+
+  updateSettings(settings: { active?: boolean; leftoversForLunch?: boolean }): void {
+    if (this.savingSettings) {
+      return;
+    }
+    this.savingSettings = true;
+    this.scheduleApi.updatePlanSettings(this.planId, settings).subscribe({
+      next: (plan) => {
+        this.plan = plan;
+        this.savingSettings = false;
+      },
+      error: () => {
+        this.errorMessage = 'Die Plan-Einstellungen konnten nicht gespeichert werden.';
+        this.savingSettings = false;
+      },
+    });
+  }
+
+  setMealSlot(dish: Dish, mealSlot: MealSlot): void {
+    this.scheduleApi.setMealSlot(dish.planEntryId, mealSlot).subscribe({
+      next: () => (dish.mealSlot = mealSlot),
+      error: () => {
+        this.errorMessage = 'Die Mahlzeit konnte nicht gespeichert werden.';
+      },
+    });
   }
 
   ngOnDestroy(): void {

@@ -98,9 +98,9 @@ public class PantryService {
     }
 
     @Transactional
-    public void consume(List<DishIngredient> ingredients) {
+    public void consume(List<DishIngredient> ingredients, double factor) {
         for (DishIngredient ingredient : ingredients) {
-            double remaining = ingredient.getQuantityGrams();
+            double remaining = ingredient.getQuantityGrams() * factor;
             List<PantryItem> stock = pantryItemRepository
                     .findByIngredientNameIgnoreCaseAndUnitIgnoreCaseOrderByPurchasedAtAsc(
                             ingredient.getIngredient().getName(), ingredient.getIngredient().getUnit());
@@ -112,7 +112,7 @@ public class PantryService {
                 double consumed = Math.min(item.getQuantity(), remaining);
                 item.setQuantity(item.getQuantity() - consumed);
                 remaining -= consumed;
-                if (item.getQuantity() == 0) {
+                if (item.getQuantity() <= 1e-6) {
                     depleted.add(item);
                 }
             }

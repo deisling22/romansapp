@@ -8,10 +8,14 @@ import de.roman.speiseplan.plan.MealPlan;
 import de.roman.speiseplan.plan.MealPlanRepository;
 import de.roman.speiseplan.plan.PlanEntry;
 import de.roman.speiseplan.plan.PlanEntryRepository;
+import de.roman.speiseplan.plan.PortionCalculator;
+import de.roman.speiseplan.profile.ProfileDto;
+import de.roman.speiseplan.profile.ProfileService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,18 +28,21 @@ public class ShoppingListService {
     private final PlanEntryRepository planEntryRepository;
     private final DishIngredientRepository dishIngredientRepository;
     private final PantryItemRepository pantryItemRepository;
+    private final ProfileService profileService;
 
     public ShoppingListService(
             ShoppingListItemRepository shoppingListItemRepository,
             MealPlanRepository mealPlanRepository,
             PlanEntryRepository planEntryRepository,
             DishIngredientRepository dishIngredientRepository,
-            PantryItemRepository pantryItemRepository) {
+            PantryItemRepository pantryItemRepository,
+            ProfileService profileService) {
         this.shoppingListItemRepository = shoppingListItemRepository;
         this.mealPlanRepository = mealPlanRepository;
         this.planEntryRepository = planEntryRepository;
         this.dishIngredientRepository = dishIngredientRepository;
         this.pantryItemRepository = pantryItemRepository;
+        this.profileService = profileService;
     }
 
     @Transactional(readOnly = true)
@@ -78,20 +85,31 @@ public class ShoppingListService {
     @Transactional
     public List<ShoppingListItemDto> generate(Long planId) {
         MealPlan plan = requirePlan(planId);
-        List<PlanEntry> entries = planEntryRepository.findByPlanIdOrderBySortOrderAsc(planId);
+        List<PlanEntry> allEntries = planEntryRepository.findByPlanIdOrderBySortOrderAsc(planId);
+        List<PlanEntry> openEntries = allEntries.stream().filter(entry -> !entry.isCooked()).toList();
+        // A finished round means the next round is what needs to be bought.
+        List<PlanEntry> entries = openEntries.isEmpty() ? allEntries : openEntries;
         List<Long> dishIds = entries.stream().map(entry -> entry.getDish().getId()).distinct().toList();
-        List<DishIngredient> dishIngredients = dishIngredientRepository.findByDishIdIn(dishIds);
+        Map<Long, List<DishIngredient>> ingredientsByDish = dishIds.isEmpty()
+                ? Map.of()
+                : dishIngredientRepository.findByDishIdIn(dishIds).stream()
+                        .collect(Collectors.groupingBy(ingredient -> ingredient.getDish().getId()));
+        ProfileDto profile = profileService.getProfile();
 
         Map<String, ShoppingListItem> aggregated = new LinkedHashMap<>();
-        for (DishIngredient dishIngredient : dishIngredients) {
-            String name = dishIngredient.getIngredient().getName();
-            String unit = dishIngredient.getIngredient().getUnit();
-            String key = normalizedKey(name, unit);
-            aggregated.merge(
-                    key,
-                    new ShoppingListItem(plan, name, dishIngredient.getQuantityGrams(), unit),
-                    (existing, addition) -> new ShoppingListItem(
-                            plan, existing.getIngredientName(), existing.getQuantity() + addition.getQuantity(), unit));
+        for (PlanEntry entry : entries) {
+            double factor = PortionCalculator.ingredientFactor(
+                    entry.getDish(), PortionCalculator.mealPortions(profile, plan, entry.getMealSlot()));
+            for (DishIngredient dishIngredient : ingredientsByDish.getOrDefault(entry.getDish().getId(), List.of())) {
+                String name = dishIngredient.getIngredient().getName();
+                String unit = dishIngredient.getIngredient().getUnit();
+                double quantity = dishIngredient.getQuantityGrams() * factor;
+                aggregated.merge(
+                        normalizedKey(name, unit),
+                        new ShoppingListItem(plan, name, quantity, unit),
+                        (existing, addition) -> new ShoppingListItem(
+                                plan, existing.getIngredientName(), existing.getQuantity() + addition.getQuantity(), unit));
+            }
         }
 
         // Only top up items still missing after pantry stock is subtracted, so re-running generate() is idempotent.

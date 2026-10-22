@@ -5,13 +5,13 @@ import de.roman.speiseplan.dish.DishIngredient;
 import de.roman.speiseplan.dish.DishIngredientRepository;
 import de.roman.speiseplan.dish.DishNutritionCalculator;
 import de.roman.speiseplan.dish.DishRatingRepository;
-import de.roman.speiseplan.plan.PlanEntry;
-import de.roman.speiseplan.plan.PlanEntryRepository;
+import de.roman.speiseplan.plan.CookLog;
+import de.roman.speiseplan.plan.CookLogRepository;
 import de.roman.speiseplan.pantry.PantryService;
 import de.roman.speiseplan.profile.ProfileDto;
 import de.roman.speiseplan.profile.ProfileService;
-import de.roman.speiseplan.recommendation.ContentType;
-import de.roman.speiseplan.recommendation.TrendScoringService;
+import de.roman.speiseplan.schedule.CookingService;
+import de.roman.speiseplan.schedule.ScheduleService;
 import de.roman.speiseplan.shopping.ShoppingListService;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -19,36 +19,37 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class DashboardService {
-    private final PlanEntryRepository planEntryRepository;
+    private final CookLogRepository cookLogRepository;
     private final DishIngredientRepository dishIngredientRepository;
     private final DishRatingRepository dishRatingRepository;
     private final ProfileService profileService;
     private final ShoppingListService shoppingListService;
     private final PantryService pantryService;
-    private final TrendScoringService trendScoringService;
+    private final ScheduleService scheduleService;
+    private final CookingService cookingService;
 
     public DashboardService(
-            PlanEntryRepository planEntryRepository,
+            CookLogRepository cookLogRepository,
             DishIngredientRepository dishIngredientRepository,
             DishRatingRepository dishRatingRepository,
             ProfileService profileService,
             ShoppingListService shoppingListService,
             PantryService pantryService,
-            TrendScoringService trendScoringService) {
-        this.planEntryRepository = planEntryRepository;
+            ScheduleService scheduleService,
+            CookingService cookingService) {
+        this.cookLogRepository = cookLogRepository;
         this.dishIngredientRepository = dishIngredientRepository;
         this.dishRatingRepository = dishRatingRepository;
         this.profileService = profileService;
         this.shoppingListService = shoppingListService;
         this.pantryService = pantryService;
-        this.trendScoringService = trendScoringService;
+        this.scheduleService = scheduleService;
+        this.cookingService = cookingService;
     }
 
 
@@ -60,8 +61,8 @@ public class DashboardService {
         Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
         Instant endOfDay = today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
 
-        List<PlanEntry> cookedToday = planEntryRepository
-            .findByPlanCreatorIsNullAndCookedTrueAndCookedAtBetween(startOfDay, endOfDay);
+        List<CookLog> cookedToday = cookLogRepository
+            .findByCookedAtGreaterThanEqualAndCookedAtLessThanOrderByCookedAtAsc(startOfDay, endOfDay);
         Map<Long, List<DishIngredient>> ingredientsByDish = loadIngredients(
                 cookedToday.stream().map(entry -> entry.getDish().getId()).distinct().toList());
 
@@ -75,7 +76,7 @@ public class DashboardService {
         double vitaminKToday = 0;
         double vitaminB12Today = 0;
         double folateToday = 0;
-        for (PlanEntry entry : cookedToday) {
+        for (CookLog entry : cookedToday) {
             Dish dish = entry.getDish();
             List<DishIngredient> ingredients = ingredientsByDish.getOrDefault(dish.getId(), List.of());
             double perServingCalories = DishNutritionCalculator.caloriesPerServing(ingredients, dish.getServings());
@@ -102,18 +103,19 @@ public class DashboardService {
                 ? null
                 : (int) Math.round(caloriesToday / calorieGoal * 100);
 
-        NextDishDto nextDish = planEntryRepository
-            .findFirstByPlanCreatorIsNullAndCookedFalseOrderByPlanIdAscSortOrderAsc()
-                .map(entry -> {
-                    Dish nextDishEntity = entry.getDish();
+        NextDishDto nextDish = scheduleService.compute(2).meals().stream()
+                .filter(meal -> meal.status() == ScheduleService.MealStatus.PLANNED)
+                .findFirst()
+                .map(meal -> {
+                    Dish nextDishEntity = meal.dish();
                     DishRatingRepository.DishRatingSummaryProjection summary = dishRatingRepository
                             .summarizeByDishIds(List.of(nextDishEntity.getId()))
                             .stream()
                             .findFirst()
                             .orElse(null);
                     return new NextDishDto(
-                            entry.getId(),
-                            entry.getPlan().getId(),
+                            meal.planEntryId(),
+                            meal.plan().getId(),
                             nextDishEntity.getId(),
                             nextDishEntity.getName(),
                             nextDishEntity.getImageUrl(),
@@ -149,17 +151,7 @@ public class DashboardService {
 
     @Transactional
     public void markCooked(Long planEntryId) {
-        PlanEntry entry = planEntryRepository.findById(planEntryId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan-Eintrag wurde nicht gefunden."));
-        if (entry.getPlan().getCreator() != null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan-Eintrag wurde nicht gefunden.");
-        }
-        if (entry.isCooked()) {
-            return;
-        }
-        pantryService.consume(dishIngredientRepository.findByDishId(entry.getDish().getId()));
-        entry.markCooked(Instant.now());
-        trendScoringService.bump(ContentType.DISH, entry.getDish().getId(), 4);
+        cookingService.markCooked(planEntryId);
     }
 
     private Map<Long, List<DishIngredient>> loadIngredients(List<Long> dishIds) {

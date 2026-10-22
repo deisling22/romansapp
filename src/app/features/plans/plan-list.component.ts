@@ -4,6 +4,7 @@ import { MealPlan } from '../../core/models';
 import { LocalMealPlan } from '../../core/offline-db';
 import { RecipeSyncService } from '../../core/recipe-sync.service';
 import { GamificationService } from '../../core/gamification.service';
+import { ScheduleApiService } from '../../core/schedule-api.service';
 
 @Component({
     selector: 'app-plan-list',
@@ -24,6 +25,7 @@ export class PlanListComponent implements OnInit {
     private readonly mealPlanApi: MealPlanApiService,
     private readonly recipeSync: RecipeSyncService,
     private readonly gamification: GamificationService,
+    private readonly scheduleApi: ScheduleApiService,
   ) {}
 
   ngOnInit(): void {
@@ -76,6 +78,19 @@ export class PlanListComponent implements OnInit {
 
   private async loadLocalPlans(): Promise<void> {
     this.localPlans = await this.recipeSync.listPlans();
+  }
+
+  toggleActive(plan: MealPlan, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.scheduleApi.updatePlanSettings(plan.id, { active: !plan.active }).subscribe({
+      next: (updated) => {
+        this.plans = this.plans.map((entry) => (entry.id === updated.id ? updated : entry));
+      },
+      error: () => {
+        this.errorMessage = 'Der Plan konnte nicht aktiviert werden.';
+      },
+    });
   }
 
   copyPlan(plan: MealPlan, event: Event): void {

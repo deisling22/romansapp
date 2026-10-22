@@ -2,6 +2,69 @@ export interface MealPlan {
   id: number;
   name: string;
   dishCount: number;
+  active?: boolean;
+  leftoversForLunch?: boolean;
+}
+
+export type MealSlot = 'BREAKFAST' | 'LUNCH' | 'DINNER';
+
+export const MEAL_SLOT_LABELS: Record<MealSlot, string> = {
+  BREAKFAST: 'Frühstück',
+  LUNCH: 'Mittagessen',
+  DINNER: 'Abendessen',
+};
+
+export interface MissingIngredient {
+  ingredientName: string;
+  unit: string;
+  missingQuantity: number;
+  uncoveredQuantity: number;
+}
+
+export interface ScheduledMeal {
+  dayOffset: number;
+  mealSlot: MealSlot;
+  status: 'COOKED' | 'PLANNED' | 'LEFTOVERS';
+  planEntryId: number | null;
+  planId: number | null;
+  planName: string | null;
+  dishId: number;
+  dishName: string;
+  imageUrl: string;
+  prepMinutes: number | null;
+  advancePrepNote: string | null;
+  portions: number;
+  cooksLeftovers: boolean;
+  ingredientStatus: 'AVAILABLE' | 'ON_LIST' | 'MISSING' | 'UNKNOWN' | null;
+  missingIngredients: MissingIngredient[];
+}
+
+export interface ScheduleDay {
+  dayOffset: number;
+  date: string;
+  meals: ScheduledMeal[];
+}
+
+export interface Schedule {
+  days: ScheduleDay[];
+  shoppingWindowDays: number;
+}
+
+export interface ReplacementSuggestion {
+  dishId: number;
+  name: string;
+  imageUrl: string;
+  prepMinutes: number | null;
+  ingredientCount: number;
+  missingCount: number;
+  coveragePercent: number;
+}
+
+export interface StapleItem {
+  id: number;
+  ingredientName: string;
+  quantity: number;
+  unit: string;
 }
 
 export interface CreatorSummary {
@@ -38,6 +101,7 @@ export interface Dish {
   sortOrder: number;
   planEntryId: number;
   cooked: boolean;
+  mealSlot?: MealSlot;
 }
 
 export interface DishCatalogEntry {
@@ -90,6 +154,7 @@ export interface DishDetail {
   ratingCount: number;
   myRating: number | null;
   favorite: boolean;
+  advancePrepNote: string | null;
 }
 
 export interface DishRatingSummary {
@@ -146,6 +211,8 @@ export interface Profile {
   age: number | null;
   sex: 'MALE' | 'FEMALE' | null;
   activityLevel: number | null;
+  householdSize: number;
+  shoppingTripsPerWeek: number;
 }
 
 export interface ShoppingListItem {

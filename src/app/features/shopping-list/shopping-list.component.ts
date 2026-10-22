@@ -7,6 +7,7 @@ import { ConnectivityService } from '../../core/connectivity.service';
 import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.service';
 import { NotificationService } from '../../core/notification.service';
 import { GamificationService } from '../../core/gamification.service';
+import { ScheduleApiService } from '../../core/schedule-api.service';
 
 const CART_REMINDER_DELAY_MS = 60_000;
 
@@ -40,6 +41,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     private readonly outbox: ShoppingListOutboxService,
     private readonly notifications: NotificationService,
     private readonly gamification: GamificationService,
+    private readonly scheduleApi: ScheduleApiService,
   ) {}
 
   ngOnInit(): void {
@@ -122,6 +124,33 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
         this.generating = false;
       },
     });
+  }
+
+  generateUpcoming(): void {
+    if (this.generating) {
+      return;
+    }
+    this.generating = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    const before = this.listSignature(this.items);
+    this.scheduleApi.generateUpcomingShoppingList().subscribe({
+      next: (items) => {
+        this.items = items;
+        this.generating = false;
+        this.successMessage = this.listSignature(items) === before
+          ? 'Für die nächsten Tage ist alles im Vorrat oder schon auf der Liste.'
+          : 'Die Liste für die nächsten Tage wurde ergänzt.';
+      },
+      error: () => {
+        this.errorMessage = 'Die Einkaufsliste für die nächsten Tage konnte nicht erstellt werden.';
+        this.generating = false;
+      },
+    });
+  }
+
+  private listSignature(items: ShoppingListItem[]): string {
+    return items.map((item) => `${item.id}:${item.quantity}`).sort().join('|');
   }
 
   toggle(item: ShoppingListItem): void {

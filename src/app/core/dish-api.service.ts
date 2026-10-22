@@ -63,6 +63,10 @@ export class DishApiService {
     return this.http.put<DishDetailsUpdate>(`${this.apiUrl}/dishes/${dishId}/details`, details);
   }
 
+  updateAdvancePrep(dishId: number, note: string | null): Observable<{ note: string | null }> {
+    return this.http.put<{ note: string | null }>(`${this.apiUrl}/dishes/${dishId}/advance-prep`, { note });
+  }
+
   addImage(dishId: number, image: File): Observable<{ imageUrl: string }> {
     const formData = new FormData();
     formData.append('image', image);

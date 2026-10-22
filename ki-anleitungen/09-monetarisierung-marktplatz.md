@@ -137,6 +137,12 @@ Klick-zu-Kauf-Raten.
    schaltet z. B. erweiterte Naehrwertanalyse, unbegrenzte KI-Zutatenscans
    oder Mehrfach-Haushaltsprofile frei. Planbare, wiederkehrende Einnahmen
    ohne Abhaengigkeit von fremder Checkout-Attribution.
+   **Vermerk (Stand 22.10.2026):** Der Koch- und Einkaufs-Workflow (aktive
+   Plaene mit Rotation, Heute/Morgen-Ansicht mit Zutaten-Ampel, Tauschen/
+   Ersetzen/Spaeter, Mahlzeiten-Slots und Reste, Einkaufsliste fuer die
+   naechsten Tage, Grundbedarf, Vorbereitungs-Hinweise/Erinnerungen) ist als
+   kuenftiger **Pro-Plan** vorgesehen. Aktuell ist er fuer alle Nutzer aktiv;
+   die Umstellung (Abo, Freischaltung, Feature-Gates) folgt spaeter.
 2. **Gesponserte Platzierung/Native Advertising:** Marken zahlen fuer
    sichtbare, klar gekennzeichnete Platzierung (z. B. "Zutat der Woche").
    Abrechnung nach Sichtbarkeit/Impressions statt nach fremdem Tracking -

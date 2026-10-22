@@ -31,6 +31,9 @@
       @if (dish.description) {
         <p>{{ dish.description }}</p>
       }
+      @if (dish.advancePrepNote) {
+        <p><strong>Vorbereitung am Vortag:</strong> {{ dish.advancePrepNote }}</p>
+      }
       <div class="meta-row">
         @if (dish.prepMinutes) {
           <span>{{ dish.prepMinutes }} Min.</span>
@@ -170,6 +173,19 @@
           <input id="quantityGrams" type="number" min="1" formControlName="quantityGrams" />
           <button type="submit" [disabled]="savingIngredient">
             {{ savingIngredient ? 'Wird gespeichert ...' : 'Hinzufügen' }}
+          </button>
+        </form>
+
+        <form class="nutrition-form" (ngSubmit)="saveAdvancePrep()" novalidate>
+          <label for="advancePrepNote">Vorbereitung am Vortag (optional)</label>
+          <input
+            id="advancePrepNote"
+            name="advancePrepNote"
+            maxlength="500"
+            placeholder="z. B. Hähnchen auftauen, Bohnen einweichen"
+            [(ngModel)]="advancePrepNote" />
+          <button type="submit" [disabled]="savingAdvancePrep">
+            {{ savingAdvancePrep ? 'Wird gespeichert ...' : 'Hinweis speichern' }}
           </button>
         </form>
 

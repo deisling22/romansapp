@@ -13,6 +13,16 @@
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <label for="defaultPortionSize">Standard-Portionsgröße</label>
       <input id="defaultPortionSize" type="number" min="1" formControlName="defaultPortionSize" />
+      <label for="householdSize">Personen im Haushalt</label>
+      <input id="householdSize" type="number" min="1" max="20" formControlName="householdSize" />
+      <label for="shoppingTripsPerWeek">Einkäufe pro Woche</label>
+      <select id="shoppingTripsPerWeek" formControlName="shoppingTripsPerWeek">
+        <option [ngValue]="1">1× (Großeinkauf, Liste für 7 Tage)</option>
+        <option [ngValue]="2">2× (Liste für 4 Tage)</option>
+        <option [ngValue]="3">3× (Liste für 3 Tage)</option>
+        <option [ngValue]="4">4× (Liste für 2 Tage)</option>
+        <option [ngValue]="7">Täglich</option>
+      </select>
       <label for="bodyWeightKg">Körpergewicht (kg)</label>
       <input id="bodyWeightKg" type="number" min="0" formControlName="bodyWeightKg" />
       <label for="bodyHeightCm">Körpergröße (cm)</label>
@@ -60,6 +70,39 @@
       <button type="submit" [disabled]="saving">{{ saving ? 'Wird gespeichert ...' : 'Speichern' }}</button>
     </form>
   }
+
+  <section class="staples" aria-labelledby="staples-title">
+    <p class="eyebrow">Einkauf</p>
+    <h2 id="staples-title">Grundbedarf</h2>
+    <p>Dinge wie Frühstück oder Kaffee, die bei „Einkaufsliste für die nächsten Tage“ automatisch aufgefüllt werden.</p>
+    <ul class="staple-list">
+      @for (staple of staples; track staple.id) {
+        <li>
+          <span>{{ staple.quantity | number: '1.0-2' }} {{ staple.unit }} {{ staple.ingredientName }}</span>
+          <button type="button" class="secondary" (click)="removeStaple(staple)">Entfernen</button>
+        </li>
+      }
+      @if (staples.length === 0) {
+        <li class="empty">Noch kein Grundbedarf hinterlegt.</li>
+      }
+    </ul>
+    <form class="staple-form" (ngSubmit)="addStaple()">
+      <input name="stapleName" [(ngModel)]="newStapleName" placeholder="z. B. Haferflocken" aria-label="Zutat" />
+      <input name="stapleQuantity" type="number" min="0.01" step="0.01" [(ngModel)]="newStapleQuantity" aria-label="Menge" />
+      <select name="stapleUnit" [(ngModel)]="newStapleUnit" aria-label="Einheit">
+        <option>Stk.</option>
+        <option>g</option>
+        <option>kg</option>
+        <option>ml</option>
+        <option>l</option>
+        <option>Packung</option>
+      </select>
+      <button type="submit">Hinzufügen</button>
+    </form>
+    @if (stapleError) {
+      <p class="field-error" role="alert">{{ stapleError }}</p>
+    }
+  </section>
 
   <section class="onboarding-replay">
     <p class="eyebrow">Hilfe</p>

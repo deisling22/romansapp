@@ -1,0 +1,178 @@
+<section class="meal-schedule" aria-labelledby="meal-schedule-title">
+  <div class="schedule-heading">
+    <div>
+      <p class="eyebrow">Kochen &amp; Einkaufen</p>
+      <h2 id="meal-schedule-title">Als Nächstes</h2>
+    </div>
+    <a routerLink="/plans" class="plans-link">Pläne</a>
+  </div>
+
+  @if (loading) {
+    <p class="status">Nächste Gerichte werden geladen ...</p>
+  }
+  @if (errorMessage) {
+    <p class="status error" role="alert">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="status success" role="status">{{ successMessage }}</p>
+  }
+
+  @if (!loading && schedule && !hasMeals) {
+    <p class="status">
+      Noch keine Gerichte geplant. Aktiviere unter <a routerLink="/plans">Pläne</a> einen oder mehrere Pläne.
+    </p>
+  }
+
+  @for (day of focusDays; track day.dayOffset) {
+    @if (day.meals.length) {
+      <div class="schedule-day">
+        <h3>{{ dayLabel(day) }} <small>{{ day.date | date: 'dd.MM.' }}</small></h3>
+        @for (meal of day.meals; track $index) {
+          @let key = mealKey(meal, $index);
+          <article class="meal-card" [class.done]="meal.status !== 'PLANNED'">
+            <div class="meal-row">
+              <img [src]="imageUrl(meal.imageUrl)" [alt]="meal.dishName" />
+              <div class="meal-copy">
+                <span class="slot">{{ slotLabels[meal.mealSlot] }}</span>
+                <a class="dish-name" [routerLink]="['/dishes', meal.dishId]">{{ meal.dishName }}</a>
+                <span class="meta">
+                  @if (meal.planName) {
+                    {{ meal.planName }}
+                  }
+                  @if (meal.prepMinutes) {
+                    · {{ meal.prepMinutes }} Min.
+                  }
+                </span>
+              </div>
+              @switch (meal.status) {
+                @case ('COOKED') {
+                  <span class="badge cooked">Gekocht</span>
+                }
+                @case ('LEFTOVERS') {
+                  <span class="badge leftovers">Reste</span>
+                }
+                @default {
+                  <span
+                    class="badge ingredient-state"
+                    [class.available]="meal.ingredientStatus === 'AVAILABLE'"
+                    [class.on-list]="meal.ingredientStatus === 'ON_LIST'"
+                    [class.missing]="meal.ingredientStatus === 'MISSING'">
+                    @switch (meal.ingredientStatus) {
+                      @case ('AVAILABLE') { Alles da }
+                      @case ('ON_LIST') { Auf der Liste }
+                      @case ('MISSING') { Fehlt etwas }
+                      @default { Ohne Zutaten }
+                    }
+                  </span>
+                }
+              }
+            </div>
+
+            @if (meal.status === 'PLANNED') {
+              @if (meal.ingredientStatus === 'MISSING') {
+                <p class="hint missing-hint">Fehlt: {{ missingNames(meal) }}</p>
+              }
+              @if (meal.advancePrepNote) {
+                <p class="hint prep-hint">Vorbereitung: {{ meal.advancePrepNote }}</p>
+              }
+              @if (meal.cooksLeftovers) {
+                <p class="hint">Doppelte Menge – Reste gibt es am nächsten Tag zum Mittagessen.</p>
+              }
+              <div class="meal-actions">
+                <button type="button" class="primary" [disabled]="busyKey !== null" (click)="cook(meal, key)">
+                  {{ busyKey === key ? 'Wird gespeichert ...' : 'Gekocht' }}
+                </button>
+                @if (meal.ingredientStatus === 'MISSING') {
+                  <button type="button" [disabled]="busyKey !== null" (click)="addMissing(meal, key)">
+                    Fehlende auf Liste
+                  </button>
+                }
+                <button type="button" [disabled]="busyKey !== null" (click)="togglePanel(key, 'swap', meal)">Tauschen</button>
+                <button type="button" [disabled]="busyKey !== null" (click)="togglePanel(key, 'replace', meal)">Ersetzen</button>
+                <button type="button" [disabled]="busyKey !== null" (click)="skip(meal, key)">Später</button>
+              </div>
+
+              @if (panel?.key === key && panel?.type === 'swap') {
+                <label class="panel">
+                  <span>Tauschen mit</span>
+                  <select #swapSelect (change)="swap(meal, key, swapSelect.value)">
+                    <option value="">Gericht wählen ...</option>
+                    @for (option of swapOptions(meal); track option.planEntryId) {
+                      <option [value]="option.planEntryId">{{ optionLabel(option) }}</option>
+                    }
+                  </select>
+                </label>
+              }
+
+              @if (panel?.key === key && panel?.type === 'replace') {
+                <div class="panel">
+                  <span>Ersetzen durch (sortiert nach Vorrat)</span>
+                  @if (suggestionsLoading) {
+                    <p class="status">Vorschläge werden geladen ...</p>
+                  }
+                  <ul class="suggestions">
+                    @for (suggestion of suggestions; track suggestion.dishId) {
+                      <li>
+                        <button type="button" [disabled]="busyKey !== null" (click)="replace(meal, key, suggestion)">
+                          <strong>{{ suggestion.name }}</strong>
+                          <small>
+                            @if (suggestion.ingredientCount) {
+                              {{ suggestion.coveragePercent }} % im Vorrat
+                              @if (suggestion.missingCount) {
+                                · {{ suggestion.missingCount }} fehlen
+                              }
+                            } @else {
+                              Keine Zutaten hinterlegt
+                            }
+                          </small>
+                        </button>
+                      </li>
+                    }
+                    @if (!suggestionsLoading && suggestions.length === 0) {
+                      <li class="status">Keine weiteren Gerichte im Katalog.</li>
+                    }
+                  </ul>
+                </div>
+              }
+            }
+          </article>
+        }
+      </div>
+    }
+  }
+
+  @if (laterDays.length) {
+    <div class="later-days">
+      <h3>Danach</h3>
+      <ul>
+        @for (day of laterDays; track day.dayOffset) {
+          @for (meal of day.meals; track $index) {
+            <li>
+              <span class="later-when">
+                {{ dayLabel(day) }}
+                <small>{{ slotLabels[meal.mealSlot] }}</small>
+              </span>
+              <a [routerLink]="['/dishes', meal.dishId]">{{ meal.dishName }}</a>
+              @if (meal.status === 'LEFTOVERS') {
+                <span class="dot leftovers" title="Reste"></span>
+              } @else {
+                <span
+                  class="dot"
+                  [class.available]="meal.ingredientStatus === 'AVAILABLE'"
+                  [class.on-list]="meal.ingredientStatus === 'ON_LIST'"
+                  [class.missing]="meal.ingredientStatus === 'MISSING'"
+                  [attr.title]="meal.ingredientStatus === 'MISSING' ? 'Fehlt: ' + missingNames(meal) : null"></span>
+              }
+            </li>
+          }
+        }
+      </ul>
+    </div>
+  }
+
+  @if (hasMeals) {
+    <button type="button" class="shopping-button" [disabled]="generatingList" (click)="generateShoppingList()">
+      {{ generatingList ? 'Wird erstellt ...' : 'Einkaufsliste für die nächsten ' + schedule!.shoppingWindowDays + ' Tage' }}
+    </button>
+  }
+</section>

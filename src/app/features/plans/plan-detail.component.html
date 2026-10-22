@@ -22,6 +22,31 @@
     <p class="status success" role="status">{{ successMessage }}</p>
   }
 
+  @if (!isLocal && plan) {
+    <section class="plan-settings" aria-label="Plan-Einstellungen">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [checked]="plan.active"
+          [disabled]="savingSettings"
+          (change)="updateSettings({ active: !plan.active })" />
+        Aktiv – Gerichte erscheinen automatisch in „Als Nächstes“
+      </label>
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [checked]="plan.leftoversForLunch"
+          [disabled]="savingSettings"
+          (change)="updateSettings({ leftoversForLunch: !plan.leftoversForLunch })" />
+        Abends doppelt kochen – Reste als Mittagessen am nächsten Tag
+      </label>
+    </section>
+  }
+
+  @if (!loading && !isLocal && roundComplete) {
+    <p class="status" role="status">Runde abgeschlossen – der Plan beginnt beim nächsten Kochen automatisch von vorn.</p>
+  }
+
   @if (!loading && !errorMessage) {
     <section class="dish-grid" aria-label="Gerichte im Plan">
       @for (dish of dishes; track dish) {
@@ -29,6 +54,16 @@
           <img [src]="mealPlanApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
           <h2>{{ dish.name }}</h2>
           @if (!isLocal) {
+            <label class="slot-select">
+              <select
+                #slotSelect
+                [attr.aria-label]="'Mahlzeit für ' + dish.name"
+                (change)="setMealSlot(dish, $any(slotSelect.value))">
+                @for (slot of slots; track slot) {
+                  <option [value]="slot" [selected]="slot === (dish.mealSlot ?? 'DINNER')">{{ slotLabels[slot] }}</option>
+                }
+              </select>
+            </label>
             <button
               type="button"
               class="cook-button"

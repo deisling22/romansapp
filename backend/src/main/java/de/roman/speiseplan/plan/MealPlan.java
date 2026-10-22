@@ -37,6 +37,12 @@ public class MealPlan {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
 
+    @Column(nullable = false)
+    private boolean active = false;
+
+    @Column(name = "leftovers_for_lunch", nullable = false)
+    private boolean leftoversForLunch = false;
+
     protected MealPlan() {
     }
 
@@ -82,6 +88,22 @@ public class MealPlan {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isLeftoversForLunch() {
+        return leftoversForLunch;
+    }
+
+    public void setLeftoversForLunch(boolean leftoversForLunch) {
+        this.leftoversForLunch = leftoversForLunch;
     }
 
     public void updateFromSync(String name, Instant updatedAt) {

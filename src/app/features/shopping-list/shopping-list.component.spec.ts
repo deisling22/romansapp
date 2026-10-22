@@ -5,6 +5,7 @@ import { ConnectivityService } from '../../core/connectivity.service';
 import { GamificationService } from '../../core/gamification.service';
 import { ShoppingListItem } from '../../core/models';
 import { NotificationService } from '../../core/notification.service';
+import { ScheduleApiService } from '../../core/schedule-api.service';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.service';
 import { ShoppingListComponent } from './shopping-list.component';
@@ -23,7 +24,8 @@ describe('ShoppingListComponent reminders', () => {
     notifications = jasmine.createSpyObj<NotificationService>('NotificationService', ['show']);
     const gamification = jasmine.createSpyObj<GamificationService>('GamificationService', ['record']);
     gamification.record.and.resolveTo();
-    component = new ShoppingListComponent(route, api, connectivity, outbox, notifications, gamification);
+    component = new ShoppingListComponent(
+      route, api, connectivity, outbox, notifications, gamification, {} as ScheduleApiService);
     item = { id: 7, ingredientName: 'Milch', quantity: 1, unit: 'l', checked: false };
     component.items = [item];
   });

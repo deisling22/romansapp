@@ -1,6 +1,7 @@
 package de.roman.speiseplan.profile;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,5 +13,7 @@ public record ProfileUpdateRequest(
         @DecimalMin(value = "0") Double calorieGoal,
         @Min(0) Integer age,
         String sex,
-        @DecimalMin(value = "1") Double activityLevel) {
+        @DecimalMin(value = "1") Double activityLevel,
+        @Min(1) @Max(20) Integer householdSize,
+        @Min(1) @Max(7) Integer shoppingTripsPerWeek) {
 }

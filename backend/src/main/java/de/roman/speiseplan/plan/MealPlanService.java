@@ -32,7 +32,7 @@ public class MealPlanService {
     @Transactional(readOnly = true)
     public List<PlanSummaryDto> getPlans() {
         return mealPlanRepository.findAllByCreatorIsNullOrderByCreatedAtAsc().stream()
-                .map(plan -> new PlanSummaryDto(plan.getId(), plan.getName(), planEntryRepository.countByPlanId(plan.getId())))
+                .map(plan -> PlanSummaryDto.from(plan, planEntryRepository.countByPlanId(plan.getId())))
                 .toList();
     }
 
@@ -47,7 +47,19 @@ public class MealPlanService {
     @Transactional
     public PlanSummaryDto createPlan(String name) {
         MealPlan plan = mealPlanRepository.save(new MealPlan(name.trim()));
-        return new PlanSummaryDto(plan.getId(), plan.getName(), 0);
+        return PlanSummaryDto.from(plan, 0);
+    }
+
+    @Transactional
+    public PlanSummaryDto updateSettings(Long planId, PlanSettingsRequest request) {
+        MealPlan plan = requireOwnPlan(planId);
+        if (request.active() != null) {
+            plan.setActive(request.active());
+        }
+        if (request.leftoversForLunch() != null) {
+            plan.setLeftoversForLunch(request.leftoversForLunch());
+        }
+        return PlanSummaryDto.from(plan, planEntryRepository.countByPlanId(planId));
     }
 
     @Transactional
@@ -60,11 +72,14 @@ public class MealPlanService {
     public PlanSummaryDto copyPlan(Long planId) {
         MealPlan source = requirePlan(planId);
         MealPlan copy = mealPlanRepository.save(new MealPlan(source.getName() + " (Kopie)"));
+        copy.setLeftoversForLunch(source.isLeftoversForLunch());
         List<PlanEntry> entries = planEntryRepository.findByPlanIdOrderBySortOrderAsc(planId);
         for (PlanEntry entry : entries) {
-            planEntryRepository.save(new PlanEntry(copy, entry.getDish(), entry.getSortOrder()));
+            PlanEntry copiedEntry = new PlanEntry(copy, entry.getDish(), entry.getSortOrder());
+            copiedEntry.setMealSlot(entry.getMealSlot());
+            planEntryRepository.save(copiedEntry);
         }
-        return new PlanSummaryDto(copy.getId(), copy.getName(), entries.size());
+        return PlanSummaryDto.from(copy, entries.size());
     }
 
     @Transactional
@@ -84,8 +99,18 @@ public class MealPlanService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan wurde nicht gefunden."));
     }
 
+    private MealPlan requireOwnPlan(Long planId) {
+        MealPlan plan = requirePlan(planId);
+        if (plan.getCreator() != null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan wurde nicht gefunden.");
+        }
+        return plan;
+    }
+
     private DishDto toDto(PlanEntry entry) {
         Dish dish = entry.getDish();
-        return new DishDto(dish.getId(), dish.getName(), dish.getImageUrl(), entry.getSortOrder(), entry.getId(), entry.isCooked());
+        return new DishDto(
+                dish.getId(), dish.getName(), dish.getImageUrl(), entry.getSortOrder(), entry.getId(), entry.isCooked(),
+                entry.getMealSlot().name());
     }
 }

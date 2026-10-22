@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,6 +49,11 @@ public class MealPlanController {
     @ResponseStatus(HttpStatus.CREATED)
     public PlanSummaryDto copyPlan(@PathVariable Long planId) {
         return mealPlanService.copyPlan(planId);
+    }
+
+    @PutMapping("/{planId}/settings")
+    public PlanSummaryDto updateSettings(@PathVariable Long planId, @RequestBody PlanSettingsRequest request) {
+        return mealPlanService.updateSettings(planId, request);
     }
 
     @GetMapping("/{planId}/dishes")

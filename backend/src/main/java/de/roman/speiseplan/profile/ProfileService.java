@@ -27,6 +27,12 @@ public class ProfileService {
         profile.setAge(request.age());
         profile.setSex(request.sex());
         profile.setActivityLevel(request.activityLevel());
+        if (request.householdSize() != null) {
+            profile.setHouseholdSize(request.householdSize());
+        }
+        if (request.shoppingTripsPerWeek() != null) {
+            profile.setShoppingTripsPerWeek(request.shoppingTripsPerWeek());
+        }
         return toDto(userProfileRepository.save(profile));
     }
 
@@ -45,6 +51,8 @@ public class ProfileService {
                 profile.getCalorieGoal(),
                 profile.getAge(),
                 profile.getSex(),
-                profile.getActivityLevel());
+                profile.getActivityLevel(),
+                profile.getHouseholdSize(),
+                profile.getShoppingTripsPerWeek());
     }
 }

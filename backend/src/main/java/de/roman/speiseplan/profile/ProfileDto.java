@@ -8,5 +8,7 @@ public record ProfileDto(
         Double calorieGoal,
         Integer age,
         String sex,
-        Double activityLevel) {
+        Double activityLevel,
+        int householdSize,
+        int shoppingTripsPerWeek) {
 }

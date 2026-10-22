@@ -33,6 +33,9 @@ public class Dish {
     @Column(length = 255)
     private String tags;
 
+    @Column(name = "advance_prep_note", length = 500)
+    private String advancePrepNote;
+
     @Column(name = "carbs_grams")
     private Double carbsGrams;
 
@@ -127,6 +130,14 @@ public class Dish {
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+
+    public String getAdvancePrepNote() {
+        return advancePrepNote;
+    }
+
+    public void setAdvancePrepNote(String advancePrepNote) {
+        this.advancePrepNote = advancePrepNote;
     }
 
     public Double getCarbsGrams() {

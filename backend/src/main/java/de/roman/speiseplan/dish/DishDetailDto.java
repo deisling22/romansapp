@@ -26,5 +26,6 @@ public record DishDetailDto(
         Double averageRating,
         int ratingCount,
         Integer myRating,
-        boolean favorite) {
+        boolean favorite,
+        String advancePrepNote) {
 }

@@ -127,7 +127,15 @@ public class DishService {
                 summary == null ? null : summary.getAverageRating(),
                 summary == null ? 0 : summary.getRatingCount().intValue(),
                 myRating,
-                userEmail != null && dishFavoriteRepository.existsByDishIdAndUserEmail(dishId, userEmail));
+                userEmail != null && dishFavoriteRepository.existsByDishIdAndUserEmail(dishId, userEmail),
+                dish.getAdvancePrepNote());
+    }
+
+    @Transactional
+    public AdvancePrepRequest updateAdvancePrep(Long dishId, AdvancePrepRequest request) {
+        Dish dish = requireDish(dishId);
+        dish.setAdvancePrepNote(blankToNull(request.note()));
+        return new AdvancePrepRequest(dish.getAdvancePrepNote());
     }
 
     @Transactional

@@ -12,6 +12,9 @@
       {{ generating ? 'Wird erstellt ...' : 'Aus Plan neu erstellen' }}
     </button>
   } @else {
+    <button type="button" class="generate" [disabled]="generating" (click)="generateUpcoming()">
+      {{ generating ? 'Wird erstellt ...' : 'Für die nächsten Tage ergänzen' }}
+    </button>
     <form class="add-form" (ngSubmit)="addItem()">
       <label>
         <span>Zutat</span>

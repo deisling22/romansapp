@@ -3,6 +3,8 @@ package de.roman.speiseplan.plan;
 import de.roman.speiseplan.dish.Dish;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,6 +36,10 @@ public class PlanEntry {
 
     @Column(name = "cooked_at")
     private Instant cookedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "meal_slot", nullable = false, length = 20)
+    private MealSlot mealSlot = MealSlot.DINNER;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
@@ -78,5 +84,25 @@ public class PlanEntry {
     public void markCooked(Instant when) {
         this.cooked = true;
         this.cookedAt = when;
+    }
+
+    public void resetCooked() {
+        this.cooked = false;
+    }
+
+    public MealSlot getMealSlot() {
+        return mealSlot;
+    }
+
+    public void setMealSlot(MealSlot mealSlot) {
+        this.mealSlot = mealSlot;
+    }
+
+    public void setDish(Dish dish) {
+        this.dish = dish;
+    }
+
+    public void setSortOrder(int sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }

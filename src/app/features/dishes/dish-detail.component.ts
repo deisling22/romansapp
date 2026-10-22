@@ -35,6 +35,8 @@ export class DishDetailComponent implements OnInit, OnDestroy {
   });
 
   savingNutrition = false;
+  advancePrepNote = '';
+  savingAdvancePrep = false;
 
   dishId = 0;
   dish: DishDetail | null = null;
@@ -173,6 +175,7 @@ export class DishDetailComponent implements OnInit, OnDestroy {
       next: (dish) => {
         this.dish = dish;
         this.selectedServings = dish.servings;
+        this.advancePrepNote = dish.advancePrepNote ?? '';
         this.nutritionForm.setValue({
           carbsGrams: dish.carbsGrams,
           fatGrams: dish.fatGrams,
@@ -247,6 +250,25 @@ export class DishDetailComponent implements OnInit, OnDestroy {
       error: () => {
         this.errorMessage = 'Das Kochbuch konnte nicht aktualisiert werden.';
         this.savingFavorite = false;
+      },
+    });
+  }
+
+  saveAdvancePrep(): void {
+    if (this.savingAdvancePrep) {
+      return;
+    }
+    this.savingAdvancePrep = true;
+    this.dishApi.updateAdvancePrep(this.dishId, this.advancePrepNote.trim() || null).subscribe({
+      next: ({ note }) => {
+        if (this.dish) {
+          this.dish.advancePrepNote = note;
+        }
+        this.savingAdvancePrep = false;
+      },
+      error: () => {
+        this.errorMessage = 'Der Vorbereitungs-Hinweis konnte nicht gespeichert werden.';
+        this.savingAdvancePrep = false;
       },
     });
   }

@@ -1,0 +1,290 @@
+:host {
+  display: block;
+}
+
+.meal-schedule {
+  display: grid;
+  gap: 14px;
+}
+
+.schedule-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #26736f;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 0;
+  color: #16342f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.5rem;
+}
+
+h3 {
+  margin: 0 0 8px;
+  color: #16342f;
+  font-size: 1rem;
+}
+
+h3 small {
+  color: #6b827d;
+  font-weight: 400;
+}
+
+a {
+  color: #26736f;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.status {
+  margin: 0;
+  border-left: 3px solid #94b8a5;
+  color: #4e6661;
+  padding: 10px 14px;
+}
+
+.status.error {
+  border-color: #b54636;
+  color: #8d2d21;
+}
+
+.status.success {
+  border-color: #26736f;
+  color: #1f5e5a;
+}
+
+.schedule-day {
+  display: grid;
+  gap: 10px;
+}
+
+.meal-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #d7e5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 14px;
+}
+
+.meal-card.done {
+  background: #f4f8f5;
+}
+
+.meal-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.meal-row img {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #e9eee9;
+}
+
+.meal-copy {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.slot,
+.meta {
+  color: #6b827d;
+  font-size: 0.78rem;
+}
+
+.slot {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dish-name {
+  overflow: hidden;
+  color: #16342f;
+  font-size: 1.05rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  flex: none;
+  border-radius: 999px;
+  background: #e9eee9;
+  color: #4e6661;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+}
+
+.badge.cooked,
+.badge.available {
+  background: #dcefe3;
+  color: #1f5e5a;
+}
+
+.badge.leftovers,
+.badge.on-list {
+  background: #fff1d6;
+  color: #85590f;
+}
+
+.badge.missing {
+  background: #fbe2dc;
+  color: #8d2d21;
+}
+
+.hint {
+  margin: 0;
+  color: #4e6661;
+  font-size: 0.85rem;
+}
+
+.missing-hint {
+  color: #8d2d21;
+}
+
+.prep-hint {
+  border-radius: 6px;
+  background: #fff4e8;
+  padding: 6px 10px;
+}
+
+.meal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button {
+  min-height: 44px;
+  border: 1px solid #bcd2c3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #16342f;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0 14px;
+}
+
+button.primary,
+.shopping-button {
+  border-color: #e06c47;
+  background: #e06c47;
+  color: #ffffff;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.panel {
+  display: grid;
+  gap: 6px;
+  color: #4e6661;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+select {
+  min-height: 44px;
+  border: 1px solid #bcd2c3;
+  border-radius: 8px;
+  font: inherit;
+  padding: 0 10px;
+}
+
+.suggestions {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestions button {
+  display: grid;
+  width: 100%;
+  gap: 2px;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.suggestions small {
+  color: #6b827d;
+  font-weight: 400;
+}
+
+.later-days ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.later-days li {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #e3ece6;
+  padding: 6px 0;
+  font-size: 0.92rem;
+}
+
+.later-when {
+  display: grid;
+  color: #16342f;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.later-when small {
+  color: #6b827d;
+  font-weight: 400;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #c9d6cf;
+}
+
+.dot.available {
+  background: #2f8f5b;
+}
+
+.dot.on-list,
+.dot.leftovers {
+  background: #d99a2b;
+}
+
+.dot.missing {
+  background: #c4452f;
+}
+
+.shopping-button {
+  min-height: 52px;
+}

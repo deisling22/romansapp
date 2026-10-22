@@ -80,28 +80,7 @@
           </div>
         </div>
       }
-      @if (dashboard.nextDish) {
-        <article class="next-dish">
-          <p class="eyebrow">Nächstes Gericht</p>
-          <div class="next-dish-row">
-            <img [src]="imageUrl(dashboard.nextDish.imageUrl)" [alt]="dashboard.nextDish.name" />
-            <div class="next-dish-copy">
-              <h2>{{ dashboard.nextDish.name }}</h2>
-              <app-star-rating
-                [average]="dashboard.nextDish.averageRating"
-                [count]="dashboard.nextDish.ratingCount"
-                ></app-star-rating>
-              <a [routerLink]="['/dishes', dashboard.nextDish.dishId]">Rezept öffnen</a>
-            </div>
-          </div>
-          <button type="button" [disabled]="cooking" (click)="markCooked()">
-            {{ cooking ? 'Wird gespeichert ...' : 'Als gekocht markieren' }}
-          </button>
-        </article>
-      }
-      @if (!dashboard.nextDish) {
-        <p class="status">Kein offenes Gericht in deinen Plänen.</p>
-      }
+      <app-meal-schedule (changed)="load()"></app-meal-schedule>
       <section class="action-widgets" aria-label="Einkauf und Vorrat">
         <a class="action-widget cart-widget" routerLink="/shopping-list">
           <span class="widget-index">02</span>

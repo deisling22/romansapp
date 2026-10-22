@@ -2,6 +2,8 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ProfileApiService } from '../../core/profile-api.service';
 import { OnboardingService } from '../../core/onboarding.service';
+import { ScheduleApiService } from '../../core/schedule-api.service';
+import { StapleItem } from '../../core/models';
 
 @Component({
     selector: 'app-settings',
@@ -20,7 +22,15 @@ export class SettingsComponent implements OnInit {
     age: this.formBuilder.control<number | null>(null, [Validators.min(0)]),
     sex: this.formBuilder.control<'MALE' | 'FEMALE' | null>(null),
     activityLevel: this.formBuilder.control<number | null>(null),
+    householdSize: [1, [Validators.required, Validators.min(1), Validators.max(20)]],
+    shoppingTripsPerWeek: [2, [Validators.required, Validators.min(1), Validators.max(7)]],
   });
+
+  staples: StapleItem[] = [];
+  newStapleName = '';
+  newStapleQuantity = 1;
+  newStapleUnit = 'Stk.';
+  stapleError = '';
 
   loading = true;
   saving = false;
@@ -32,9 +42,13 @@ export class SettingsComponent implements OnInit {
     private readonly formBuilder: FormBuilder,
     private readonly profileApi: ProfileApiService,
     private readonly onboarding: OnboardingService,
+    private readonly scheduleApi: ScheduleApiService,
   ) {}
 
   ngOnInit(): void {
+    this.scheduleApi.getStaples().subscribe({
+      next: (staples) => (this.staples = staples),
+    });
     this.profileApi.getProfile().subscribe({
       next: (profile) => {
         this.form.setValue({
@@ -46,6 +60,8 @@ export class SettingsComponent implements OnInit {
           age: profile.age,
           sex: profile.sex,
           activityLevel: profile.activityLevel,
+          householdSize: profile.householdSize,
+          shoppingTripsPerWeek: profile.shoppingTripsPerWeek,
         });
         this.loading = false;
       },
@@ -88,6 +104,30 @@ export class SettingsComponent implements OnInit {
         this.errorMessage = 'Das Profil konnte nicht gespeichert werden.';
         this.saving = false;
       },
+    });
+  }
+
+  addStaple(): void {
+    const name = this.newStapleName.trim();
+    const unit = this.newStapleUnit.trim();
+    if (!name || !unit || this.newStapleQuantity <= 0) {
+      return;
+    }
+    this.stapleError = '';
+    this.scheduleApi.addStaple(name, this.newStapleQuantity, unit).subscribe({
+      next: (staple) => {
+        this.staples = [...this.staples, staple];
+        this.newStapleName = '';
+        this.newStapleQuantity = 1;
+      },
+      error: () => (this.stapleError = 'Der Grundbedarf konnte nicht gespeichert werden.'),
+    });
+  }
+
+  removeStaple(staple: StapleItem): void {
+    this.scheduleApi.deleteStaple(staple.id).subscribe({
+      next: () => (this.staples = this.staples.filter((entry) => entry.id !== staple.id)),
+      error: () => (this.stapleError = 'Der Grundbedarf konnte nicht entfernt werden.'),
     });
   }
 

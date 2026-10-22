@@ -100,6 +100,6 @@ public class CreatorService {
         Dish dish = entry.getDish();
         return new DishDto(
                 dish.getId(), dish.getName(), dish.getImageUrl(), entry.getSortOrder(),
-                entry.getId(), entry.isCooked());
+                entry.getId(), entry.isCooked(), entry.getMealSlot().name());
     }
 }

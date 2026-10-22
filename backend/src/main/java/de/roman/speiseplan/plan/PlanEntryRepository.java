@@ -10,15 +10,15 @@ public interface PlanEntryRepository extends JpaRepository<PlanEntry, Long> {
 
     List<PlanEntry> findByPlanIdOrderBySortOrderAsc(Long planId);
 
+    List<PlanEntry> findByPlanIdInOrderBySortOrderAsc(List<Long> planIds);
+
+    List<PlanEntry> findByPlanIdAndMealSlot(Long planId, MealSlot mealSlot);
+
     Optional<PlanEntry> findTopByPlanIdOrderBySortOrderDesc(Long planId);
 
     boolean existsByPlanIdAndDishId(Long planId, Long dishId);
 
     boolean existsByDishIdAndPlanCreatorIsNotNull(Long dishId);
-
-    Optional<PlanEntry> findFirstByPlanCreatorIsNullAndCookedFalseOrderByPlanIdAscSortOrderAsc();
-
-    List<PlanEntry> findByPlanCreatorIsNullAndCookedTrueAndCookedAtBetween(Instant start, Instant end);
 
     long countByPlanCreatorIdAndCreatedAtAfter(Long creatorId, Instant createdAt);
 }

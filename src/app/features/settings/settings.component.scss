@@ -151,6 +151,59 @@ button:disabled {
   border-top: 1px solid #d7e5dd;
 }
 
+.staples {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid #d7e5dd;
+}
+
+.staples h2 {
+  margin: 0 0 6px;
+  color: #16342f;
+  font-size: 1.3rem;
+}
+
+.staples p:not(.eyebrow) {
+  color: #54716d;
+  line-height: 1.5;
+}
+
+.staple-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.staple-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.staple-list .empty {
+  color: #6b827d;
+}
+
+.staples .secondary {
+  min-height: 44px;
+  border: 1px solid #aac9ba;
+  background: #ffffff;
+  color: #16342f;
+  padding: 0 14px;
+}
+
+.staple-form {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  margin-top: 16px;
+}
+
+.staple-form button {
+  grid-column: 1 / -1;
+}
+
 .onboarding-replay .secondary {
   min-height: 48px;
   border: 1px solid #aac9ba;

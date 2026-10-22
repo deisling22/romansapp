@@ -5,17 +5,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import tools.jackson.databind.ObjectMapper;
 import de.roman.speiseplan.dish.AddDishIngredientRequest;
 import de.roman.speiseplan.dish.CreateIngredientRequest;
+import de.roman.speiseplan.dish.DishDetailsUpdateRequest;
 import de.roman.speiseplan.pantry.PantryItem;
 import de.roman.speiseplan.pantry.PantryItemRepository;
 import de.roman.speiseplan.plan.CreatePlanRequest;
+import de.roman.speiseplan.profile.ProfileUpdateRequest;
 import java.time.Instant;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -37,6 +41,51 @@ class ShoppingListControllerTest {
 
         @Autowired
         private PantryItemRepository pantryItemRepository;
+
+    @BeforeEach
+    void useSinglePortionProfile() throws Exception {
+        mockMvc.perform(put("/api/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new ProfileUpdateRequest(1.0, null, null, false, null, null, null, null, 1, null))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void generateCountsRepeatedDishesAndScalesToPortions() throws Exception {
+        long planId = createPlan("Portionen-Test-Plan");
+        long dishId = createDish(planId, "Portionen-Test-Gericht");
+        long ingredientId = createIngredient("Portionen-Zutat", 100, 10, "g");
+        mockMvc.perform(post("/api/dishes/{dishId}/ingredients", dishId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new AddDishIngredientRequest(ingredientId, 400))))
+                .andExpect(status().isCreated());
+        mockMvc.perform(put("/api/dishes/{dishId}/details", dishId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new DishDetailsUpdateRequest(null, null, 4, List.of()))))
+                .andExpect(status().isOk());
+        createDish(planId, "Wird-ersetzt");
+        String dishes = mockMvc.perform(get("/api/plans/{planId}/dishes", planId))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        long secondEntryId = objectMapper.readTree(dishes).get(1).get("planEntryId").asLong();
+        mockMvc.perform(put("/api/plan-entries/{id}/dish", secondEntryId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dishId\":" + dishId + "}"))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(put("/api/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new ProfileUpdateRequest(1.0, null, null, false, null, null, null, null, 2, null))))
+                .andExpect(status().isOk());
+
+        // 400 g for 4 servings, household of two -> 200 g per cooking, and the dish appears twice.
+        mockMvc.perform(post("/api/plans/{planId}/shopping-list/generate", planId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.ingredientName == 'Portionen-Zutat')].quantity").value(400.0));
+    }
 
     @Test
     void generateAndToggleShoppingListItems() throws Exception {

@@ -76,6 +76,11 @@ public class DishController {
         return dishService.updateNutrition(dishId, request);
     }
 
+    @PutMapping("/{dishId}/advance-prep")
+    public AdvancePrepRequest updateAdvancePrep(@PathVariable Long dishId, @Valid @RequestBody AdvancePrepRequest request) {
+        return dishService.updateAdvancePrep(dishId, request);
+    }
+
     @PutMapping("/{dishId}/details")
     public DishDetailsDto updateDetails(@PathVariable Long dishId, @Valid @RequestBody DishDetailsUpdateRequest request) {
         return dishService.updateDetails(dishId, request);

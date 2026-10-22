@@ -3,6 +3,7 @@
     <p class="eyebrow">Mein Kochalltag</p>
     <h1>Speisepläne</h1>
     <p class="intro">Wähle einen Plan und ergänze dein nächstes Gericht direkt mit einem Foto.</p>
+    <p class="intro">Aktive Pläne (●) wechseln sich in der Übersicht automatisch ab.</p>
   </header>
 
   <form class="new-plan" (ngSubmit)="createPlan()" novalidate>
@@ -50,9 +51,23 @@
           <span class="plan-mark">{{ plan.name.charAt(0) }}</span>
           <span class="plan-copy">
             <strong>{{ plan.name }}</strong>
-            <small>{{ plan.dishCount }} {{ plan.dishCount === 1 ? 'Gericht' : 'Gerichte' }}</small>
+            <small>
+              {{ plan.dishCount }} {{ plan.dishCount === 1 ? 'Gericht' : 'Gerichte' }}
+              @if (plan.active) {
+                · aktiv
+              }
+            </small>
           </span>
           <span class="plan-actions">
+            <button
+              type="button"
+              class="active-toggle"
+              [class.is-active]="plan.active"
+              [attr.aria-pressed]="plan.active"
+              (click)="toggleActive(plan, $event)"
+              [title]="plan.active ? 'Plan pausieren' : 'Plan aktivieren'">
+              {{ plan.active ? '●' : '○' }}
+            </button>
             <button type="button" (click)="copyPlan(plan, $event)" title="Plan kopieren">⧉</button>
             <button type="button" (click)="deletePlan(plan, $event)" title="Plan löschen">✕</button>
           </span>
