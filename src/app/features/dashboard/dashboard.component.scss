@@ -45,6 +45,11 @@
   text-decoration: none;
 }
 
+.shortcut-list .expiring {
+  color: var(--orange);
+  font-weight: 600;
+}
+
 .stat-copy {
   display: grid;
   gap: 2px;

@@ -1,9 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DashboardApiService } from '../../core/dashboard-api.service';
-import { DashboardData, Recommendations } from '../../core/models';
+import { DashboardData, Recommendations, WeekNutrition } from '../../core/models';
 import { toAbsoluteImageUrl } from '../../core/image-url';
 import { RecommendationApiService } from '../../core/recommendation-api.service';
 import { MealScheduleComponent } from './meal-schedule.component';
+import { WeekNutritionComponent } from './week-nutrition.component';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 
@@ -12,13 +13,14 @@ import { DecimalPipe } from '@angular/common';
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MealScheduleComponent, RouterLink, DecimalPipe]
+    imports: [MealScheduleComponent, WeekNutritionComponent, RouterLink, DecimalPipe]
 })
 export class DashboardComponent implements OnInit {
   dashboard: DashboardData | null = null;
   loading = true;
   errorMessage = '';
   recommendations: Recommendations | null = null;
+  week: WeekNutrition | null = null;
   readonly todayLabel = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
     .format(new Date());
 
@@ -52,6 +54,14 @@ export class DashboardComponent implements OnInit {
       next: (dashboard) => {
         this.dashboard = dashboard;
         this.loading = false;
+        if (dashboard.nutritionTrackingEnabled) {
+          this.dashboardApi.getWeek().subscribe({
+            next: (week) => (this.week = week),
+            error: () => (this.week = null),
+          });
+        } else {
+          this.week = null;
+        }
       },
       error: () => {
         this.errorMessage = 'Die Übersicht konnte nicht geladen werden. Ist das Backend gestartet?';

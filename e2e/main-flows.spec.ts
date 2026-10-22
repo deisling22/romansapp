@@ -1,4 +1,4 @@
-import { expect, openTab, test } from './fixtures';
+import { API_URL, expect, openTab, test } from './fixtures';
 
 test.describe('Hauptanwendungsfälle', () => {
   test('Heute-Ansicht zeigt die nächsten Gerichte', async ({ page }) => {
@@ -83,5 +83,66 @@ test.describe('Hauptanwendungsfälle', () => {
     await page.getByRole('button', { name: 'Hinzufügen und weitere Bereiche' }).click();
     await page.getByRole('menuitem', { name: /Vorratsschrank/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Vorratsschrank' })).toBeVisible();
+  });
+
+  test('Kosten: Anzeige einschalten, Beleg manuell erfassen, Übersicht zeigt Ausgaben', async ({ page }) => {
+    await page.goto('/#/settings');
+    const toggle = page.locator('#costTrackingEnabled');
+    await expect(toggle).toBeVisible();
+    await toggle.check();
+    await page.locator('#weeklyBudgetEur').fill('100');
+    await page.getByRole('button', { name: 'Speichern', exact: true }).click();
+    await expect(page.getByText('Profil gespeichert.')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Haushalt' })).toBeVisible();
+
+    await page.goto('/#/receipts');
+    await expect(page.getByRole('heading', { level: 1, name: 'Belege & Ausgaben' })).toBeVisible();
+    await page.getByTestId('receipt-total').fill('12.34');
+    await page.locator('input[name=store]').fill('E2E-Markt');
+    await page.getByRole('button', { name: 'Ausgabe speichern' }).click();
+    await expect(page.locator('.receipt-list li', { hasText: 'E2E-Markt' }).first()).toContainText(/12[.,]34/);
+
+    await page.goto('/');
+    await expect(page.getByTestId('cost-card')).toContainText('Ausgaben diese Woche');
+  });
+
+  test('Vorrat: Ablaufdatum setzen, bald ablaufende Zutaten werden hervorgehoben', async ({ page, request }) => {
+    const isoDate = (offset: number) => {
+      const date = new Date();
+      date.setDate(date.getDate() + offset);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    };
+    const name = `E2E-Ablauf-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const created = await request.post(`${API_URL}/pantry/batches`, {
+      data: { items: [{ ingredientName: name, quantity: 1, unit: 'Stk.', expiresOn: isoDate(1) }] },
+    });
+    expect(created.ok()).toBeTruthy();
+    const [item] = await created.json();
+
+    try {
+      await page.goto('/#/pantry');
+      await expect(page.getByTestId('use-soon')).toContainText(name);
+      const row = page.locator('.item-list li', { hasText: name });
+      await expect(row).toContainText('Läuft morgen ab');
+      await row.locator('input[type=date]').fill(isoDate(10));
+      await expect(row).toContainText('Noch 10 Tage haltbar');
+      await expect(page.getByTestId('use-soon').filter({ hasText: name })).toHaveCount(0);
+    } finally {
+      await request.delete(`${API_URL}/pantry/${item.id}`);
+    }
+  });
+
+  test('Nährwerte: Wochenübersicht erscheint bei aktivierter Nährwert-Anzeige', async ({ page }) => {
+    await page.goto('/#/settings');
+    const toggle = page.locator('#nutritionTrackingEnabled');
+    await expect(toggle).toBeVisible();
+    await toggle.check();
+    await page.getByRole('button', { name: 'Speichern', exact: true }).click();
+    await expect(page.getByText('Profil gespeichert.')).toBeVisible();
+
+    await page.goto('/');
+    const week = page.getByTestId('week-nutrition');
+    await expect(week).toContainText('Diese Woche');
+    await expect(week.locator('.bar')).toHaveCount(7);
   });
 });

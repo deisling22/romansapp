@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DashboardData } from './models';
+import { DashboardData, WeekNutrition } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardApiService {
@@ -12,6 +12,10 @@ export class DashboardApiService {
 
   getDashboard(): Observable<DashboardData> {
     return this.http.get<DashboardData>(`${this.apiUrl}/dashboard`);
+  }
+
+  getWeek(): Observable<WeekNutrition> {
+    return this.http.get<WeekNutrition>(`${this.apiUrl}/dashboard/week`);
   }
 
   markCooked(planEntryId: number): Observable<DashboardData> {

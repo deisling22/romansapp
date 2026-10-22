@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { PantryApiService } from '../../core/pantry-api.service';
-import { PantryItem } from '../../core/models';
+import { PantryItem, UseSoon } from '../../core/models';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe, DatePipe } from '@angular/common';
+import { ExpiryInfo, expiryInfo } from './expiry';
+import { toAbsoluteImageUrl } from '../../core/image-url';
 
 @Component({
     selector: 'app-pantry',
@@ -21,8 +23,40 @@ export class PantryComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   deletingItemId: number | null = null;
+  savingExpiryId: number | null = null;
+  useSoon: UseSoon | null = null;
 
   constructor(private readonly pantryApi: PantryApiService) {}
+
+  expiry(item: PantryItem): ExpiryInfo | null {
+    return expiryInfo(item.expiresOn);
+  }
+
+  imageUrl(path: string): string {
+    return toAbsoluteImageUrl(path);
+  }
+
+  setExpiry(item: PantryItem, value: string): void {
+    const expiresOn = value || null;
+    if (expiresOn === (item.expiresOn ?? null)) {
+      return;
+    }
+    this.savingExpiryId = item.id;
+    this.successMessage = '';
+    this.pantryApi.updateExpiry(item.id, expiresOn).subscribe({
+      next: (updated) => {
+        this.items = this.items
+          .map((entry) => (entry.id === updated.id ? updated : entry))
+          .sort((a, b) => (a.expiresOn ?? '9999').localeCompare(b.expiresOn ?? '9999'));
+        this.savingExpiryId = null;
+        this.loadUseSoon();
+      },
+      error: () => {
+        this.errorMessage = 'Das Ablaufdatum konnte nicht gespeichert werden.';
+        this.savingExpiryId = null;
+      },
+    });
+  }
 
   purchaseAgeLabel(purchasedAt: string): string {
     const purchased = new Date(purchasedAt);
@@ -55,6 +89,14 @@ export class PantryComponent implements OnInit {
         this.loading = false;
       },
     });
+    this.loadUseSoon();
+  }
+
+  private loadUseSoon(): void {
+    this.pantryApi.getUseSoon().subscribe({
+      next: (useSoon) => (this.useSoon = useSoon),
+      error: () => (this.useSoon = null),
+    });
   }
 
   remove(item: PantryItem): void {
@@ -68,6 +110,7 @@ export class PantryComponent implements OnInit {
         this.items = this.items.filter((entry) => entry.id !== item.id);
         this.successMessage = `${item.ingredientName} wurde aus dem Vorrat entfernt.`;
         this.deletingItemId = null;
+        this.loadUseSoon();
       },
       error: () => {
         this.errorMessage = 'Der Artikel konnte nicht entfernt werden.';

@@ -22,5 +22,6 @@ public record DashboardDto(
         long cartItemCount,
         long pantryItemCount,
         boolean costTrackingEnabled,
-        CostSummaryService.CostSummaryDto cost) {
+        CostSummaryService.CostSummaryDto cost,
+        long expiringSoonCount) {
 }

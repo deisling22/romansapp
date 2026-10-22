@@ -18,6 +18,11 @@ public class DashboardController {
         return dashboardService.getDashboard();
     }
 
+    @GetMapping("/api/dashboard/week")
+    public WeekNutritionDto getWeek() {
+        return dashboardService.getWeek();
+    }
+
     @PatchMapping("/api/plan-entries/{planEntryId}/cook")
     public DashboardDto markCooked(@PathVariable Long planEntryId) {
         dashboardService.markCooked(planEntryId);

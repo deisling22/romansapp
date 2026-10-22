@@ -59,6 +59,9 @@
           <div><dt>Vitamin B12</dt><dd>{{ displayInteger(dashboard.vitaminB12Today) }} µg</dd></div>
           <div><dt>Folat</dt><dd>{{ displayInteger(dashboard.folateToday) }} µg</dd></div>
         </dl>
+        @if (week) {
+          <app-week-nutrition [week]="week" />
+        }
       }
       @if (dashboard.costTrackingEnabled && dashboard.cost; as cost) {
         <a class="stat-card cost-card" routerLink="/receipts" data-testid="cost-card">
@@ -101,7 +104,12 @@
             <svg viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2.5" /><path d="M4 12h16M10 8h4M10 16h4" /></svg>
           </span>
           <span class="label">Vorratsschrank</span>
-          <span class="value">{{ dashboard.pantryItemCount }} Artikel</span>
+          <span class="value">
+            @if (dashboard.expiringSoonCount) {
+              <span class="expiring" data-testid="expiring-soon">{{ dashboard.expiringSoonCount }} bald ablaufend · </span>
+            }
+            {{ dashboard.pantryItemCount }} Artikel
+          </span>
           <span class="chevron" aria-hidden="true">›</span>
         </a>
       </nav>

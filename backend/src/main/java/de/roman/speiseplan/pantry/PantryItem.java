@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "pantry_item")
@@ -30,6 +31,9 @@ public class PantryItem {
 
     @Column(name = "purchased_at", nullable = false)
     private Instant purchasedAt;
+
+    @Column(name = "expires_on")
+    private LocalDate expiresOn;
 
     protected PantryItem() {
     }
@@ -63,5 +67,13 @@ public class PantryItem {
 
     public void setQuantity(double quantity) {
         this.quantity = quantity;
+    }
+
+    public LocalDate getExpiresOn() {
+        return expiresOn;
+    }
+
+    public void setExpiresOn(LocalDate expiresOn) {
+        this.expiresOn = expiresOn;
     }
 }

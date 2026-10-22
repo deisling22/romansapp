@@ -76,6 +76,94 @@
   font: var(--text-subhead);
 }
 
+.expiry {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.expiry input {
+  min-width: 0;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--fill-strong);
+  color: var(--label);
+  font: var(--text-footnote);
+}
+
+.item-list li.soon .expiry-label {
+  color: var(--orange);
+  font-weight: 600;
+}
+
+.item-list li.expired .expiry-label {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.use-soon {
+  @include ios.card;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--orange);
+
+  h2 {
+    margin: 0 0 4px;
+    font: var(--text-headline);
+  }
+}
+
+.use-soon-items,
+.use-soon-hint {
+  margin: 0 0 6px;
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.use-soon-items span {
+  color: var(--label);
+  font-weight: 600;
+}
+
+.use-soon-dishes {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--label);
+    text-decoration: none;
+  }
+
+  img {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  span {
+    display: grid;
+    min-width: 0;
+  }
+
+  small {
+    color: var(--label-2);
+    font: var(--text-caption);
+  }
+}
+
 .empty {
   display: block !important;
   color: var(--label-2);

@@ -205,6 +205,27 @@ export interface DashboardData {
   pantryItemCount: number;
   costTrackingEnabled?: boolean;
   cost?: CostSummary | null;
+  expiringSoonCount?: number;
+}
+
+export interface WeekNutritionDay {
+  date: string;
+  meals: number;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+export interface WeekNutrition {
+  days: WeekNutritionDay[];
+  trackedDays: number;
+  averageCalories: number;
+  averageProtein: number;
+  averageCarbs: number;
+  averageFat: number;
+  calorieGoal: number | null;
+  proteinGoal: number | null;
 }
 
 export interface CostSummary {
@@ -280,6 +301,12 @@ export interface PantryItem {
   quantity: number;
   unit: string;
   purchasedAt: string;
+  expiresOn?: string | null;
+}
+
+export interface UseSoon {
+  items: PantryItem[];
+  dishes: Array<{ id: number; name: string; imageUrl: string | null; matchedIngredients: string[] }>;
 }
 
 export interface PlanRecommendation {

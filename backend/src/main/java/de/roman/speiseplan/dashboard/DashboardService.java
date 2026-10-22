@@ -148,7 +148,59 @@ public class DashboardService {
             shoppingListService.countItems(),
             pantryService.countItems(),
             profile.costTrackingEnabled(),
-            profile.costTrackingEnabled() ? costSummaryService.summarize(profile) : null);
+            profile.costTrackingEnabled() ? costSummaryService.summarize(profile) : null,
+            pantryService.countExpiringSoon());
+    }
+
+    /** Nutrition of the last 7 days (today included), one entry per day, oldest first. */
+    @Transactional(readOnly = true)
+    public WeekNutritionDto getWeek() {
+        ProfileDto profile = profileService.getProfile();
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDate today = LocalDate.now(zone);
+        LocalDate first = today.minusDays(6);
+        List<CookLog> logs = cookLogRepository.findByCookedAtGreaterThanEqualAndCookedAtLessThanOrderByCookedAtAsc(
+                first.atStartOfDay(zone).toInstant(), today.plusDays(1).atStartOfDay(zone).toInstant());
+        Map<Long, List<DishIngredient>> ingredientsByDish = loadIngredients(
+                logs.stream().map(entry -> entry.getDish().getId()).distinct().toList());
+        Map<LocalDate, List<CookLog>> byDay = logs.stream()
+                .collect(Collectors.groupingBy(entry -> LocalDate.ofInstant(entry.getCookedAt(), zone)));
+
+        double portion = profile.defaultPortionSize();
+        List<WeekNutritionDto.Day> days = new java.util.ArrayList<>();
+        for (LocalDate day = first; !day.isAfter(today); day = day.plusDays(1)) {
+            double calories = 0;
+            double protein = 0;
+            double carbs = 0;
+            double fat = 0;
+            List<CookLog> dayLogs = byDay.getOrDefault(day, List.of());
+            for (CookLog entry : dayLogs) {
+                Dish dish = entry.getDish();
+                List<DishIngredient> ingredients = ingredientsByDish.getOrDefault(dish.getId(), List.of());
+                calories += DishNutritionCalculator.caloriesPerServing(ingredients, dish.getServings()) * portion;
+                protein += DishNutritionCalculator.proteinPerServing(ingredients, dish.getServings()) * portion;
+                carbs += orZero(dish.getCarbsGrams()) * portion;
+                fat += orZero(dish.getFatGrams()) * portion;
+            }
+            days.add(new WeekNutritionDto.Day(day, dayLogs.size(), calories, protein, carbs, fat));
+        }
+
+        List<WeekNutritionDto.Day> tracked = days.stream().filter(day -> day.meals() > 0).toList();
+        Double proteinGoal = profile.bodyWeightKg() == null ? null : profile.bodyWeightKg() * 2;
+        return new WeekNutritionDto(
+                days,
+                tracked.size(),
+                average(tracked, WeekNutritionDto.Day::calories),
+                average(tracked, WeekNutritionDto.Day::protein),
+                average(tracked, WeekNutritionDto.Day::carbs),
+                average(tracked, WeekNutritionDto.Day::fat),
+                profile.calorieGoal(),
+                proteinGoal);
+    }
+
+    private static double average(
+            List<WeekNutritionDto.Day> days, java.util.function.ToDoubleFunction<WeekNutritionDto.Day> value) {
+        return days.stream().mapToDouble(value).average().orElse(0);
     }
 
     private static double orZero(Double value) {
