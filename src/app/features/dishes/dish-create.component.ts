@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { RecipeSyncService } from '../../core/recipe-sync.service';
 import { GamificationService } from '../../core/gamification.service';
@@ -10,7 +10,7 @@ import { GamificationService } from '../../core/gamification.service';
     templateUrl: './dish-create.component.html',
     styleUrls: ['./dish-create.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [RouterLink, FormsModule, ReactiveFormsModule]
 })
 export class DishCreateComponent implements OnInit, OnDestroy {
   readonly form = this.formBuilder.nonNullable.group({

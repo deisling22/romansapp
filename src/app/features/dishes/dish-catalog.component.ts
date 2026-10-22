@@ -4,13 +4,16 @@ import { EMPTY, Subject, catchError, debounceTime, startWith, switchMap } from '
 import { DishApiService } from '../../core/dish-api.service';
 import { DishCatalogEntry } from '../../core/models';
 import { AuthService, AuthenticatedUser } from '../../core/auth.service';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { StarRatingComponent } from '../../shared/star-rating.component';
 
 @Component({
     selector: 'app-dish-catalog',
     templateUrl: './dish-catalog.component.html',
     styleUrls: ['./dish-catalog.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [FormsModule, RouterLink, StarRatingComponent]
 })
 export class DishCatalogComponent implements OnInit {
   dishes: DishCatalogEntry[] = [];

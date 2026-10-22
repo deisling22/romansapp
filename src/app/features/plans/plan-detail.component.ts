@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { DashboardApiService } from '../../core/dashboard-api.service';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
@@ -8,13 +8,14 @@ import { ShareService } from '../../core/share.service';
 import { RecipeSyncService } from '../../core/recipe-sync.service';
 import { GamificationService } from '../../core/gamification.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-plan-detail',
     templateUrl: './plan-detail.component.html',
     styleUrls: ['./plans.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [RouterLink, FormsModule]
 })
 export class PlanDetailComponent implements OnInit, OnDestroy {
   dishes: Dish[] = [];

@@ -1,4 +1,4 @@
-import Dexie, { Table } from 'dexie';
+import type { OfflineDatabase } from './offline-db.dexie';
 
 export interface QueuedShoppingListUpdate {
   itemId: number;
@@ -44,29 +44,10 @@ export interface QueuedGamificationEvent {
   occurredAt: string;
 }
 
-export class OfflineDatabase extends Dexie {
-  shoppingListOutbox!: Table<QueuedShoppingListUpdate, number>;
-  mealPlans!: Table<LocalMealPlan, string>;
-  dishes!: Table<LocalDish, string>;
-  gamificationOutbox!: Table<QueuedGamificationEvent, string>;
+let database: Promise<OfflineDatabase> | null = null;
 
-  constructor() {
-    super('speiseplan-offline');
-    this.version(1).stores({
-      shoppingListOutbox: 'itemId, queuedAt',
-    });
-    this.version(2).stores({
-      shoppingListOutbox: 'itemId, queuedAt',
-      mealPlans: 'clientId, serverId, updatedAt',
-      dishes: 'clientId, planClientId, serverId, updatedAt',
-    });
-    this.version(3).stores({
-      shoppingListOutbox: 'itemId, queuedAt',
-      mealPlans: 'clientId, serverId, updatedAt',
-      dishes: 'clientId, planClientId, serverId, updatedAt',
-      gamificationOutbox: 'eventId, occurredAt, type',
-    });
-  }
+// Dexie is loaded on first use so it stays out of the initial bundle.
+export function openOfflineDatabase(): Promise<OfflineDatabase> {
+  database ??= import('./offline-db.dexie').then((module) => module.offlineDatabase);
+  return database;
 }
-
-export const offlineDatabase = new OfflineDatabase();

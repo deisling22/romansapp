@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-star-rating',
-  standalone: false,
-  templateUrl: './star-rating.component.html',
-  styleUrls: ['./star-rating.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
+    selector: 'app-star-rating',
+    templateUrl: './star-rating.component.html',
+    styleUrls: ['./star-rating.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [DecimalPipe],
 })
 export class StarRatingComponent {
   @Input() average: number | null = null;

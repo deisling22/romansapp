@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, CanDeactivateFn } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { ShoppingListItem } from '../../core/models';
@@ -8,6 +8,8 @@ import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.servi
 import { NotificationService } from '../../core/notification.service';
 import { GamificationService } from '../../core/gamification.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe, DecimalPipe } from '@angular/common';
 
 const CART_REMINDER_DELAY_MS = 60_000;
 const TOGGLE_SYNC_DELAY_MS = 300;
@@ -17,7 +19,7 @@ const TOGGLE_SYNC_DELAY_MS = 300;
     templateUrl: './shopping-list.component.html',
     styleUrls: ['./shopping-list.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [RouterLink, FormsModule, AsyncPipe, DecimalPipe]
 })
 export class ShoppingListComponent implements OnInit, OnDestroy {
   planId = 0;
@@ -275,7 +277,4 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     });
   }
 }
-
-export const pendingCartCheckoutGuard: CanDeactivateFn<ShoppingListComponent> = (component) =>
-  component.prepareForExit();
 

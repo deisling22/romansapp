@@ -1,17 +1,18 @@
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { PantryApiService } from '../../core/pantry-api.service';
 import {
   IngredientRecognitionService,
   RecognizedIngredient,
 } from './ingredient-recognition.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-ingredient-scan',
-  templateUrl: './ingredient-scan.component.html',
-  styleUrls: ['./ingredient-scan.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+    selector: 'app-ingredient-scan',
+    templateUrl: './ingredient-scan.component.html',
+    styleUrls: ['./ingredient-scan.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [RouterLink, FormsModule],
 })
 export class IngredientScanComponent implements OnDestroy {
   readonly units = ['Stk.', 'g', 'kg', 'ml', 'l', 'Packung'];

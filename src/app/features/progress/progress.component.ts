@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { GamificationProgress, GamificationService } from '../../core/gamification.service';
+import { NgIf, NgFor } from '@angular/common';
 
 @Component({
-  selector: 'app-progress',
-  standalone: false,
-  templateUrl: './progress.component.html',
-  styleUrls: ['./progress.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
+    selector: 'app-progress',
+    templateUrl: './progress.component.html',
+    styleUrls: ['./progress.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [NgIf, NgFor],
 })
 export class ProgressComponent implements OnInit {
   progress: GamificationProgress | null = null;

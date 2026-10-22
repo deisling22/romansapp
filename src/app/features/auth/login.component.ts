@@ -1,12 +1,13 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'app-login',
-  standalone: false,
-  templateUrl: './login.component.html',
-  styleUrls: ['./auth.component.scss'],
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./auth.component.scss'],
+    imports: [NgIf],
 })
 export class LoginComponent implements OnInit {
   isAuthenticated = false;

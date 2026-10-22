@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin, switchMap } from 'rxjs';
 import { DishApiService } from '../../core/dish-api.service';
 import { AuthService, AuthenticatedUser } from '../../core/auth.service';
@@ -9,13 +9,15 @@ import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { DishDetail, DishIngredientEntry, Ingredient, PantryItem, ShoppingListItem } from '../../core/models';
 import { ShareService } from '../../core/share.service';
 import { GamificationService } from '../../core/gamification.service';
+import { StarRatingComponent } from '../../shared/star-rating.component';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
     selector: 'app-dish-detail',
     templateUrl: './dish-detail.component.html',
     styleUrls: ['./dish-detail.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [RouterLink, StarRatingComponent, FormsModule, ReactiveFormsModule, DecimalPipe]
 })
 export class DishDetailComponent implements OnInit, OnDestroy {
   readonly ingredientForm = this.formBuilder.nonNullable.group({

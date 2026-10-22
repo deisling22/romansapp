@@ -1,16 +1,17 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProfileApiService } from '../../core/profile-api.service';
 import { OnboardingService } from '../../core/onboarding.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
 import { StapleItem } from '../../core/models';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
     selector: 'app-settings',
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, DecimalPipe]
 })
 export class SettingsComponent implements OnInit {
   readonly form = this.formBuilder.nonNullable.group({

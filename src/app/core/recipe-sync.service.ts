@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { ConnectivityService } from './connectivity.service';
-import { LocalDish, LocalMealPlan, offlineDatabase } from './offline-db';
+import { LocalDish, LocalMealPlan, openOfflineDatabase } from './offline-db';
 
 interface SyncDishResponse {
   serverId: number;
@@ -38,16 +38,19 @@ export class RecipeSyncService {
     });
   }
 
-  listPlans(): Promise<LocalMealPlan[]> {
-    return offlineDatabase.mealPlans.orderBy('updatedAt').reverse().toArray();
+  async listPlans(): Promise<LocalMealPlan[]> {
+    const db = await openOfflineDatabase();
+    return db.mealPlans.orderBy('updatedAt').reverse().toArray();
   }
 
-  getPlan(clientId: string): Promise<LocalMealPlan | undefined> {
-    return offlineDatabase.mealPlans.get(clientId);
+  async getPlan(clientId: string): Promise<LocalMealPlan | undefined> {
+    const db = await openOfflineDatabase();
+    return db.mealPlans.get(clientId);
   }
 
-  listDishes(planClientId: string): Promise<LocalDish[]> {
-    return offlineDatabase.dishes.where('planClientId').equals(planClientId).sortBy('updatedAt');
+  async listDishes(planClientId: string): Promise<LocalDish[]> {
+    const db = await openOfflineDatabase();
+    return db.dishes.where('planClientId').equals(planClientId).sortBy('updatedAt');
   }
 
   async createPlan(name: string): Promise<LocalMealPlan> {
@@ -56,13 +59,14 @@ export class RecipeSyncService {
       name: name.trim(),
       updatedAt: Date.now(),
     };
-    await offlineDatabase.mealPlans.add(plan);
+    await (await openOfflineDatabase()).mealPlans.add(plan);
     void this.sync();
     return plan;
   }
 
   async addDish(planClientId: string, name: string, image: Blob): Promise<LocalDish> {
-    if (!(await offlineDatabase.mealPlans.get(planClientId))) {
+    const db = await openOfflineDatabase();
+    if (!(await db.mealPlans.get(planClientId))) {
       throw new Error('Der lokale Plan wurde nicht gefunden.');
     }
     const dish: LocalDish = {
@@ -72,18 +76,19 @@ export class RecipeSyncService {
       image,
       updatedAt: Date.now(),
     };
-    await offlineDatabase.transaction('rw', offlineDatabase.mealPlans, offlineDatabase.dishes, async () => {
-      await offlineDatabase.dishes.add(dish);
-      await offlineDatabase.mealPlans.update(planClientId, { updatedAt: dish.updatedAt, syncedAt: undefined });
+    await db.transaction('rw', db.mealPlans, db.dishes, async () => {
+      await db.dishes.add(dish);
+      await db.mealPlans.update(planClientId, { updatedAt: dish.updatedAt, syncedAt: undefined });
     });
     void this.sync();
     return dish;
   }
 
   async deletePlan(clientId: string): Promise<void> {
-    await offlineDatabase.transaction('rw', offlineDatabase.mealPlans, offlineDatabase.dishes, async () => {
-      await offlineDatabase.dishes.where('planClientId').equals(clientId).delete();
-      await offlineDatabase.mealPlans.delete(clientId);
+    const db = await openOfflineDatabase();
+    await db.transaction('rw', db.mealPlans, db.dishes, async () => {
+      await db.dishes.where('planClientId').equals(clientId).delete();
+      await db.mealPlans.delete(clientId);
     });
   }
 
@@ -93,7 +98,7 @@ export class RecipeSyncService {
     }
     this.syncing = true;
     try {
-      const plans = await offlineDatabase.mealPlans.toArray();
+      const plans = await (await openOfflineDatabase()).mealPlans.toArray();
       const requestPlans = await Promise.all(plans.map(async (plan) => {
         const dishes = await this.listDishes(plan.clientId);
         return {
@@ -122,11 +127,12 @@ export class RecipeSyncService {
   }
 
   private async merge(serverPlans: SyncPlanResponse[]): Promise<void> {
-    await offlineDatabase.transaction('rw', offlineDatabase.mealPlans, offlineDatabase.dishes, async () => {
+    const db = await openOfflineDatabase();
+    await db.transaction('rw', db.mealPlans, db.dishes, async () => {
       for (const serverPlan of serverPlans) {
         const serverUpdatedAt = Date.parse(serverPlan.updatedAt);
-        const localPlan = await offlineDatabase.mealPlans.get(serverPlan.clientId);
-        await offlineDatabase.mealPlans.put({
+        const localPlan = await db.mealPlans.get(serverPlan.clientId);
+        await db.mealPlans.put({
           clientId: serverPlan.clientId,
           serverId: serverPlan.serverId,
           name: !localPlan || serverUpdatedAt >= localPlan.updatedAt ? serverPlan.name : localPlan.name,
@@ -135,8 +141,8 @@ export class RecipeSyncService {
         });
         for (const serverDish of serverPlan.dishes) {
           const serverDishUpdatedAt = Date.parse(serverDish.updatedAt);
-          const localDish = await offlineDatabase.dishes.get(serverDish.clientId);
-          await offlineDatabase.dishes.put({
+          const localDish = await db.dishes.get(serverDish.clientId);
+          await db.dishes.put({
             clientId: serverDish.clientId,
             planClientId: serverPlan.clientId,
             serverId: serverDish.serverId,

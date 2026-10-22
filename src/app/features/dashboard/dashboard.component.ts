@@ -3,13 +3,16 @@ import { DashboardApiService } from '../../core/dashboard-api.service';
 import { DashboardData, Recommendations } from '../../core/models';
 import { toAbsoluteImageUrl } from '../../core/image-url';
 import { RecommendationApiService } from '../../core/recommendation-api.service';
+import { MealScheduleComponent } from './meal-schedule.component';
+import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MealScheduleComponent, RouterLink, DecimalPipe]
 })
 export class DashboardComponent implements OnInit {
   dashboard: DashboardData | null = null;

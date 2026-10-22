@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { DashboardApiService } from '../../core/dashboard-api.service';
 import { GamificationService } from '../../core/gamification.service';
@@ -7,6 +7,7 @@ import { toAbsoluteImageUrl } from '../../core/image-url';
 import { MEAL_SLOT_LABELS, ReplacementSuggestion, Schedule, ScheduleDay, ScheduledMeal } from '../../core/models';
 import { NotificationService } from '../../core/notification.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
+import { DatePipe } from '@angular/common';
 
 const PREVIEW_DAYS = 7;
 const REMINDER_STORAGE_KEY = 'mealSchedule.lastReminderDate';
@@ -14,11 +15,14 @@ const REMINDER_STORAGE_KEY = 'mealSchedule.lastReminderDate';
 type Panel = { key: string; type: 'swap' | 'replace' };
 
 @Component({
-  selector: 'app-meal-schedule',
-  templateUrl: './meal-schedule.component.html',
-  styleUrls: ['./meal-schedule.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+    selector: 'app-meal-schedule',
+    templateUrl: './meal-schedule.component.html',
+    styleUrls: ['./meal-schedule.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [
+        RouterLink,
+        DatePipe,
+    ],
 })
 export class MealScheduleComponent implements OnInit {
   @Output() readonly changed = new EventEmitter<void>();

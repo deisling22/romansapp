@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { DishApiService } from '../../core/dish-api.service';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
@@ -7,6 +7,7 @@ import { GamificationService } from '../../core/gamification.service';
 import { Ingredient, MealPlan } from '../../core/models';
 import { OcrProgress, RecipeOcrService } from './recipe-ocr.service';
 import { ParsedIngredient, ParsedNutrition, ParsedStep, parseRecipeText } from './recipe-parser';
+import { FormsModule } from '@angular/forms';
 
 const HIGH_ACCURACY_ENABLED_KEY = 'recipeScan.highAccuracyEnabled';
 const HIGH_ACCURACY_DOWNLOADED_KEY = 'recipeScan.highAccuracyDownloaded';
@@ -22,11 +23,11 @@ const OCR_STATUS_LABELS: Record<string, string> = {
 };
 
 @Component({
-  selector: 'app-recipe-scan',
-  templateUrl: './recipe-scan.component.html',
-  styleUrls: ['./recipe-scan.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+    selector: 'app-recipe-scan',
+    templateUrl: './recipe-scan.component.html',
+    styleUrls: ['./recipe-scan.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [RouterLink, FormsModule],
 })
 export class RecipeScanComponent implements OnInit, OnDestroy {
   readonly units = [

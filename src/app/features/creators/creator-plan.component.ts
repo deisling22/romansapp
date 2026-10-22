@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { CreatorApiService } from '../../core/creator-api.service';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
@@ -7,11 +7,11 @@ import { CreatorDetail, CreatorPlan, Dish } from '../../core/models';
 import { ShareService } from '../../core/share.service';
 
 @Component({
-  selector: 'app-creator-plan',
-  templateUrl: './creator-plan.component.html',
-  styleUrls: ['./creators.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+    selector: 'app-creator-plan',
+    templateUrl: './creator-plan.component.html',
+    styleUrls: ['./creators.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [RouterLink],
 })
 export class CreatorPlanComponent implements OnInit {
   creator: CreatorDetail | null = null;

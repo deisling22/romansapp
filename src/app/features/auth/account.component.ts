@@ -1,12 +1,18 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AuthService, AuthenticatedUser } from '../../core/auth.service';
 import { GamificationProgress, GamificationService } from '../../core/gamification.service';
+import { NgIf, NgFor } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-account',
-  standalone: false,
-  templateUrl: './account.component.html',
-  styleUrls: ['./auth.component.scss'],
+    selector: 'app-account',
+    templateUrl: './account.component.html',
+    styleUrls: ['./auth.component.scss'],
+    imports: [
+        NgIf,
+        RouterLink,
+        NgFor,
+    ],
 })
 export class AccountComponent implements OnInit {
   user: AuthenticatedUser | null = null;

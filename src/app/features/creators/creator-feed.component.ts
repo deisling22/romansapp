@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CreatorApiService } from '../../core/creator-api.service';
 import { CreatorSummary } from '../../core/models';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-creator-feed',
-  templateUrl: './creator-feed.component.html',
-  styleUrls: ['./creators.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+    selector: 'app-creator-feed',
+    templateUrl: './creator-feed.component.html',
+    styleUrls: ['./creators.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [RouterLink],
 })
 export class CreatorFeedComponent implements OnInit {
   creators: CreatorSummary[] = [];

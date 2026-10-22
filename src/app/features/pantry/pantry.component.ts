@@ -1,13 +1,19 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { PantryApiService } from '../../core/pantry-api.service';
 import { PantryItem } from '../../core/models';
+import { RouterLink } from '@angular/router';
+import { DecimalPipe, DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-pantry',
-  templateUrl: './pantry.component.html',
-  styleUrls: ['./pantry.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+    selector: 'app-pantry',
+    templateUrl: './pantry.component.html',
+    styleUrls: ['./pantry.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [
+        RouterLink,
+        DecimalPipe,
+        DatePipe,
+    ],
 })
 export class PantryComponent implements OnInit {
   items: PantryItem[] = [];

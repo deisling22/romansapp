@@ -8,11 +8,10 @@ interface OnboardingStep {
 }
 
 @Component({
-  selector: 'app-onboarding-tour',
-  standalone: false,
-  templateUrl: './onboarding-tour.component.html',
-  styleUrls: ['./onboarding-tour.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
+    selector: 'app-onboarding-tour',
+    templateUrl: './onboarding-tour.component.html',
+    styleUrls: ['./onboarding-tour.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class OnboardingTourComponent {
   readonly steps: OnboardingStep[] = [

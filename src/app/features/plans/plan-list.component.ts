@@ -5,13 +5,15 @@ import { LocalMealPlan } from '../../core/offline-db';
 import { RecipeSyncService } from '../../core/recipe-sync.service';
 import { GamificationService } from '../../core/gamification.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-plan-list',
     templateUrl: './plan-list.component.html',
     styleUrls: ['./plans.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [FormsModule, RouterLink]
 })
 export class PlanListComponent implements OnInit {
   plans: MealPlan[] = [];

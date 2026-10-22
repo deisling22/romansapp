@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-import { GamificationEventType, QueuedGamificationEvent, offlineDatabase } from './offline-db';
+import { GamificationEventType, QueuedGamificationEvent, openOfflineDatabase } from './offline-db';
 
 export interface ProfileFrame {
   id: string;
@@ -96,7 +96,7 @@ export class GamificationService {
       referenceId,
       occurredAt: new Date().toISOString(),
     };
-    await offlineDatabase.gamificationOutbox.put(event);
+    await (await openOfflineDatabase()).gamificationOutbox.put(event);
     await this.sync();
   }
 
@@ -106,12 +106,13 @@ export class GamificationService {
     }
     this.syncing = true;
     try {
-      const events = await offlineDatabase.gamificationOutbox.toArray();
+      const db = await openOfflineDatabase();
+      const events = await db.gamificationOutbox.toArray();
       if (!events.length) {
         return;
       }
       await firstValueFrom(this.http.post(`${environment.apiUrl}/gamification/events`, { events }));
-      await offlineDatabase.gamificationOutbox.bulkDelete(events.map((event) => event.eventId));
+      await db.gamificationOutbox.bulkDelete(events.map((event) => event.eventId));
     } catch {
       // Events remain queued until the next successful online sync.
     } finally {

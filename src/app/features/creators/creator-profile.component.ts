@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CreatorApiService } from '../../core/creator-api.service';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { CreatorDetail } from '../../core/models';
@@ -8,11 +8,11 @@ import { AuthService } from '../../core/auth.service';
 import { NotificationService } from '../../core/notification.service';
 
 @Component({
-  selector: 'app-creator-profile',
-  templateUrl: './creator-profile.component.html',
-  styleUrls: ['./creators.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  standalone: false,
+    selector: 'app-creator-profile',
+    templateUrl: './creator-profile.component.html',
+    styleUrls: ['./creators.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    imports: [RouterLink],
 })
 export class CreatorProfileComponent implements OnInit {
   creator: CreatorDetail | null = null;
