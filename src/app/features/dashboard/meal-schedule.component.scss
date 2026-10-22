@@ -47,6 +47,11 @@ a {
   margin: 0;
 }
 
+// Reserves roughly the height of the loaded meal cards so the shortcuts below don't jump (CLS).
+.loading-placeholder {
+  min-height: 70vh;
+}
+
 .schedule-day {
   display: grid;
   gap: 10px;

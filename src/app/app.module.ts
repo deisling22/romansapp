@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXsrfConfiguration, withXhr } from '@angular/common/http';
 import { AuthInterceptor } from './auth.interceptor';
+import { ResilienceInterceptor } from './core/resilience.interceptor';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DishCreateComponent } from './features/dishes/dish-create.component';
 import { DishCatalogComponent } from './features/dishes/dish-catalog.component';
@@ -65,6 +66,7 @@ import { OnboardingTourComponent } from './features/onboarding/onboarding-tour.c
             headerName: 'X-XSRF-TOKEN',
         })),
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ResilienceInterceptor, multi: true },
     ] })
 export class AppModule { }
 

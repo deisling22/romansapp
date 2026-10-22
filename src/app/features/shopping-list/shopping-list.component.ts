@@ -10,6 +10,7 @@ import { GamificationService } from '../../core/gamification.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
 
 const CART_REMINDER_DELAY_MS = 60_000;
+const TOGGLE_SYNC_DELAY_MS = 300;
 
 @Component({
     selector: 'app-shopping-list',
@@ -33,6 +34,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   deletingItemId: number | null = null;
   finishingCheckout = false;
   private readonly reminderTimers = new Map<number, ReturnType<typeof setTimeout>>();
+  private readonly pendingToggles = new Map<number, { checked: boolean; timer: ReturnType<typeof setTimeout> }>();
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -56,6 +58,11 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
       clearTimeout(timer);
     }
     this.reminderTimers.clear();
+    for (const [itemId, pending] of this.pendingToggles) {
+      clearTimeout(pending.timer);
+      this.syncToggle(itemId, pending.checked);
+    }
+    this.pendingToggles.clear();
   }
 
   get openItems(): ShoppingListItem[] {
@@ -165,14 +172,27 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
       this.cancelReminder(item.id);
     }
 
+    // Rapid taps on the same row only send the final state.
+    const pending = this.pendingToggles.get(item.id);
+    if (pending) {
+      clearTimeout(pending.timer);
+    }
+    const timer = setTimeout(() => {
+      this.pendingToggles.delete(item.id);
+      this.syncToggle(item.id, checked);
+    }, TOGGLE_SYNC_DELAY_MS);
+    this.pendingToggles.set(item.id, { checked, timer });
+  }
+
+  private syncToggle(itemId: number, checked: boolean): void {
     if (!this.connectivity.isOnline) {
-      void this.outbox.queue(item.id, checked);
+      void this.outbox.queue(itemId, checked);
       return;
     }
 
-    this.shoppingListApi.updateItem(item.id, checked).subscribe({
+    this.shoppingListApi.updateItem(itemId, checked).subscribe({
       error: () => {
-        void this.outbox.queue(item.id, checked);
+        void this.outbox.queue(itemId, checked);
       },
     });
   }

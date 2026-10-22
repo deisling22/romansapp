@@ -7,6 +7,9 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:speiseplan;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1}
     username: ${SPRING_DATASOURCE_USERNAME:sa}
     password: ${SPRING_DATASOURCE_PASSWORD:}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      connection-timeout: 5000
   jpa:
     hibernate:
       ddl-auto: validate
@@ -19,6 +22,16 @@ spring:
 
 server:
   port: ${PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 2KB
+  tomcat:
+    # Bounded so bursts queue up instead of exhausting the small instance's memory.
+    threads:
+      max: ${TOMCAT_MAX_THREADS:40}
+    accept-count: 100
+    connection-timeout: 10s
   servlet:
     session:
       cookie:

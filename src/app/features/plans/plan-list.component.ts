@@ -20,6 +20,7 @@ export class PlanListComponent implements OnInit {
   errorMessage = '';
   newPlanName = '';
   creating = false;
+  busyPlanId: number | null = null;
 
   constructor(
     private readonly mealPlanApi: MealPlanApiService,
@@ -83,12 +84,18 @@ export class PlanListComponent implements OnInit {
   toggleActive(plan: MealPlan, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+    if (this.busyPlanId !== null) {
+      return;
+    }
+    this.busyPlanId = plan.id;
     this.scheduleApi.updatePlanSettings(plan.id, { active: !plan.active }).subscribe({
       next: (updated) => {
         this.plans = this.plans.map((entry) => (entry.id === updated.id ? updated : entry));
+        this.busyPlanId = null;
       },
       error: () => {
         this.errorMessage = 'Der Plan konnte nicht aktiviert werden.';
+        this.busyPlanId = null;
       },
     });
   }
@@ -96,10 +103,18 @@ export class PlanListComponent implements OnInit {
   copyPlan(plan: MealPlan, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+    if (this.busyPlanId !== null) {
+      return;
+    }
+    this.busyPlanId = plan.id;
     this.mealPlanApi.copyPlan(plan.id).subscribe({
-      next: () => this.load(),
+      next: () => {
+        this.busyPlanId = null;
+        this.load();
+      },
       error: () => {
         this.errorMessage = 'Der Plan konnte nicht kopiert werden.';
+        this.busyPlanId = null;
       },
     });
   }
@@ -107,13 +122,18 @@ export class PlanListComponent implements OnInit {
   deletePlan(plan: MealPlan, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    if (!confirm(`Plan "${plan.name}" wirklich löschen?`)) {
+    if (this.busyPlanId !== null || !confirm(`Plan "${plan.name}" wirklich löschen?`)) {
       return;
     }
+    this.busyPlanId = plan.id;
     this.mealPlanApi.deletePlan(plan.id).subscribe({
-      next: () => this.load(),
+      next: () => {
+        this.busyPlanId = null;
+        this.load();
+      },
       error: () => {
         this.errorMessage = 'Der Plan konnte nicht gelöscht werden.';
+        this.busyPlanId = null;
       },
     });
   }

@@ -1,4 +1,6 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, DestroyRef, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, Subject, catchError, debounceTime, startWith, switchMap } from 'rxjs';
 import { DishApiService } from '../../core/dish-api.service';
 import { DishCatalogEntry } from '../../core/models';
 import { AuthService, AuthenticatedUser } from '../../core/auth.service';
@@ -18,6 +20,8 @@ export class DishCatalogComponent implements OnInit {
   currentUser: AuthenticatedUser | null = null;
   loading = true;
   errorMessage = '';
+  private readonly filterChanges = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(readonly dishApi: DishApiService, private readonly authService: AuthService) {}
 
@@ -26,24 +30,31 @@ export class DishCatalogComponent implements OnInit {
       next: (user) => (this.currentUser = user),
       error: () => (this.currentUser = null),
     });
-    this.load();
+    // Typing fires one request after a short pause; switchMap drops stale responses.
+    this.filterChanges
+      .pipe(
+        debounceTime(250),
+        startWith(undefined),
+        switchMap(() => {
+          this.loading = true;
+          return this.dishApi.search(this.search.trim(), this.tag.trim(), this.favoritesOnly).pipe(
+            catchError(() => {
+              this.errorMessage = 'Die Gerichte konnten nicht geladen werden.';
+              this.loading = false;
+              return EMPTY;
+            }),
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((dishes) => {
+        this.dishes = dishes;
+        this.errorMessage = '';
+        this.loading = false;
+      });
   }
 
   onFilterChange(): void {
-    this.load();
-  }
-
-  private load(): void {
-    this.loading = true;
-    this.dishApi.search(this.search.trim(), this.tag.trim(), this.favoritesOnly).subscribe({
-      next: (dishes) => {
-        this.dishes = dishes;
-        this.loading = false;
-      },
-      error: () => {
-        this.errorMessage = 'Die Gerichte konnten nicht geladen werden.';
-        this.loading = false;
-      },
-    });
+    this.filterChanges.next();
   }
 }

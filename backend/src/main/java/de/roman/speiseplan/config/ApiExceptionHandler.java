@@ -1,6 +1,8 @@
 package de.roman.speiseplan.config;
 
 import java.time.Instant;
+import org.springframework.dao.ConcurrencyFailureException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,6 +24,13 @@ public class ApiExceptionHandler {
         HttpStatus status = HttpStatus.PAYLOAD_TOO_LARGE;
         return ResponseEntity.status(status)
                 .body(new ApiError(status.value(), "Das Bild ist zu groß. Bitte wähle eine kleinere Datei.", Instant.now()));
+    }
+
+    @ExceptionHandler({ConcurrencyFailureException.class, DataIntegrityViolationException.class})
+    public ResponseEntity<ApiError> handleConflict(RuntimeException exception) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        return ResponseEntity.status(status)
+                .body(new ApiError(status.value(), "Die Daten wurden gerade parallel geändert. Bitte erneut versuchen.", Instant.now()));
     }
 
     public record ApiError(int status, String message, Instant timestamp) {

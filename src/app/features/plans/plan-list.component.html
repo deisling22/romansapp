@@ -64,12 +64,13 @@
               class="active-toggle"
               [class.is-active]="plan.active"
               [attr.aria-pressed]="plan.active"
+              [disabled]="busyPlanId !== null"
               (click)="toggleActive(plan, $event)"
               [title]="plan.active ? 'Plan pausieren' : 'Plan aktivieren'">
               {{ plan.active ? '●' : '○' }}
             </button>
-            <button type="button" (click)="copyPlan(plan, $event)" title="Plan kopieren">⧉</button>
-            <button type="button" (click)="deletePlan(plan, $event)" title="Plan löschen">✕</button>
+            <button type="button" [disabled]="busyPlanId !== null" (click)="copyPlan(plan, $event)" title="Plan kopieren">⧉</button>
+            <button type="button" [disabled]="busyPlanId !== null" (click)="deletePlan(plan, $event)" title="Plan löschen">✕</button>
           </span>
           <span class="chevron" aria-hidden="true">›</span>
         </a>

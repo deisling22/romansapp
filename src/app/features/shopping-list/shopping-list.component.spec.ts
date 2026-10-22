@@ -13,11 +13,12 @@ import { ShoppingListComponent } from './shopping-list.component';
 describe('ShoppingListComponent reminders', () => {
   let component: ShoppingListComponent;
   let notifications: jasmine.SpyObj<NotificationService>;
+  let api: jasmine.SpyObj<ShoppingListApiService>;
   let item: ShoppingListItem;
 
   beforeEach(() => {
     const route = { snapshot: { paramMap: { get: () => null } } } as unknown as ActivatedRoute;
-    const api = jasmine.createSpyObj<ShoppingListApiService>('ShoppingListApiService', ['updateItem']);
+    api = jasmine.createSpyObj<ShoppingListApiService>('ShoppingListApiService', ['updateItem']);
     api.updateItem.and.returnValue(of({} as ShoppingListItem));
     const connectivity = { isOnline: true } as ConnectivityService;
     const outbox = jasmine.createSpyObj<ShoppingListOutboxService>('ShoppingListOutboxService', ['queue']);
@@ -48,5 +49,15 @@ describe('ShoppingListComponent reminders', () => {
     tick(60_000);
 
     expect(notifications.show).not.toHaveBeenCalled();
+  }));
+
+  it('sends only the final state when an item is tapped repeatedly', fakeAsync(() => {
+    component.toggle(item);
+    component.toggle(item);
+    component.toggle(item);
+    tick(300);
+
+    expect(api.updateItem).toHaveBeenCalledOnceWith(7, true);
+    tick(60_000);
   }));
 });

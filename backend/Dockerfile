@@ -14,6 +14,7 @@ WORKDIR /app
 COPY --from=build /workspace/target/speiseplan-backend-0.0.1-SNAPSHOT.jar app.jar
 
 ENV PORT=8080
+ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=70 -Xss512k -XX:+ExitOnOutOfMemoryError"
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
