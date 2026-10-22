@@ -16,6 +16,8 @@ export class DashboardComponent implements OnInit {
   loading = true;
   errorMessage = '';
   recommendations: Recommendations | null = null;
+  readonly todayLabel = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
+    .format(new Date());
 
   constructor(
     readonly dashboardApi: DashboardApiService,
@@ -28,6 +30,10 @@ export class DashboardComponent implements OnInit {
 
   displayInteger(value: number): string {
     return Math.trunc(value).toString();
+  }
+
+  ringPercent(percent: number | null): number {
+    return Math.max(0, Math.min(100, percent ?? 0));
   }
 
   ngOnInit(): void {

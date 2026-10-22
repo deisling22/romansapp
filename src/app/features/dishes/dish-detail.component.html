@@ -132,7 +132,7 @@
               } @else {
                 <span class="stock-state missing">
                   @if (cartQuantity(ingredient) >= missingQuantity(ingredient)) {
-                    Im Warenkorb
+                    Auf der Liste
                   } @else {
                     {{ missingQuantity(ingredient) | number:'1.0-2' }} {{ ingredient.unit }} fehlen
                   }
@@ -151,10 +151,10 @@
           class="missing-action"
           [disabled]="addingMissingIngredients"
           (click)="addMissingIngredientsToCart()">
-          {{ addingMissingIngredients ? 'Wird ergänzt ...' : 'Fehlende Zutaten in den Warenkorb' }}
+          {{ addingMissingIngredients ? 'Wird ergänzt ...' : 'Fehlende Zutaten auf die Einkaufsliste' }}
         </button>
       } @else if (pantryLoaded && missingIngredients.length > 0) {
-        <a class="cart-link" routerLink="/shopping-list">Fehlende Zutaten sind im Warenkorb</a>
+        <a class="cart-link" routerLink="/shopping-list">Fehlende Zutaten stehen auf der Einkaufsliste</a>
       }
       @if (successMessage) {
         <p class="success-message" role="status">{{ successMessage }}</p>

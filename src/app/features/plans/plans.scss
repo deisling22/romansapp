@@ -1,375 +1,206 @@
+@use '../../../styles/ios';
+
 :host {
   display: block;
 }
 
-.screen {
-  box-sizing: border-box;
-  margin: 0 auto;
-  max-width: 760px;
-  min-height: 100vh;
-  padding: 32px 20px 112px;
-}
-
-.page-header {
-  margin-bottom: 28px;
-}
-
-.page-header.compact {
-  margin-bottom: 20px;
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  color: #26736f;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-h1,
-h2,
-p {
-  margin-top: 0;
-}
-
-h1 {
-  margin-bottom: 10px;
-  color: #16342f;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 2.4rem;
-  line-height: 1.05;
-}
-
 .share-heading {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
 }
 
 .share-button {
-  flex: 0 0 auto;
-  min-height: 38px;
-  border: 1px solid #26736f;
-  border-radius: 6px;
-  background: #ffffff;
-  color: #26736f;
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 800;
-  padding: 0 12px;
-}
-
-.share-success {
-  border-color: #26736f;
-}
-
-.intro {
-  color: #54716d;
-  line-height: 1.55;
+  @include ios.button-tinted;
+  @include ios.button-small;
 }
 
 .plan-list,
 .dish-grid {
   display: grid;
   gap: 12px;
+  margin-bottom: 20px;
+}
+
+.plan-list {
+  @include ios.grouped-list;
+  gap: 0;
 }
 
 .new-plan {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 20px;
 }
 
 .new-plan input {
-  box-sizing: border-box;
   flex: 1;
-  min-height: 48px;
-  border: 1px solid #aac9ba;
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 10px 12px;
-  color: #16342f;
-  font: inherit;
 }
 
 .new-plan button {
-  min-height: 48px;
-  border: 0;
-  border-radius: 8px;
-  background: #e06c47;
-  color: #ffffff;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  padding: 0 16px;
+  @include ios.button-filled;
+  min-height: 44px;
   white-space: nowrap;
 }
 
-.new-plan button:disabled {
-  cursor: wait;
-  opacity: 0.65;
-}
-
-.plan-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.plan-actions button {
-  min-width: 36px;
-  min-height: 36px;
-  border: 1px solid #d7e5dd;
-  border-radius: 6px;
-  background: #ffffff;
-  color: #26736f;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-
 .plan-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  border: 1px solid #d7e5dd;
-  border-radius: 8px;
-  background: #ffffff;
-  color: inherit;
-  min-height: 76px;
-  padding: 12px;
+  @include ios.grouped-row;
+  min-height: 60px;
+  color: var(--label);
   text-decoration: none;
 }
 
-.plan-row:focus-visible,
-.plan-row:hover {
-  border-color: #26736f;
+.plan-row:hover,
+.plan-row:focus-visible {
+  background: var(--fill);
 }
 
 .plan-mark {
   display: grid;
+  flex: none;
+  width: 40px;
+  height: 40px;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #e4f0d4;
-  color: #204e43;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.4rem;
+  border-radius: 10px;
+  background: var(--tint-soft);
+  color: var(--tint-text);
+  font: var(--text-headline);
 }
 
 .plan-copy {
   display: grid;
-  gap: 3px;
   flex: 1;
+  gap: 1px;
+  min-width: 0;
+}
+
+.plan-copy strong {
+  overflow: hidden;
+  font: var(--text-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .plan-copy small {
-  color: #6b827d;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.plan-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.plan-actions button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--fill);
+  color: var(--label-2);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.plan-actions .active-toggle.is-active {
+  background: var(--tint-soft);
+  color: var(--tint-text);
 }
 
 .chevron {
-  color: #26736f;
-  font-size: 2rem;
+  color: var(--label-3);
+  font-size: 1.5rem;
   line-height: 1;
 }
 
-.status {
-  border-left: 3px solid #94b8a5;
-  color: #4e6661;
-  padding: 12px 14px;
+.plan-settings {
+  @include ios.grouped-list;
+  margin-bottom: 20px;
 }
 
-.error {
-  border-color: #b54636;
-  color: #8d2d21;
+.toggle-row {
+  @include ios.grouped-row;
+  justify-content: space-between;
+  color: var(--label);
+  font: var(--text-body);
 }
 
-.back-link {
-  display: inline-block;
-  margin-bottom: 24px;
-  color: #26736f;
-  font-weight: 700;
-  text-decoration: none;
+.toggle-row small {
+  display: block;
+  color: var(--label-2);
+  font: var(--text-footnote);
 }
 
 .dish-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+@media (min-width: 640px) {
+  .dish-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .dish-card {
+  @include ios.card;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  border: 1px solid #d7e5dd;
-  border-radius: 8px;
-  background: #ffffff;
 }
 
 .dish-card img {
   display: block;
   width: 100%;
-  aspect-ratio: 1 / 0.78;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-  background: #e9eee9;
+  background: var(--fill);
 }
 
 .dish-card h2 {
+  flex: 1;
   margin: 0;
-  padding: 12px;
-  color: #16342f;
-  font-size: 1rem;
+  padding: 10px 12px 8px;
+  color: var(--label);
+  font: var(--text-headline);
 }
 
-.dish-card.cooked {
-  opacity: 0.7;
+.dish-card.cooked img {
+  opacity: 0.55;
 }
 
 .slot-select {
   display: block;
-  margin: 0 12px 8px;
+  margin: 0 10px 8px;
 }
 
 .slot-select select {
-  box-sizing: border-box;
-  width: 100%;
   min-height: 36px;
-  border: 1px solid #d7e5dd;
-  border-radius: 6px;
-  background: #ffffff;
-  color: #16342f;
-  font: inherit;
-  font-size: 0.82rem;
-}
-
-.plan-settings {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 16px;
-  border: 1px solid #d7e5dd;
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 12px 14px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  color: #16342f;
-}
-
-.checkbox-label input {
-  width: 20px;
-  height: 20px;
-  accent-color: #26736f;
-}
-
-.plan-actions .active-toggle.is-active {
-  border-color: #26736f;
-  background: #e4f0d4;
+  padding: 6px 10px;
+  font: var(--text-subhead);
 }
 
 .cook-button {
-  display: block;
-  box-sizing: border-box;
-  width: calc(100% - 24px);
-  margin: 0 12px 12px;
-  border: 0;
-  border-radius: 6px;
-  background: #26736f;
-  color: #ffffff;
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  min-height: 36px;
+  @include ios.button-tinted;
+  @include ios.button-small;
+  margin: 0 10px 10px;
 }
 
-.cook-button:disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-
-.scan-recipe-link {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
-  margin-bottom: 16px;
-  border: 1px dashed #26736f;
-  border-radius: 8px;
-  background: #edf4ef;
-  color: #26736f;
-  min-height: 50px;
-  padding: 14px 16px;
-  font-weight: 800;
-  text-align: center;
-  text-decoration: none;
+.plan-footer {
+  display: grid;
+  gap: 10px;
 }
 
 .primary-action {
-  position: fixed;
-  right: max(20px, calc((100vw - 720px) / 2));
-  bottom: 76px;
-  display: block;
-  box-sizing: border-box;
-  border-radius: 8px;
-  background: #e06c47;
-  color: #ffffff;
-  min-height: 52px;
-  padding: 16px 20px;
-  font-weight: 700;
-  text-align: center;
-  text-decoration: none;
+  @include ios.button-filled;
 }
 
 .secondary-action {
-  position: fixed;
-  left: max(20px, calc((100vw - 720px) / 2));
-  bottom: 76px;
-  display: block;
-  box-sizing: border-box;
-  border: 1px solid #26736f;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #26736f;
-  min-height: 52px;
-  padding: 16px 20px;
-  font-weight: 700;
-  font: inherit;
-  text-align: center;
-  text-decoration: none;
+  @include ios.button-tinted;
 }
 
-.secondary-action:disabled {
-  cursor: wait;
-  opacity: 0.6;
-}
-
-@media (max-width: 639px) {
-  .screen {
-    padding-bottom: 164px;
-  }
-
-  .secondary-action,
-  .primary-action {
-    min-height: 64px;
-    padding: 10px 12px;
-  }
-
-  .secondary-action {
-    right: calc(50% + 5px);
-  }
-
-  .primary-action {
-    left: calc(50% + 5px);
-  }
-}
-
-
-@media (min-width: 640px) {
-  .dish-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.scan-recipe-link {
+  @include ios.button-gray;
 }

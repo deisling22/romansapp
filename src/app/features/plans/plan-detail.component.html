@@ -3,7 +3,7 @@
   <header class="page-header compact">
     <p class="eyebrow">Dein Plan</p>
     <div class="share-heading">
-      <h1>{{ localPlanName || 'Gerichte' }}</h1>
+      <h1>{{ localPlanName || plan?.name || 'Gerichte' }}</h1>
       <button type="button" class="share-button" (click)="sharePlan()">Teilen</button>
     </div>
   </header>
@@ -24,21 +24,29 @@
 
   @if (!isLocal && plan) {
     <section class="plan-settings" aria-label="Plan-Einstellungen">
-      <label class="checkbox-label">
+      <label class="toggle-row">
+        <span>
+          Aktiv
+          <small>Gerichte erscheinen automatisch unter „Als Nächstes“.</small>
+        </span>
         <input
           type="checkbox"
+          class="switch"
           [checked]="plan.active"
           [disabled]="savingSettings"
           (change)="updateSettings({ active: !plan.active })" />
-        Aktiv – Gerichte erscheinen automatisch in „Als Nächstes“
       </label>
-      <label class="checkbox-label">
+      <label class="toggle-row">
+        <span>
+          Reste als Mittagessen
+          <small>Abends doppelt kochen, am nächsten Tag mittags essen.</small>
+        </span>
         <input
           type="checkbox"
+          class="switch"
           [checked]="plan.leftoversForLunch"
           [disabled]="savingSettings"
           (change)="updateSettings({ leftoversForLunch: !plan.leftoversForLunch })" />
-        Abends doppelt kochen – Reste als Mittagessen am nächsten Tag
       </label>
     </section>
   }
@@ -69,7 +77,7 @@
               class="cook-button"
               [disabled]="dish.cooked || cookingDishId === dish.id"
               (click)="markCooked(dish)">
-              {{ dish.cooked ? 'Gekocht' : cookingDishId === dish.id ? 'Wird gespeichert ...' : 'Als gekocht markieren' }}
+              {{ dish.cooked ? '✓ Gekocht' : cookingDishId === dish.id ? 'Wird gespeichert ...' : 'Gekocht' }}
             </button>
           }
         </article>
@@ -80,17 +88,19 @@
     </section>
   }
 
-  @if (!isLocal) {
-    <a class="scan-recipe-link" [routerLink]="['/plans', planId, 'dishes', 'scan']">Rezept scannen</a>
-    <button
-      type="button"
-      class="secondary-action"
-      [disabled]="addingToCart || dishes.length === 0"
-      (click)="addIngredientsToCart()">
-      {{ addingToCart ? 'Wird hinzugefügt ...' : 'Zutaten in den Warenkorb' }}
-    </button>
-  }
-  <a class="primary-action" [routerLink]="isLocal
-      ? ['/local-plans', localClientId, 'dishes', 'new']
-      : ['/plans', planId, 'dishes', 'new']">Gericht hinzufügen</a>
+  <div class="plan-footer">
+    <a class="primary-action" [routerLink]="isLocal
+        ? ['/local-plans', localClientId, 'dishes', 'new']
+        : ['/plans', planId, 'dishes', 'new']">Gericht hinzufügen</a>
+    @if (!isLocal) {
+      <button
+        type="button"
+        class="secondary-action"
+        [disabled]="addingToCart || dishes.length === 0"
+        (click)="addIngredientsToCart()">
+        {{ addingToCart ? 'Wird hinzugefügt ...' : 'Zutaten auf die Einkaufsliste' }}
+      </button>
+      <a class="scan-recipe-link" [routerLink]="['/plans', planId, 'dishes', 'scan']">Rezept scannen</a>
+    }
+  </div>
 </main>

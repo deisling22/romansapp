@@ -1,0 +1,126 @@
+// iOS-27-inspired building blocks ("fully tinted": solid surfaces, no translucency).
+// Tokens live in src/styles.scss so they can switch with light/dark/increased-contrast.
+
+@mixin card {
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+@mixin grouped-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  list-style: none;
+}
+
+@mixin grouped-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 11px 16px;
+
+  & + & {
+    border-top: 0.5px solid var(--separator);
+  }
+}
+
+@mixin section-title {
+  margin: 0 0 8px;
+  padding: 0 4px;
+  color: var(--label);
+  font: var(--text-title3);
+}
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  min-height: 50px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font: var(--text-headline);
+  text-align: center;
+  text-decoration: none;
+  transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease;
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+}
+
+@mixin button-filled {
+  @include button-base;
+  background: var(--tint);
+  color: var(--on-tint);
+}
+
+@mixin button-tinted {
+  @include button-base;
+  background: var(--tint-soft);
+  color: var(--tint-text);
+}
+
+@mixin button-gray {
+  @include button-base;
+  background: var(--fill);
+  color: var(--label);
+}
+
+@mixin button-destructive {
+  @include button-base;
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+@mixin button-small {
+  min-height: 36px;
+  padding: 0 14px;
+  font: var(--text-subhead-strong);
+}
+
+@mixin button-plain {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--tint-text);
+  cursor: pointer;
+  font: var(--text-body);
+}
+
+@mixin chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  background: var(--fill);
+  color: var(--label-2);
+  font: var(--text-caption-strong);
+  white-space: nowrap;
+}
+
+@mixin thumb($size) {
+  flex: none;
+  width: $size;
+  height: $size;
+  border-radius: var(--radius-s);
+  object-fit: cover;
+  background: var(--fill);
+}

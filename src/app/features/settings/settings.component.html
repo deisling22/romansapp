@@ -58,8 +58,8 @@
       <label for="calorieGoal">Zielkalorien pro Tag (optional)</label>
       <input id="calorieGoal" type="number" min="0" placeholder="z. B. 2200" formControlName="calorieGoal" />
       <label class="checkbox-label" for="nutritionTrackingEnabled">
-        <input id="nutritionTrackingEnabled" type="checkbox" formControlName="nutritionTrackingEnabled" />
-        Vitamine &amp; weitere Makronährstoffe (Kohlenhydrate, Fett) zusätzlich verfolgen
+        <span>Vitamine &amp; weitere Makronährstoffe (Kohlenhydrate, Fett) zusätzlich verfolgen</span>
+        <input id="nutritionTrackingEnabled" type="checkbox" class="switch" formControlName="nutritionTrackingEnabled" />
       </label>
       @if (errorMessage) {
         <p class="field-error" role="alert">{{ errorMessage }}</p>

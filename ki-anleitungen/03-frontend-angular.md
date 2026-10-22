@@ -50,6 +50,29 @@ in HTML verwenden.
 - Lade-, Leer- und Fehlerzustand fuer Plan- und Gerichtsliste darstellen.
 - Waehrend Upload: Submit deaktivieren und Fortschritts-/Ladetext zeigen.
 - Fehlermeldungen des Backends nahe am Formular anzeigen, ohne die Eingabe zu verlieren.
+
+## Designsystem (Stand 22.10.2026, angelehnt an iOS 27)
+
+- Vorbilder: Apple-Design-Award-2026-Apps (Tide Guide: klare Datendarstellung,
+  Moonlitt: native Bedienelemente, Structured: scanbarer Tagesablauf, Guitar Wiz:
+  Dynamic Type/Kontrast/nicht nur Farbe, The Outsiders: Fortschrittsringe) und
+  Apple-Systemapps (Erinnerungen, Einstellungen, Health).
+- iOS 27 erlaubt Liquid Glass "voll eingefaerbt": wir nutzen **nur opake Flaechen**,
+  keine Transparenz/Blur. Tab-Bar, Menues und Toasts sind immer voll sichtbar.
+- Tokens in `src/styles.scss` (Farben, Schriftstufen, Radien, Schatten) mit Hell-/Dunkel-
+  und Hochkontrast-Varianten; wiederverwendbare Mixins in `src/styles/_ios.scss`
+  (`card`, `grouped-list`, `grouped-row`, `button-filled|tinted|gray|small|plain`, `chip`).
+  Komponenten nutzen `@use '../../../styles/ios';` und nur `var(--...)`-Farben,
+  keine Hex-Werte ausser bewusst feste Farben (z. B. Icon-Kacheln, Reels).
+- Schrift: Systemschrift (`-apple-system`/SF Pro), Groessen in rem nach iOS-Textstilen
+  (Large Title 34, Title 1-3, Headline/Body 17, Subhead 15, Footnote 13, Caption 12).
+- Akzentfarbe "Basilikum" `#1a7a43` (dunkel `#30d158`), Status immer mit Text/Symbol
+  zusaetzlich zur Farbe (✓, ≡, !, ↺).
+- Navigation: schwebende, opake Tab-Bar (Heute, Plaene, Gerichte, Einkauf) plus runder
+  Aktionsknopf fuer Scannen und weitere Bereiche. Schalter (`input.switch`) statt Checkboxen
+  fuer Einstellungen, abgerundete Abhak-Kreise in der Einkaufsliste.
+- Globale Formularstile stehen in `:where(...)` (Spezifitaet 0), damit Komponenten sie
+  ohne `!important` ueberschreiben koennen.
 ## Akzeptanzkriterien
 
 - [ ] `npm run start` zeigt das Dashboard sowie unter `/plans` die Daten des Backends.

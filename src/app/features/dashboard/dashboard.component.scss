@@ -1,50 +1,12 @@
+@use '../../../styles/ios';
+
 :host {
   display: block;
 }
 
-.screen {
-  box-sizing: border-box;
-  margin: 0 auto;
-  max-width: 760px;
-  min-height: 100vh;
-  padding: 32px 20px 40px;
-}
-
-.page-header {
-  margin-bottom: 28px;
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  color: #26736f;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-h1 {
-  margin: 0;
-  color: #16342f;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 2.4rem;
-  line-height: 1.05;
-}
-
-.status {
-  border-left: 3px solid #94b8a5;
-  color: #4e6661;
-  padding: 12px 14px;
-}
-
-.error {
-  border-color: #b54636;
-  color: #8d2d21;
-}
-
 .dashboard {
   display: grid;
-  gap: 20px;
+  gap: 24px;
 }
 
 .stat-grid {
@@ -53,188 +15,214 @@ h1 {
   gap: 12px;
 }
 
-.nutrition-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-@media (max-width: 520px) {
-  .nutrition-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 .stat-card {
+  @include ios.card;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+}
+
+/* Fortschrittsring wie in Fitness/Health: conic-gradient mit ausgestanztem Innenkreis. */
+.ring {
+  --ring-color: var(--tint);
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: conic-gradient(var(--ring-color) calc(var(--p, 0) * 1%), var(--fill-strong) 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+}
+
+.ring.protein {
+  --ring-color: var(--orange);
+}
+
+.stat-copy {
   display: grid;
-  gap: 4px;
-  border: 1px solid #d7e5dd;
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 16px;
+  gap: 2px;
+  min-width: 0;
 }
 
 .stat-label {
-  color: #6b827d;
-  font-size: 0.82rem;
-  font-weight: 700;
+  color: var(--label-2);
+  font: var(--text-footnote);
+  font-weight: 600;
 }
 
 .stat-value {
-  color: #16342f;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.6rem;
+  color: var(--label);
+  font: var(--text-number);
+}
+
+.stat-value small {
+  color: var(--label-2);
+  font: var(--text-subhead-strong);
 }
 
 .stat-sub {
-  color: #6b827d;
-  font-size: 0.8rem;
-}
-
-progress {
-  width: 100%;
-  height: 6px;
-  margin-top: 6px;
-  border: 0;
-  border-radius: 999px;
   overflow: hidden;
-  background: #dce8df;
+  color: var(--label-2);
+  font: var(--text-caption);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-progress::-webkit-progress-bar {
-  background: #dce8df;
-}
-
-progress::-webkit-progress-value {
-  background: #26736f;
-}
-
-progress::-moz-progress-bar {
-  background: #26736f;
-}
-
-.action-widgets {
+.nutrition-list {
+  @include ios.card;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  margin: 0;
+  padding: 4px 16px;
 }
 
-.action-widget {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  min-height: 92px;
-  border: 1px solid #d7e5dd;
-  border-radius: 8px;
-  color: #16342f;
-  padding: 16px;
+.nutrition-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--separator);
+}
+
+.nutrition-list div:nth-child(odd) {
+  margin-right: 12px;
+}
+
+.nutrition-list div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.nutrition-list dt {
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.nutrition-list dd {
+  margin: 0;
+  color: var(--label);
+  font: var(--text-subhead-strong);
+}
+
+.shortcut-list {
+  @include ios.grouped-list;
+}
+
+.shortcut-list a {
+  @include ios.grouped-row;
+  color: var(--label);
   text-decoration: none;
 }
 
-.cart-widget {
-  background: #fff4e8;
-  border-color: #e9c7a5;
-}
-
-.pantry-widget {
-  background: #e8f1eb;
-  border-color: #bcd2c3;
-}
-
-.widget-index {
-  align-self: start;
-  color: #7b8f88;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 0.82rem;
-}
-
-.widget-copy {
+.shortcut-list .icon {
   display: grid;
-  gap: 4px;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 8px;
+  color: #ffffff;
 }
 
-.widget-copy strong {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.15rem;
+.shortcut-list .icon.cart {
+  background: #ff9500;
 }
 
-.widget-copy span {
-  color: #5d746e;
-  font-size: 0.84rem;
+.shortcut-list .icon.pantry {
+  background: #34c759;
 }
 
-.widget-arrow {
-  font-size: 1.8rem;
+.shortcut-list svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.shortcut-list .label {
+  flex: 1;
+  font: var(--text-body);
+}
+
+.shortcut-list .value {
+  color: var(--label-2);
+  font: var(--text-body);
+}
+
+.shortcut-list .chevron {
+  color: var(--label-3);
+  font-size: 1.5rem;
   line-height: 1;
-}
-
-@media (max-width: 520px) {
-  .action-widgets {
-    grid-template-columns: 1fr;
-  }
 }
 
 .for-you-block {
   display: grid;
-  gap: 10px;
+  gap: 4px;
+}
+
+.for-you-block .eyebrow {
+  padding: 0 4px;
 }
 
 .for-you-block h2 {
-  margin: 0;
-  color: #16342f;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.15rem;
+  @include ios.section-title;
 }
 
 .for-you-strip {
   display: flex;
   gap: 12px;
+  margin: 0 -16px;
+  padding: 0 16px 4px;
   overflow-x: auto;
-  padding-bottom: 4px;
-  scroll-snap-type: x proximity;
+  scroll-padding: 16px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
 
 .for-you-card,
 .for-you-creator-card {
   display: grid;
-  flex: 0 0 auto;
+  flex: none;
+  align-content: start;
   gap: 6px;
-  width: 128px;
-  color: #16342f;
+  width: 148px;
+  color: var(--label);
   text-decoration: none;
   scroll-snap-align: start;
 }
 
-.for-you-card img,
-.for-you-creator-card img {
-  width: 128px;
-  height: 96px;
-  border-radius: 8px;
-  object-fit: cover;
-  background: #e9eee9;
+.for-you-card img {
+  @include ios.thumb(148px);
+  height: 112px;
+  border-radius: var(--radius-m);
+}
+
+.for-you-creator-card {
+  width: 96px;
+  justify-items: center;
+  text-align: center;
 }
 
 .for-you-creator-card img {
-  width: 72px;
-  height: 72px;
-  justify-self: center;
+  @include ios.thumb(72px);
   border-radius: 50%;
 }
 
 .for-you-card span,
 .for-you-creator-card span {
+  max-width: 100%;
   overflow: hidden;
-  font-size: 0.84rem;
-  font-weight: 700;
+  font: var(--text-subhead-strong);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.for-you-creator-card {
-  text-align: center;
-}
-
+.for-you-card small,
 .for-you-creator-card small {
-  color: #6b827d;
-  font-size: 0.74rem;
+  color: var(--label-2);
+  font: var(--text-caption);
 }
 

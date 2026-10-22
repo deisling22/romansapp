@@ -100,6 +100,32 @@ export class MealScheduleComponent implements OnInit {
       .join(', ');
   }
 
+  statusSymbol(meal: ScheduledMeal): string {
+    switch (meal.ingredientStatus) {
+      case 'AVAILABLE':
+        return '✓';
+      case 'ON_LIST':
+        return '≡';
+      case 'MISSING':
+        return '!';
+      default:
+        return '·';
+    }
+  }
+
+  statusLabel(meal: ScheduledMeal): string {
+    switch (meal.ingredientStatus) {
+      case 'AVAILABLE':
+        return 'Alles da';
+      case 'ON_LIST':
+        return 'Auf der Einkaufsliste';
+      case 'MISSING':
+        return `Fehlt: ${this.missingNames(meal)}`;
+      default:
+        return 'Keine Zutaten hinterlegt';
+    }
+  }
+
   swapOptions(meal: ScheduledMeal): ScheduledMeal[] {
     const seen = new Set<number>([meal.planEntryId ?? -1]);
     const options: ScheduledMeal[] = [];

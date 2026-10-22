@@ -1,7 +1,7 @@
 <main class="screen">
   <header class="page-header">
-    <p class="eyebrow">Heute</p>
-    <h1>Übersicht</h1>
+    <p class="eyebrow">{{ todayLabel }}</p>
+    <h1>Heute</h1>
   </header>
 
   @if (loading) {
@@ -15,95 +15,72 @@
     <section class="dashboard">
       <div class="stat-grid">
         <div class="stat-card">
-          <span class="stat-label">Kalorien heute</span>
-          <span class="stat-value">{{ displayInteger(dashboard.caloriesToday) }} kcal</span>
           @if (dashboard.calorieGoal) {
-            <span class="stat-sub">
-              von {{ dashboard.calorieGoal | number:'1.0-0' }} kcal ({{ dashboard.caloriePercent }}%)
-            </span>
-            <progress
-              [value]="dashboard.caloriesToday"
-              [max]="dashboard.calorieGoal"
-              [attr.aria-label]="'Kalorienziel zu ' + dashboard.caloriePercent + ' Prozent erreicht'">
-            </progress>
+            <span
+              class="ring"
+              role="img"
+              [style.--p]="ringPercent(dashboard.caloriePercent)"
+              [attr.aria-label]="'Kalorienziel zu ' + dashboard.caloriePercent + ' Prozent erreicht'"></span>
           }
+          <span class="stat-copy">
+            <span class="stat-label">Kalorien</span>
+            <span class="stat-value">{{ displayInteger(dashboard.caloriesToday) }}<small> kcal</small></span>
+            @if (dashboard.calorieGoal) {
+              <span class="stat-sub">von {{ dashboard.calorieGoal | number:'1.0-0' }} · {{ dashboard.caloriePercent }} %</span>
+            }
+          </span>
         </div>
         <div class="stat-card">
-          <span class="stat-label">Protein heute</span>
-          <span class="stat-value">{{ displayInteger(dashboard.proteinToday) }} g</span>
           @if (dashboard.proteinGoal) {
-            <span class="stat-sub">
-              von {{ dashboard.proteinGoal | number:'1.0-2' }} g ({{ dashboard.proteinPercent }}%)
-            </span>
-            <progress
-              [value]="dashboard.proteinToday"
-              [max]="dashboard.proteinGoal"
-              [attr.aria-label]="'Proteinziel zu ' + dashboard.proteinPercent + ' Prozent erreicht'">
-            </progress>
+            <span
+              class="ring protein"
+              role="img"
+              [style.--p]="ringPercent(dashboard.proteinPercent)"
+              [attr.aria-label]="'Proteinziel zu ' + dashboard.proteinPercent + ' Prozent erreicht'"></span>
           }
+          <span class="stat-copy">
+            <span class="stat-label">Protein</span>
+            <span class="stat-value">{{ displayInteger(dashboard.proteinToday) }}<small> g</small></span>
+            @if (dashboard.proteinGoal) {
+              <span class="stat-sub">von {{ dashboard.proteinGoal | number:'1.0-0' }} · {{ dashboard.proteinPercent }} %</span>
+            }
+          </span>
         </div>
       </div>
 
       @if (dashboard.nutritionTrackingEnabled) {
-        <div class="stat-grid nutrition-grid" aria-label="Weitere Nährwerte heute">
-          <div class="stat-card">
-            <span class="stat-label">Kohlenhydrate heute</span>
-            <span class="stat-value">{{ displayInteger(dashboard.carbsToday) }} g</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Fett heute</span>
-            <span class="stat-value">{{ displayInteger(dashboard.fatToday) }} g</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Vitamin A heute</span>
-            <span class="stat-value">{{ displayInteger(dashboard.vitaminAToday) }} µg</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Vitamin C heute</span>
-            <span class="stat-value">{{ displayInteger(dashboard.vitaminCToday) }} mg</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Vitamin D heute</span>
-            <span class="stat-value">{{ displayInteger(dashboard.vitaminDToday) }} µg</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Vitamin K heute</span>
-            <span class="stat-value">{{ displayInteger(dashboard.vitaminKToday) }} µg</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Vitamin B12 heute</span>
-            <span class="stat-value">{{ displayInteger(dashboard.vitaminB12Today) }} µg</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Folat heute</span>
-            <span class="stat-value">{{ displayInteger(dashboard.folateToday) }} µg</span>
-          </div>
-        </div>
+        <dl class="nutrition-list" aria-label="Weitere Nährwerte heute">
+          <div><dt>Kohlenhydrate</dt><dd>{{ displayInteger(dashboard.carbsToday) }} g</dd></div>
+          <div><dt>Fett</dt><dd>{{ displayInteger(dashboard.fatToday) }} g</dd></div>
+          <div><dt>Vitamin A</dt><dd>{{ displayInteger(dashboard.vitaminAToday) }} µg</dd></div>
+          <div><dt>Vitamin C</dt><dd>{{ displayInteger(dashboard.vitaminCToday) }} mg</dd></div>
+          <div><dt>Vitamin D</dt><dd>{{ displayInteger(dashboard.vitaminDToday) }} µg</dd></div>
+          <div><dt>Vitamin K</dt><dd>{{ displayInteger(dashboard.vitaminKToday) }} µg</dd></div>
+          <div><dt>Vitamin B12</dt><dd>{{ displayInteger(dashboard.vitaminB12Today) }} µg</dd></div>
+          <div><dt>Folat</dt><dd>{{ displayInteger(dashboard.folateToday) }} µg</dd></div>
+        </dl>
       }
       <app-meal-schedule (changed)="load()"></app-meal-schedule>
-      <section class="action-widgets" aria-label="Einkauf und Vorrat">
-        <a class="action-widget cart-widget" routerLink="/shopping-list">
-          <span class="widget-index">02</span>
-          <span class="widget-copy">
-            <strong>Warenkorb</strong>
-            <span>
-              {{ dashboard.cartItemCount }}
-              {{ dashboard.cartItemCount === 1 ? 'Produkt' : 'Produkte' }}
-            </span>
+      <nav class="shortcut-list" aria-label="Einkauf und Vorrat">
+        <a routerLink="/shopping-list">
+          <span class="icon cart" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 4h2.5l2.2 11h10.6l2-8H6.6" /><circle cx="9" cy="19.5" r="1.5" /><circle cx="17" cy="19.5" r="1.5" /></svg>
           </span>
-          <span class="widget-arrow" aria-hidden="true">›</span>
-        </a>
-        <a class="action-widget pantry-widget" routerLink="/pantry">
-          <span class="widget-index">03</span>
-          <span class="widget-copy">
-            <strong>Vorratsschrank</strong>
-            <span>
-              {{ dashboard.pantryItemCount }} Artikel
-            </span>
+          <span class="label">Einkaufsliste</span>
+          <span class="value">
+            {{ dashboard.cartItemCount }} {{ dashboard.cartItemCount === 1 ? 'Produkt' : 'Produkte' }}
           </span>
-          <span class="widget-arrow" aria-hidden="true">›</span>
+          <span class="chevron" aria-hidden="true">›</span>
         </a>
-      </section>
+        <a routerLink="/pantry">
+          <span class="icon pantry" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2.5" /><path d="M4 12h16M10 8h4M10 16h4" /></svg>
+          </span>
+          <span class="label">Vorratsschrank</span>
+          <span class="value">{{ dashboard.pantryItemCount }} Artikel</span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </a>
+      </nav>
 
       @if (recommendations?.dishes?.length) {
         <section class="for-you-block" aria-labelledby="for-you-dishes-title">

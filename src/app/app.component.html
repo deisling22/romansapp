@@ -24,37 +24,48 @@
   </p>
 }
 
-<div *ngIf="menuOpen" class="quick-menu" role="menu" aria-label="Weitere Bereiche">
-  <a routerLink="/shopping-list" role="menuitem" (click)="closeMenu()">Warenkorb</a>
-  <a routerLink="/pantry" role="menuitem" (click)="closeMenu()">Vorratsschrank</a>
-  <a routerLink="/ingredient-scan" role="menuitem" (click)="closeMenu()">Zutaten scannen</a>
-  <a routerLink="/recipe-scan" role="menuitem" (click)="closeMenu()">Rezept scannen</a>
-  <a routerLink="/creators" role="menuitem" (click)="closeMenu()">Creator</a>
-  <a routerLink="/progress" role="menuitem" (click)="closeMenu()">Fortschritt & Abzeichen</a>
-  <a routerLink="/settings" role="menuitem" (click)="closeMenu()">Einstellungen</a>
-  <a routerLink="/account" role="menuitem" (click)="closeMenu()">Konto & Anmeldung</a>
-</div>
+@if (menuOpen) {
+  <button type="button" class="menu-backdrop" aria-label="Menü schließen" (click)="closeMenu()"></button>
+  <div id="quick-menu" class="quick-menu" role="menu" aria-label="Weitere Bereiche">
+    <p class="menu-section">Hinzufügen</p>
+    <a routerLink="/recipe-scan" role="menuitem" (click)="closeMenu()">Rezept scannen</a>
+    <a routerLink="/ingredient-scan" role="menuitem" (click)="closeMenu()">Zutaten scannen</a>
+    <p class="menu-section">Mehr</p>
+    <a routerLink="/pantry" role="menuitem" (click)="closeMenu()">Vorratsschrank</a>
+    <a routerLink="/creators" role="menuitem" (click)="closeMenu()">Creator</a>
+    <a routerLink="/progress" role="menuitem" (click)="closeMenu()">Fortschritt &amp; Abzeichen</a>
+    <a routerLink="/settings" role="menuitem" (click)="closeMenu()">Einstellungen</a>
+    <a routerLink="/account" role="menuitem" (click)="closeMenu()">Konto &amp; Anmeldung</a>
+  </div>
+}
 
-<nav class="bottom-nav" aria-label="Hauptnavigation">
-  <div class="nav-main">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-      <span>Übersicht</span>
+<nav class="tab-bar" aria-label="Hauptnavigation">
+  <div class="tabs">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6h-6v6H4.5a1 1 0 0 1-1-1z" /></svg>
+      <span>Heute</span>
     </a>
-    <a routerLink="/plans" routerLinkActive="active">
+    <a routerLink="/plans" routerLinkActive="active" ariaCurrentWhenActive="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" /></svg>
       <span>Pläne</span>
     </a>
-    <a routerLink="/dishes" routerLinkActive="active">
+    <a routerLink="/dishes" routerLinkActive="active" ariaCurrentWhenActive="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8m-2.5-8v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17 21V3c-2.2 1.2-3.5 3.6-3.5 7v3H17" /></svg>
       <span>Gerichte</span>
+    </a>
+    <a routerLink="/shopping-list" routerLinkActive="active" ariaCurrentWhenActive="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.5l2.2 11h10.6l2-8H6.6" /><circle cx="9" cy="19.5" r="1.5" /><circle cx="17" cy="19.5" r="1.5" /></svg>
+      <span>Einkauf</span>
     </a>
   </div>
   <button
     type="button"
     class="menu-trigger"
-    aria-label="Weitere Bereiche öffnen"
+    aria-label="Hinzufügen und weitere Bereiche"
     [attr.aria-expanded]="menuOpen"
     aria-controls="quick-menu"
     (click)="toggleMenu()">
-    <span aria-hidden="true">+</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true" [class.open]="menuOpen"><path d="M12 5v14M5 12h14" /></svg>
   </button>
 </nav>
 

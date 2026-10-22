@@ -12,7 +12,7 @@
 .star {
   font-size: 1.1rem;
   line-height: 1;
-  color: #d0d0d0;
+  color: var(--fill-strong);
   cursor: default;
 }
 
@@ -21,10 +21,10 @@
 }
 
 .star.filled {
-  color: #f5a623;
+  color: #ff9f0a;
 }
 
 .rating-summary {
-  font-size: 0.85rem;
-  color: #666;
+  color: var(--label-2);
+  font: var(--text-footnote);
 }

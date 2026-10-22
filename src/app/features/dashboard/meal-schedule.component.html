@@ -1,7 +1,6 @@
 <section class="meal-schedule" aria-labelledby="meal-schedule-title">
   <div class="schedule-heading">
     <div>
-      <p class="eyebrow">Kochen &amp; Einkaufen</p>
       <h2 id="meal-schedule-title">Als Nächstes</h2>
     </div>
     <a routerLink="/plans" class="plans-link">Pläne</a>
@@ -46,10 +45,10 @@
               </div>
               @switch (meal.status) {
                 @case ('COOKED') {
-                  <span class="badge cooked">Gekocht</span>
+                  <span class="badge cooked"><span aria-hidden="true">✓</span> Gekocht</span>
                 }
                 @case ('LEFTOVERS') {
-                  <span class="badge leftovers">Reste</span>
+                  <span class="badge leftovers"><span aria-hidden="true">↺</span> Reste</span>
                 }
                 @default {
                   <span
@@ -58,9 +57,9 @@
                     [class.on-list]="meal.ingredientStatus === 'ON_LIST'"
                     [class.missing]="meal.ingredientStatus === 'MISSING'">
                     @switch (meal.ingredientStatus) {
-                      @case ('AVAILABLE') { Alles da }
-                      @case ('ON_LIST') { Auf der Liste }
-                      @case ('MISSING') { Fehlt etwas }
+                      @case ('AVAILABLE') { <span aria-hidden="true">✓</span> Alles da }
+                      @case ('ON_LIST') { <span aria-hidden="true">≡</span> Auf der Liste }
+                      @case ('MISSING') { <span aria-hidden="true">!</span> Fehlt etwas }
                       @default { Ohne Zutaten }
                     }
                   </span>
@@ -154,14 +153,16 @@
               </span>
               <a [routerLink]="['/dishes', meal.dishId]">{{ meal.dishName }}</a>
               @if (meal.status === 'LEFTOVERS') {
-                <span class="dot leftovers" title="Reste"></span>
+                <span class="dot leftovers" role="img" aria-label="Reste">↺</span>
               } @else {
                 <span
                   class="dot"
+                  role="img"
                   [class.available]="meal.ingredientStatus === 'AVAILABLE'"
                   [class.on-list]="meal.ingredientStatus === 'ON_LIST'"
                   [class.missing]="meal.ingredientStatus === 'MISSING'"
-                  [attr.title]="meal.ingredientStatus === 'MISSING' ? 'Fehlt: ' + missingNames(meal) : null"></span>
+                  [attr.aria-label]="statusLabel(meal)"
+                  [attr.title]="statusLabel(meal)">{{ statusSymbol(meal) }}</span>
               }
             </li>
           }

@@ -1,10 +1,10 @@
 <main class="screen">
-  <a class="back-link" [routerLink]="hasPlanContext ? ['/plans', planId] : ['/']">
-    ‹ {{ hasPlanContext ? 'Zurück zum Plan' : 'Zur Übersicht' }}
-  </a>
+  @if (hasPlanContext) {
+    <a class="back-link" [routerLink]="['/plans', planId]">‹ Zurück zum Plan</a>
+  }
   <header class="page-header">
     <p class="eyebrow">Einkaufen</p>
-    <h1>Warenkorb</h1>
+    <h1>Einkaufsliste</h1>
   </header>
 
   @if (hasPlanContext) {
@@ -102,7 +102,7 @@
             </li>
           }
         </ul>
-        <p class="checkout-note">Beim Verlassen des Warenkorbs wandern diese Artikel automatisch in den Vorratsschrank.</p>
+        <p class="checkout-note">Beim Verlassen der Einkaufsliste wandern diese Artikel automatisch in den Vorratsschrank.</p>
         <button type="button" class="finish-shopping" [disabled]="finishingCheckout" (click)="finishShopping()">
           {{ finishingCheckout ? 'Wird gebucht ...' : 'Einkauf abschließen' }}
         </button>

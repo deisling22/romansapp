@@ -6,23 +6,25 @@
 
   <div class="filter-row">
     <input
-      type="text"
-      placeholder="Suche nach Name ..."
+      type="search"
+      class="search-field"
+      placeholder="Suchen"
       [(ngModel)]="search"
       (ngModelChange)="onFilterChange()"
       aria-label="Suche nach Name"
       />
     <input
-      type="text"
-      placeholder="Tag filtern ..."
+      type="search"
+      class="search-field tag-field"
+      placeholder="Tag"
       [(ngModel)]="tag"
       (ngModelChange)="onFilterChange()"
       aria-label="Tag filtern"
       />
     @if (currentUser) {
       <label class="favorite-filter">
-        <input type="checkbox" [(ngModel)]="favoritesOnly" (ngModelChange)="onFilterChange()" />
-        Nur mein Kochbuch
+        <span>Nur mein Kochbuch</span>
+        <input type="checkbox" class="switch" [(ngModel)]="favoritesOnly" (ngModelChange)="onFilterChange()" />
       </label>
     }
   </div>

@@ -1,3 +1,5 @@
+@use '../../../styles/ios';
+
 :host {
   display: block;
 }
@@ -8,54 +10,51 @@
   z-index: 40;
   display: grid;
   place-items: center;
-  background: rgba(22, 52, 47, 0.72);
+  background: rgba(0, 0, 0, 0.45);
   padding: 20px;
 }
 
 .onboarding-card {
   position: relative;
   box-sizing: border-box;
-  width: min(100%, 420px);
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 20px 48px rgba(16, 36, 32, 0.32);
-  padding: 32px 24px 24px;
+  width: min(100%, 400px);
+  border-radius: 32px;
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  padding: 36px 24px 24px;
   text-align: center;
 }
 
 .skip-link {
+  @include ios.button-plain;
   position: absolute;
-  top: 14px;
-  right: 14px;
-  border: 0;
-  background: transparent;
-  color: #6b827d;
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-decoration: underline;
+  top: 8px;
+  right: 12px;
+  font: var(--text-subhead);
 }
 
 .step-icon {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 2.8rem;
+  display: grid;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  place-items: center;
+  border-radius: 20px;
+  background: var(--tint-soft);
+  font-size: 2.4rem;
   line-height: 1;
 }
 
 h1 {
-  margin: 0 0 10px;
-  color: #16342f;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.5rem;
-  line-height: 1.15;
+  margin: 0 0 8px;
+  color: var(--label);
+  font: var(--text-title2);
 }
 
 p {
   margin: 0;
-  color: #54716d;
-  line-height: 1.55;
+  color: var(--label-2);
+  font: var(--text-body);
 }
 
 .step-dots {
@@ -70,13 +69,13 @@ p {
   height: 8px;
   border: 0;
   border-radius: 50%;
-  background: #d7e5dd;
+  background: var(--fill-strong);
   cursor: pointer;
   padding: 0;
 }
 
 .dot.active {
-  background: #26736f;
+  background: var(--label);
 }
 
 .step-actions {
@@ -84,22 +83,12 @@ p {
   gap: 10px;
 }
 
-.step-actions button {
-  flex: 1;
-  min-height: 48px;
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-}
-
 .step-actions .primary {
-  background: #e06c47;
-  color: #ffffff;
+  @include ios.button-filled;
+  flex: 1;
 }
 
 .step-actions .secondary {
-  background: #edf4ef;
-  color: #16342f;
+  @include ios.button-gray;
+  flex: 1;
 }
