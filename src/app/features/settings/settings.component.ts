@@ -5,13 +5,15 @@ import { OnboardingService } from '../../core/onboarding.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
 import { StapleItem } from '../../core/models';
 import { DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { HouseholdSectionComponent } from './household-section.component';
 
 @Component({
     selector: 'app-settings',
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [FormsModule, ReactiveFormsModule, DecimalPipe]
+    imports: [FormsModule, ReactiveFormsModule, DecimalPipe, RouterLink, HouseholdSectionComponent]
 })
 export class SettingsComponent implements OnInit {
   readonly form = this.formBuilder.nonNullable.group({
@@ -25,6 +27,8 @@ export class SettingsComponent implements OnInit {
     activityLevel: this.formBuilder.control<number | null>(null),
     householdSize: [1, [Validators.required, Validators.min(1), Validators.max(20)]],
     shoppingTripsPerWeek: [2, [Validators.required, Validators.min(1), Validators.max(7)]],
+    costTrackingEnabled: [false],
+    weeklyBudgetEur: this.formBuilder.control<number | null>(null, [Validators.min(0), Validators.max(100000)]),
   });
 
   staples: StapleItem[] = [];
@@ -63,6 +67,8 @@ export class SettingsComponent implements OnInit {
           activityLevel: profile.activityLevel,
           householdSize: profile.householdSize,
           shoppingTripsPerWeek: profile.shoppingTripsPerWeek,
+          costTrackingEnabled: profile.costTrackingEnabled ?? false,
+          weeklyBudgetEur: profile.weeklyBudgetEur ?? null,
         });
         this.loading = false;
       },

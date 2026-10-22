@@ -34,6 +34,7 @@ const routes: Routes = [
   { path: 'plans/:planId/dishes/new', loadComponent: loadDishCreate },
   { path: 'plans/:planId/dishes/scan', loadComponent: loadRecipeScan },
   { path: 'recipe-scan', loadComponent: loadRecipeScan },
+  { path: 'receipts', loadComponent: () => import('./features/receipts/receipts.component').then((m) => m.ReceiptsComponent) },
   { path: 'shopping-list', loadComponent: loadShoppingList, canDeactivate: [pendingCartCheckoutGuard] },
   { path: 'pantry', loadComponent: () => import('./features/pantry/pantry.component').then((m) => m.PantryComponent) },
   { path: 'creators', loadComponent: () => import('./features/creators/creator-feed.component').then((m) => m.CreatorFeedComponent) },

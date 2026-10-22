@@ -36,9 +36,10 @@ public class DevDataSeeder {
             DishIngredientRepository dishIngredientRepository,
             PrepStepRepository prepStepRepository) {
         return arguments -> {
+            SeedRepositories repositories = new SeedRepositories(
+                dishRepository, dishIngredientRepository, prepStepRepository, mealPlanRepository, planEntryRepository);
             if (mealPlanRepository.count() > 0) {
-                seedAdditionalCreatorPlans(
-                    creatorRepository, mealPlanRepository, dishRepository, planEntryRepository);
+                seedAdditionalCreatorPlans(creatorRepository, repositories);
                 seedRomansPlanIfMissing(mealPlanRepository, dishRepository, planEntryRepository,
                     ingredientRepository, dishIngredientRepository, prepStepRepository);
                 return;
@@ -158,15 +159,14 @@ public class DevDataSeeder {
 
                 seedCreatorPlan("Mias Feierabend-Favoriten", mia,
                     List.of(weekDishes.get(0), weekDishes.get(2), weekDishes.get(5), weekDishes.get(9)),
-                    mealPlanRepository, planEntryRepository);
+                    repositories);
                 seedCreatorPlan("Jonas' 20-Minuten-Hits", jonas,
                     List.of(quickDishes.get(1), quickDishes.get(2), quickDishes.get(6), quickDishes.get(8)),
-                    mealPlanRepository, planEntryRepository);
+                    repositories);
                 seedCreatorPlan("Aylins bunter Familientisch", aylin,
                     List.of(weekDishes.get(3), quickDishes.get(3), quickDishes.get(4), quickDishes.get(9)),
-                    mealPlanRepository, planEntryRepository);
-                seedAdditionalCreatorPlans(
-                    creatorRepository, mealPlanRepository, dishRepository, planEntryRepository);
+                    repositories);
+                seedAdditionalCreatorPlans(creatorRepository, repositories);
                 seedRomansPlanIfMissing(mealPlanRepository, dishRepository, planEntryRepository,
                     ingredientRepository, dishIngredientRepository, prepStepRepository);
         };
@@ -213,23 +213,23 @@ public class DevDataSeeder {
 
             private void seedAdditionalCreatorPlans(
                 CreatorRepository creatorRepository,
-                MealPlanRepository mealPlanRepository,
-                DishRepository dishRepository,
-                PlanEntryRepository planEntryRepository) {
-            List<Dish> dishes = dishRepository.findAll();
+                SeedRepositories repositories) {
+            List<Dish> dishes = repositories.dishes().findAll().stream()
+                .filter(dish -> dish.getHouseholdId() != null)
+                .toList();
             if (dishes.size() < 4) {
                 return;
             }
             seedCreatorPlanIfMissing("Leas Ofenwoche", "leasofenkueche", dishes.subList(0, 4),
-                creatorRepository, mealPlanRepository, planEntryRepository);
+                creatorRepository, repositories);
             seedCreatorPlanIfMissing("Noahs Meal-Prep-Favoriten", "noahmealprep", dishes.subList(0, 4),
-                creatorRepository, mealPlanRepository, planEntryRepository);
+                creatorRepository, repositories);
             seedCreatorPlanIfMissing("Sofias mediterrane Woche", "sofiasmediterran", dishes.subList(0, 4),
-                creatorRepository, mealPlanRepository, planEntryRepository);
+                creatorRepository, repositories);
             seedCreatorPlanIfMissing("Emils grüne Küche", "emilkochtgruen", dishes.subList(0, 4),
-                creatorRepository, mealPlanRepository, planEntryRepository);
+                creatorRepository, repositories);
             seedCreatorPlanIfMissing("Ninas Familienfavoriten", "ninasfamilienzeit", dishes.subList(0, 4),
-                creatorRepository, mealPlanRepository, planEntryRepository);
+                creatorRepository, repositories);
             }
 
             private void seedCreatorPlanIfMissing(
@@ -237,11 +237,10 @@ public class DevDataSeeder {
                 String creatorHandle,
                 List<Dish> dishes,
                 CreatorRepository creatorRepository,
-                MealPlanRepository mealPlanRepository,
-                PlanEntryRepository planEntryRepository) {
+                SeedRepositories repositories) {
             creatorRepository.findByHandle(creatorHandle).ifPresent(creator -> {
-                if (mealPlanRepository.findByCreatorIdOrderByCreatedAtAsc(creator.getId()).isEmpty()) {
-                    seedCreatorPlan(planName, creator, dishes, mealPlanRepository, planEntryRepository);
+                if (repositories.plans().findByCreatorIdOrderByCreatedAtAsc(creator.getId()).isEmpty()) {
+                    seedCreatorPlan(planName, creator, dishes, repositories);
                 }
             });
             }
@@ -289,12 +288,38 @@ public class DevDataSeeder {
                 String name,
                 Creator creator,
                 List<Dish> dishes,
-                MealPlanRepository mealPlanRepository,
-                PlanEntryRepository planEntryRepository) {
-            MealPlan plan = mealPlanRepository.save(new MealPlan(name, creator));
+                SeedRepositories repositories) {
+            MealPlan plan = repositories.plans().save(new MealPlan(name, creator));
             for (int index = 0; index < dishes.size(); index++) {
-                planEntryRepository.save(new PlanEntry(plan, dishes.get(index), index));
+                repositories.entries().save(new PlanEntry(plan, publicCopy(dishes.get(index), repositories), index));
             }
+            }
+
+            /** Creator plans are public, so they get catalog copies instead of household dishes. */
+            private Dish publicCopy(Dish source, SeedRepositories repositories) {
+            Dish copy = new Dish(source.getName(), source.getImageUrl());
+            copy.setDescription(source.getDescription());
+            copy.setPrepMinutes(source.getPrepMinutes());
+            copy.setServings(source.getServings());
+            copy.setTags(source.getTags());
+            copy.makePublic();
+            copy = repositories.dishes().save(copy);
+            for (DishIngredient ingredient : repositories.ingredients().findByDishId(source.getId())) {
+                repositories.ingredients().save(
+                    new DishIngredient(copy, ingredient.getIngredient(), ingredient.getQuantityGrams()));
+            }
+            for (PrepStep step : repositories.steps().findByDishIdOrderByStepOrderAsc(source.getId())) {
+                repositories.steps().save(new PrepStep(copy, step.getStepOrder(), step.getText(), step.getTimerSeconds()));
+            }
+            return copy;
+            }
+
+            private record SeedRepositories(
+                DishRepository dishes,
+                DishIngredientRepository ingredients,
+                PrepStepRepository steps,
+                MealPlanRepository plans,
+                PlanEntryRepository entries) {
             }
 
                 private List<String> instructionsFor(String recipeName) {

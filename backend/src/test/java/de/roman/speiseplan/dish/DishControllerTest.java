@@ -100,9 +100,9 @@ class DishControllerTest {
 
     @Test
     void favoritesCanBeSavedFilteredAndRemoved() throws Exception {
-        long planId = createPlan("Favoriten-Test-Plan");
-        long dishId = createDish(planId, "Favoriten-Test-Gericht");
         String token = tokenService.issueToken(Map.of("email", "favorites@example.com", "name", "Favoriten Test"));
+        long planId = createPlan("Favoriten-Test-Plan", token);
+        long dishId = createDish(planId, "Favoriten-Test-Gericht", token);
 
         mockMvc.perform(put("/api/dishes/{dishId}/favorite", dishId)
                         .header("Authorization", "Bearer " + token)
@@ -136,7 +136,15 @@ class DishControllerTest {
     }
 
     private long createPlan(String name) throws Exception {
-        String response = mockMvc.perform(post("/api/plans")
+        return createPlan(name, null);
+    }
+
+    private long createPlan(String name, String token) throws Exception {
+        var request = post("/api/plans");
+        if (token != null) {
+            request.header("Authorization", "Bearer " + token);
+        }
+        String response = mockMvc.perform(request
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CreatePlanRequest(name))))
                 .andExpect(status().isCreated())
@@ -147,10 +155,16 @@ class DishControllerTest {
     }
 
     private long createDish(long planId, String name) throws Exception {
+        return createDish(planId, name, null);
+    }
+
+    private long createDish(long planId, String name, String token) throws Exception {
         MockMultipartFile image = new MockMultipartFile("image", "dish.jpg", "image/jpeg", new byte[] {1, 2, 3});
-        String response = mockMvc.perform(multipart("/api/plans/{planId}/dishes", planId)
-                        .file(image)
-                        .param("name", name))
+        var request = multipart("/api/plans/{planId}/dishes", planId).file(image).param("name", name);
+        if (token != null) {
+            request.header("Authorization", "Bearer " + token);
+        }
+        String response = mockMvc.perform(request)
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()

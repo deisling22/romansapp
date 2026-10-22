@@ -47,6 +47,9 @@
         @if (dish.fatGrams !== null) {
           <span>{{ dish.fatGrams }} g Fett / Portion</span>
         }
+        @if (dish.costEur != null) {
+          <span>{{ dish.costEur | number: '1.2-2' }} €</span>
+        }
       </div>
       <div class="rating-block">
         <app-star-rating [average]="dish.averageRating" [count]="dish.ratingCount"></app-star-rating>
@@ -159,6 +162,7 @@
       @if (successMessage) {
         <p class="success-message" role="status">{{ successMessage }}</p>
       }
+      @if (dish.editable !== false) {
       <details class="recipe-editor">
         <summary>Rezept bearbeiten</summary>
         <form [formGroup]="ingredientForm" (ngSubmit)="addIngredient()" novalidate>
@@ -211,7 +215,16 @@
             {{ savingNutrition ? 'Wird gespeichert ...' : 'Nährwerte speichern' }}
           </button>
         </form>
+
+        <form class="nutrition-form" (ngSubmit)="saveCost()" novalidate>
+          <label for="dishCost">Kosten für das ganze Gericht in € (optional)</label>
+          <input id="dishCost" name="dishCost" type="number" min="0" step="0.01" placeholder="z. B. 8,50" [(ngModel)]="costEur" />
+          <button type="submit" [disabled]="savingCost">
+            {{ savingCost ? 'Wird gespeichert ...' : 'Kosten speichern' }}
+          </button>
+        </form>
       </details>
+      }
     </section>
 
     @if (cookingModeActive && dish.steps.length) {

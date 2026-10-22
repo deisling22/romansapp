@@ -10,7 +10,11 @@ import jakarta.persistence.Table;
 /** Basic supplies (e.g. breakfast items) that every upcoming-shopping list tops up. */
 @Entity
 @Table(name = "staple_item")
+@org.hibernate.annotations.Filter(name = de.roman.speiseplan.household.HouseholdScope.FILTER)
 public class StapleItem {
+    @Column(name = "household_id", nullable = false)
+    private Long householdId = de.roman.speiseplan.household.HouseholdContext.currentId();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

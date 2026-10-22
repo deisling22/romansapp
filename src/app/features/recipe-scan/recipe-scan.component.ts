@@ -8,6 +8,7 @@ import { Ingredient, MealPlan } from '../../core/models';
 import { OcrProgress, RecipeOcrService } from './recipe-ocr.service';
 import { ParsedIngredient, ParsedNutrition, ParsedStep, parseRecipeText } from './recipe-parser';
 import { FormsModule } from '@angular/forms';
+import { HouseholdApiService } from '../../core/household-api.service';
 
 const HIGH_ACCURACY_ENABLED_KEY = 'recipeScan.highAccuracyEnabled';
 const HIGH_ACCURACY_DOWNLOADED_KEY = 'recipeScan.highAccuracyDownloaded';
@@ -68,8 +69,16 @@ export class RecipeScanComponent implements OnInit, OnDestroy {
   cropping = false;
   cropRect: { left: number; top: number; width: number; height: number } | null = null;
   private cropDragStart: { x: number; y: number } | null = null;
+  importUrl = '';
+  importing = false;
+  importedFrom = '';
 
   @ViewChild('cropImage') private cropImageRef?: ElementRef<HTMLImageElement>;
+  @ViewChild('importUrlInput') private set importUrlInput(input: ElementRef<HTMLInputElement> | undefined) {
+    if (input && this.route.snapshot.queryParamMap.has('link')) {
+      setTimeout(() => input.nativeElement.focus());
+    }
+  }
 
   name = '';
   description = '';
@@ -99,19 +108,28 @@ export class RecipeScanComponent implements OnInit, OnDestroy {
     private readonly dishApi: DishApiService,
     private readonly mealPlanApi: MealPlanApiService,
     private readonly gamification: GamificationService,
+    private readonly householdApi: HouseholdApiService,
   ) {}
 
   ngOnInit(): void {
+    this.importUrl = this.route.snapshot.queryParamMap.get('url') ?? '';
     const routePlanId = Number(this.route.snapshot.paramMap.get('planId'));
     if (routePlanId) {
       this.planId = routePlanId;
       this.hasRoutePlanId = true;
+      if (this.importUrl) {
+        void this.importFromUrl();
+      }
     } else {
       this.loadingPlans = true;
       this.mealPlanApi.getPlans().subscribe({
         next: (plans) => {
           this.plans = plans;
           this.loadingPlans = false;
+          if (this.importUrl && !this.planId && plans.length > 0) {
+            this.planId = (plans.find((plan) => plan.active) ?? plans[0]).id;
+            void this.importFromUrl();
+          }
         },
         error: () => {
           this.errorMessage = 'Deine Pläne konnten nicht geladen werden.';
@@ -244,10 +262,73 @@ export class RecipeScanComponent implements OnInit, OnDestroy {
     this.releaseImage();
     this.imageFile = file;
     this.imageUrl = URL.createObjectURL(file);
-    this.analyzed = false;
     this.errorMessage = '';
+    if (this.importedFrom) {
+      // Imported recipes only need a photo; the text already came from the page.
+      return;
+    }
+    this.analyzed = false;
     this.cropping = this.cropEnabled;
     this.cropRect = null;
+  }
+
+  async importFromUrl(): Promise<void> {
+    const url = this.importUrl.trim();
+    if (!url || this.importing) {
+      return;
+    }
+    if (!this.planId) {
+      this.errorMessage = 'Bitte wähle zuerst einen Plan aus.';
+      return;
+    }
+    this.importing = true;
+    this.errorMessage = '';
+    try {
+      const recipe = await firstValueFrom(this.householdApi.importRecipe(url));
+      const text = [
+        recipe.name,
+        'Zutaten',
+        ...recipe.ingredients.map((line) => line.replace(/\s+/g, ' ')),
+        'Zubereitung',
+        ...recipe.steps.map((line) => line.replace(/\s+/g, ' ')),
+      ].join('\n');
+      const parsed = parseRecipeText(text);
+      this.rawText = text;
+      this.name = recipe.name.slice(0, 120);
+      this.description = (recipe.description ?? '').slice(0, 2000);
+      this.prepMinutes = recipe.prepMinutes;
+      this.servings = recipe.servings ?? 1;
+      this.tagsText = recipe.tags.join(', ');
+      this.ingredients = parsed.ingredients;
+      this.steps = parsed.steps;
+      this.nextRowId = parsed.ingredients.length + parsed.steps.length + 1;
+      this.importedFrom = recipe.sourceUrl;
+      this.analyzed = true;
+      this.cropping = false;
+      if (recipe.imageUrl) {
+        await this.loadImportedImage(recipe.imageUrl);
+      }
+      if (!this.imageFile) {
+        this.errorMessage = 'Rezept übernommen. Bitte füge noch ein Foto hinzu.';
+      }
+    } catch (error) {
+      const detail = (error as { error?: { detail?: string } })?.error?.detail;
+      this.errorMessage = detail || 'Das Rezept konnte nicht von diesem Link geladen werden.';
+    } finally {
+      this.importing = false;
+    }
+  }
+
+  private async loadImportedImage(imageUrl: string): Promise<void> {
+    try {
+      const blob = await firstValueFrom(this.householdApi.importRecipeImage(imageUrl));
+      const extension = blob.type.split('/')[1] || 'jpg';
+      this.releaseImage();
+      this.imageFile = new File([blob], `rezept.${extension}`, { type: blob.type || 'image/jpeg' });
+      this.imageUrl = URL.createObjectURL(this.imageFile);
+    } catch {
+      // The user can still add a photo manually.
+    }
   }
 
   async analyze(): Promise<void> {

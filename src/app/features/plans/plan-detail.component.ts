@@ -30,6 +30,7 @@ export class PlanDetailComponent implements OnInit, OnDestroy {
   localPlanName = '';
   plan: MealPlan | null = null;
   savingSettings = false;
+  costEur: number | null = null;
   readonly slotLabels = MEAL_SLOT_LABELS;
   readonly slots = Object.keys(MEAL_SLOT_LABELS) as MealSlot[];
   private readonly localImageUrls: string[] = [];
@@ -55,7 +56,28 @@ export class PlanDetailComponent implements OnInit, OnDestroy {
     this.planId = Number(this.route.snapshot.paramMap.get('planId'));
     this.load();
     this.mealPlanApi.getPlans().subscribe({
-      next: (plans) => (this.plan = plans.find((plan) => plan.id === this.planId) ?? null),
+      next: (plans) => {
+        this.plan = plans.find((plan) => plan.id === this.planId) ?? null;
+        this.costEur = this.plan?.costEur ?? null;
+      },
+    });
+  }
+
+  saveCost(): void {
+    if (!this.plan || this.savingSettings || (this.plan.costEur ?? null) === this.costEur
+        || (this.costEur !== null && this.costEur < 0)) {
+      return;
+    }
+    this.savingSettings = true;
+    this.mealPlanApi.updateCost(this.planId, this.costEur).subscribe({
+      next: (plan) => {
+        this.plan = plan;
+        this.savingSettings = false;
+      },
+      error: () => {
+        this.errorMessage = 'Die Kosten konnten nicht gespeichert werden.';
+        this.savingSettings = false;
+      },
     });
   }
 

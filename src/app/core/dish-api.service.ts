@@ -63,6 +63,10 @@ export class DishApiService {
     return this.http.put<DishDetailsUpdate>(`${this.apiUrl}/dishes/${dishId}/details`, details);
   }
 
+  updateCost(dishId: number, costEur: number | null): Observable<{ costEur: number | null }> {
+    return this.http.put<{ costEur: number | null }>(`${this.apiUrl}/dishes/${dishId}/cost`, { costEur });
+  }
+
   updateAdvancePrep(dishId: number, note: string | null): Observable<{ note: string | null }> {
     return this.http.put<{ note: string | null }>(`${this.apiUrl}/dishes/${dishId}/advance-prep`, { note });
   }

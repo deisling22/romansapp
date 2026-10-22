@@ -43,6 +43,7 @@ class RecommendationControllerTest {
         String token = tokenService.issueToken(Map.of("email", UUID.randomUUID() + "@example.com"));
 
         String planResponse = mockMvc.perform(post("/api/plans")
+                        .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Empfehlungs-Test-Plan\"}"))
                 .andExpect(status().isCreated())
@@ -52,6 +53,7 @@ class RecommendationControllerTest {
         MockMultipartFile image = new MockMultipartFile("image", "dish.jpg", "image/jpeg", new byte[] {1, 2, 3});
         String dishResponse = mockMvc.perform(multipart("/api/plans/{planId}/dishes", planId)
                         .file(image)
+                        .header("Authorization", "Bearer " + token)
                         .param("name", "Empfehlungs-Test-Gericht"))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();

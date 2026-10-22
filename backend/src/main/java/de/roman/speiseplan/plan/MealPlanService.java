@@ -63,8 +63,15 @@ public class MealPlanService {
     }
 
     @Transactional
+    public PlanSummaryDto updateCost(Long planId, Double costEur) {
+        MealPlan plan = requireOwnPlan(planId);
+        plan.setCostEur(costEur);
+        return PlanSummaryDto.from(plan, planEntryRepository.countByPlanId(planId));
+    }
+
+    @Transactional
     public void deletePlan(Long planId) {
-        MealPlan plan = requirePlan(planId);
+        MealPlan plan = requireOwnPlan(planId);
         mealPlanRepository.delete(plan);
     }
 
@@ -84,7 +91,7 @@ public class MealPlanService {
 
     @Transactional
     public DishDto addDish(Long planId, String name, MultipartFile image) {
-        MealPlan plan = requirePlan(planId);
+        MealPlan plan = requireOwnPlan(planId);
         String imageUrl = imageStorage.store(image);
         Dish dish = dishRepository.save(new Dish(name.trim(), imageUrl));
         int nextSortOrder = planEntryRepository.findTopByPlanIdOrderBySortOrderDesc(planId)

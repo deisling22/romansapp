@@ -56,6 +56,12 @@ public class MealPlanController {
         return mealPlanService.updateSettings(planId, request);
     }
 
+    @PutMapping("/{planId}/cost")
+    public PlanSummaryDto updateCost(
+            @PathVariable Long planId, @Valid @RequestBody de.roman.speiseplan.cost.CostDto request) {
+        return mealPlanService.updateCost(planId, request.costEur());
+    }
+
     @GetMapping("/{planId}/dishes")
     public List<DishDto> getDishes(@PathVariable Long planId) {
         return mealPlanService.getDishes(planId);

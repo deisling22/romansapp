@@ -121,13 +121,18 @@ h1 {
   font: var(--text-footnote);
 }
 
-.plan-picker {
+.plan-picker,
+.url-import label {
   display: grid;
   gap: 4px;
   margin-bottom: 14px;
   color: var(--label-2);
   font: var(--text-footnote);
   font-weight: 600;
+}
+
+.url-import {
+  margin-top: 16px;
 }
 
 .capture-button input {

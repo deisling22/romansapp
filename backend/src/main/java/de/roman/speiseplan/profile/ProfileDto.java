@@ -10,5 +10,7 @@ public record ProfileDto(
         String sex,
         Double activityLevel,
         int householdSize,
-        int shoppingTripsPerWeek) {
+        int shoppingTripsPerWeek,
+        boolean costTrackingEnabled,
+        Double weeklyBudgetEur) {
 }

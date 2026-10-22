@@ -15,5 +15,7 @@ public record ProfileUpdateRequest(
         String sex,
         @DecimalMin(value = "1") Double activityLevel,
         @Min(1) @Max(20) Integer householdSize,
-        @Min(1) @Max(7) Integer shoppingTripsPerWeek) {
+        @Min(1) @Max(7) Integer shoppingTripsPerWeek,
+        Boolean costTrackingEnabled,
+        @DecimalMin(value = "0") Double weeklyBudgetEur) {
 }

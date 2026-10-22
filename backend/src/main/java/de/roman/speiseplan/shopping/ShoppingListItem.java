@@ -12,7 +12,11 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "shopping_list_item")
+@org.hibernate.annotations.Filter(name = de.roman.speiseplan.household.HouseholdScope.FILTER)
 public class ShoppingListItem {
+    @Column(name = "household_id", nullable = false)
+    private Long householdId = de.roman.speiseplan.household.HouseholdContext.currentId();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

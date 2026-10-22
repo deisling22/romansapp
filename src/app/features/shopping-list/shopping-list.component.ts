@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, NgZone } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
@@ -46,6 +46,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     private readonly notifications: NotificationService,
     private readonly gamification: GamificationService,
     private readonly scheduleApi: ScheduleApiService,
+    private readonly zone: NgZone,
   ) {}
 
   ngOnInit(): void {
@@ -53,9 +54,49 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     this.hasPlanContext = planId !== null;
     this.planId = Number(planId);
     this.load();
+    // Household members share one list: pick up their changes while the list is open.
+    this.zone.runOutsideAngular(() => {
+      this.refreshTimer = setInterval(() => this.refreshInBackground(), 20_000);
+      document.addEventListener('visibilitychange', this.onVisibilityChange);
+    });
+  }
+
+  private refreshTimer: ReturnType<typeof setInterval> | undefined;
+
+  private readonly onVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      this.refreshInBackground();
+    }
+  };
+
+  private refreshInBackground(): void {
+    const busy = this.loading || this.adding || this.generating || this.finishingCheckout
+      || this.deletingItemId !== null || this.pendingToggles.size > 0;
+    if (busy || document.visibilityState !== 'visible' || !navigator.onLine) {
+      return;
+    }
+    this.zone.run(() => {
+      const request = this.hasPlanContext
+        ? this.shoppingListApi.getItems(this.planId)
+        : this.shoppingListApi.getAllItems();
+      request.subscribe({
+        next: (items) => {
+          if (this.pendingToggles.size === 0 && this.listState(items) !== this.listState(this.items)) {
+            this.items = items;
+          }
+        },
+        error: () => undefined,
+      });
+    });
+  }
+
+  private listState(items: ShoppingListItem[]): string {
+    return items.map((item) => `${item.id}:${item.quantity}:${item.checked}`).join('|');
   }
 
   ngOnDestroy(): void {
+    clearInterval(this.refreshTimer);
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
     for (const timer of this.reminderTimers.values()) {
       clearTimeout(timer);
     }

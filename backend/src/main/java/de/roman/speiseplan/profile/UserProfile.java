@@ -43,7 +43,34 @@ public class UserProfile {
     @Column(name = "shopping_trips_per_week", nullable = false)
     private int shoppingTripsPerWeek = 2;
 
+    @Column(name = "cost_tracking_enabled", nullable = false)
+    private boolean costTrackingEnabled = false;
+
+    @Column(name = "weekly_budget_eur")
+    private Double weeklyBudgetEur;
+
     protected UserProfile() {
+    }
+
+    /** One profile per household; the id equals the household id. */
+    UserProfile(Long householdId) {
+        this.id = householdId;
+    }
+
+    public boolean isCostTrackingEnabled() {
+        return costTrackingEnabled;
+    }
+
+    public void setCostTrackingEnabled(boolean costTrackingEnabled) {
+        this.costTrackingEnabled = costTrackingEnabled;
+    }
+
+    public Double getWeeklyBudgetEur() {
+        return weeklyBudgetEur;
+    }
+
+    public void setWeeklyBudgetEur(Double weeklyBudgetEur) {
+        this.weeklyBudgetEur = weeklyBudgetEur;
     }
 
     public Long getId() {

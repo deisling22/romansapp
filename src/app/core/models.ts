@@ -4,6 +4,7 @@ export interface MealPlan {
   dishCount: number;
   active?: boolean;
   leftoversForLunch?: boolean;
+  costEur?: number | null;
 }
 
 export type MealSlot = 'BREAKFAST' | 'LUNCH' | 'DINNER';
@@ -155,6 +156,8 @@ export interface DishDetail {
   myRating: number | null;
   favorite: boolean;
   advancePrepNote: string | null;
+  costEur?: number | null;
+  editable?: boolean;
 }
 
 export interface DishRatingSummary {
@@ -200,6 +203,52 @@ export interface DashboardData {
   nextDish: NextDish | null;
   cartItemCount: number;
   pantryItemCount: number;
+  costTrackingEnabled?: boolean;
+  cost?: CostSummary | null;
+}
+
+export interface CostSummary {
+  spentThisWeek: number;
+  spentThisMonth: number;
+  plannedCost: number | null;
+  weeklyBudget: number | null;
+  budgetPercent: number | null;
+}
+
+export interface Receipt {
+  id?: number;
+  purchasedOn: string;
+  totalEur: number;
+  store: string | null;
+}
+
+export interface HouseholdMember {
+  email: string;
+  role: 'OWNER' | 'MEMBER';
+  you: boolean;
+}
+
+export interface Household {
+  id: number;
+  name: string;
+  guest: boolean;
+  authenticated: boolean;
+  role: 'OWNER' | 'MEMBER' | null;
+  inviteCode: string | null;
+  members: HouseholdMember[];
+  defaultClaimable: boolean;
+}
+
+export interface RecipeImport {
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  servings: number | null;
+  prepMinutes: number | null;
+  ingredients: string[];
+  steps: string[];
+  tags: string[];
+  sourceUrl: string;
 }
 
 export interface Profile {
@@ -213,6 +262,8 @@ export interface Profile {
   activityLevel: number | null;
   householdSize: number;
   shoppingTripsPerWeek: number;
+  costTrackingEnabled?: boolean;
+  weeklyBudgetEur?: number | null;
 }
 
 export interface ShoppingListItem {

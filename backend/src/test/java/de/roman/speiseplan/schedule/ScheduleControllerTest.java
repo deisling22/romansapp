@@ -45,7 +45,7 @@ class ScheduleControllerTest {
         mockMvc.perform(put("/api/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new ProfileUpdateRequest(1.0, null, null, false, null, null, null, null, 2, 2))))
+                                new ProfileUpdateRequest(1.0, null, null, false, null, null, null, null, 2, 2, null, null))))
                 .andExpect(status().isOk());
         String plans = mockMvc.perform(get("/api/plans")).andReturn().getResponse().getContentAsString();
         for (JsonNode plan : objectMapper.readTree(plans)) {

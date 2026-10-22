@@ -1,5 +1,6 @@
 package de.roman.speiseplan.dashboard;
 
+import de.roman.speiseplan.cost.CostSummaryService;
 import de.roman.speiseplan.dish.Dish;
 import de.roman.speiseplan.dish.DishIngredient;
 import de.roman.speiseplan.dish.DishIngredientRepository;
@@ -32,6 +33,7 @@ public class DashboardService {
     private final PantryService pantryService;
     private final ScheduleService scheduleService;
     private final CookingService cookingService;
+    private final CostSummaryService costSummaryService;
 
     public DashboardService(
             CookLogRepository cookLogRepository,
@@ -41,7 +43,9 @@ public class DashboardService {
             ShoppingListService shoppingListService,
             PantryService pantryService,
             ScheduleService scheduleService,
-            CookingService cookingService) {
+            CookingService cookingService,
+            CostSummaryService costSummaryService) {
+        this.costSummaryService = costSummaryService;
         this.cookLogRepository = cookLogRepository;
         this.dishIngredientRepository = dishIngredientRepository;
         this.dishRatingRepository = dishRatingRepository;
@@ -142,7 +146,9 @@ public class DashboardService {
             folateToday,
             nextDish,
             shoppingListService.countItems(),
-            pantryService.countItems());
+            pantryService.countItems(),
+            profile.costTrackingEnabled(),
+            profile.costTrackingEnabled() ? costSummaryService.summarize(profile) : null);
     }
 
     private static double orZero(Double value) {

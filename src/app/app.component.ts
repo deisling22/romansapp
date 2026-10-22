@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { ConnectivityService } from './core/connectivity.service';
 import { ShoppingListOutboxService } from './core/shopping-list-outbox.service';
 import { NotificationService } from './core/notification.service';
@@ -30,11 +31,27 @@ export class AppComponent {
     private readonly recipeSync: RecipeSyncService,
     private readonly creatorNotifications: CreatorNotificationService,
     private readonly gamification: GamificationService,
+    private readonly router: Router,
   ) {
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates
         .pipe(filter((event): event is VersionReadyEvent => event.type === 'VERSION_READY'))
         .subscribe(() => (this.updateAvailable = true));
+    }
+    this.handleSharedLink();
+  }
+
+  /** Web Share Target (manifest): shared recipe links arrive as ?url= / ?text= on the start URL. */
+  private handleSharedLink(): void {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('url') && !params.has('text')) {
+      return;
+    }
+    const candidates = [params.get('url'), params.get('text'), params.get('title')].filter(Boolean).join(' ');
+    const sharedUrl = /https?:\/\/\S+/.exec(candidates)?.[0];
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+    if (sharedUrl) {
+      void this.router.navigate(['/recipe-scan'], { queryParams: { url: sharedUrl } });
     }
   }
 

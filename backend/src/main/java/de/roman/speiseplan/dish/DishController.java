@@ -49,6 +49,12 @@ public class DishController {
         return dishService.rateDish(dishId, extractEmail(user), request.stars());
     }
 
+    @PutMapping("/{dishId}/cost")
+    public de.roman.speiseplan.cost.CostDto updateCost(
+            @PathVariable Long dishId, @Valid @RequestBody de.roman.speiseplan.cost.CostDto request) {
+        return dishService.updateCost(dishId, request);
+    }
+
     @PutMapping("/{dishId}/favorite")
     public DishFavoriteResponseDto setFavorite(
             @PathVariable Long dishId,

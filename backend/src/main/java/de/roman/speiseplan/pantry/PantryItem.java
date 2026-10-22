@@ -10,7 +10,11 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "pantry_item")
+@org.hibernate.annotations.Filter(name = de.roman.speiseplan.household.HouseholdScope.FILTER)
 public class PantryItem {
+    @Column(name = "household_id", nullable = false)
+    private Long householdId = de.roman.speiseplan.household.HouseholdContext.currentId();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

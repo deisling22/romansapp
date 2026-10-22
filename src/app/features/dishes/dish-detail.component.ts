@@ -38,6 +38,8 @@ export class DishDetailComponent implements OnInit, OnDestroy {
 
   savingNutrition = false;
   advancePrepNote = '';
+  costEur: number | null = null;
+  savingCost = false;
   savingAdvancePrep = false;
 
   dishId = 0;
@@ -178,6 +180,7 @@ export class DishDetailComponent implements OnInit, OnDestroy {
         this.dish = dish;
         this.selectedServings = dish.servings;
         this.advancePrepNote = dish.advancePrepNote ?? '';
+        this.costEur = dish.costEur ?? null;
         this.nutritionForm.setValue({
           carbsGrams: dish.carbsGrams,
           fatGrams: dish.fatGrams,
@@ -252,6 +255,25 @@ export class DishDetailComponent implements OnInit, OnDestroy {
       error: () => {
         this.errorMessage = 'Das Kochbuch konnte nicht aktualisiert werden.';
         this.savingFavorite = false;
+      },
+    });
+  }
+
+  saveCost(): void {
+    if (this.savingCost || (this.costEur !== null && this.costEur < 0)) {
+      return;
+    }
+    this.savingCost = true;
+    this.dishApi.updateCost(this.dishId, this.costEur).subscribe({
+      next: ({ costEur }) => {
+        if (this.dish) {
+          this.dish.costEur = costEur;
+        }
+        this.savingCost = false;
+      },
+      error: () => {
+        this.errorMessage = 'Die Kosten konnten nicht gespeichert werden.';
+        this.savingCost = false;
       },
     });
   }

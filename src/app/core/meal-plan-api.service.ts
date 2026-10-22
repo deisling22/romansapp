@@ -27,6 +27,10 @@ export class MealPlanApiService {
     return this.http.post<MealPlan>(`${this.apiUrl}/plans/${planId}/copy`, {});
   }
 
+  updateCost(planId: number, costEur: number | null): Observable<MealPlan> {
+    return this.http.put<MealPlan>(`${this.apiUrl}/plans/${planId}/cost`, { costEur });
+  }
+
   getDishes(planId: number): Observable<Dish[]> {
     return this.http.get<Dish[]>(`${this.apiUrl}/plans/${planId}/dishes`);
   }

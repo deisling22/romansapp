@@ -60,6 +60,30 @@
           <div><dt>Folat</dt><dd>{{ displayInteger(dashboard.folateToday) }} µg</dd></div>
         </dl>
       }
+      @if (dashboard.costTrackingEnabled && dashboard.cost; as cost) {
+        <a class="stat-card cost-card" routerLink="/receipts" data-testid="cost-card">
+          @if (cost.weeklyBudget) {
+            <span
+              class="ring"
+              role="img"
+              [style.--p]="ringPercent(cost.budgetPercent)"
+              [attr.aria-label]="'Wochenbudget zu ' + cost.budgetPercent + ' Prozent ausgegeben'"></span>
+          }
+          <span class="stat-copy">
+            <span class="stat-label">Ausgaben diese Woche</span>
+            <span class="stat-value">{{ cost.spentThisWeek | number:'1.2-2' }}<small> €</small></span>
+            <span class="stat-sub">
+              @if (cost.weeklyBudget) {
+                von {{ cost.weeklyBudget | number:'1.0-2' }} € · {{ cost.budgetPercent }} % ·
+              }
+              Monat {{ cost.spentThisMonth | number:'1.2-2' }} €
+              @if (cost.plannedCost !== null) {
+                · geplant {{ cost.plannedCost | number:'1.2-2' }} €
+              }
+            </span>
+          </span>
+        </a>
+      }
       <app-meal-schedule (changed)="load()"></app-meal-schedule>
       <nav class="shortcut-list" aria-label="Einkauf und Vorrat">
         <a routerLink="/shopping-list">

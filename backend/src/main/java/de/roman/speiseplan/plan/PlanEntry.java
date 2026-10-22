@@ -15,6 +15,9 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "plan_entry")
+@org.hibernate.annotations.Filter(
+        name = de.roman.speiseplan.household.HouseholdScope.FILTER,
+        condition = de.roman.speiseplan.household.HouseholdScope.SHARED_CONDITION)
 public class PlanEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +47,9 @@ public class PlanEntry {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
+    @Column(name = "household_id")
+    private Long householdId;
+
     protected PlanEntry() {
     }
 
@@ -51,6 +57,7 @@ public class PlanEntry {
         this.plan = plan;
         this.dish = dish;
         this.sortOrder = sortOrder;
+        this.householdId = plan.getHouseholdId();
     }
 
     public Long getId() {

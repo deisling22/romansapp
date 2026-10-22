@@ -61,6 +61,15 @@
         <span>Vitamine &amp; weitere Makronährstoffe (Kohlenhydrate, Fett) zusätzlich verfolgen</span>
         <input id="nutritionTrackingEnabled" type="checkbox" class="switch" formControlName="nutritionTrackingEnabled" />
       </label>
+      <label class="checkbox-label" for="costTrackingEnabled">
+        <span>Kosten in der Übersicht anzeigen (Belege &amp; geplante Kosten)</span>
+        <input id="costTrackingEnabled" type="checkbox" class="switch" formControlName="costTrackingEnabled" />
+      </label>
+      @if (form.controls.costTrackingEnabled.value) {
+        <label for="weeklyBudgetEur">Wochenbudget in € (optional)</label>
+        <input id="weeklyBudgetEur" type="number" min="0" step="0.01" placeholder="z. B. 120" formControlName="weeklyBudgetEur" />
+        <a routerLink="/receipts">Belege &amp; Ausgaben verwalten</a>
+      }
       @if (errorMessage) {
         <p class="field-error" role="alert">{{ errorMessage }}</p>
       }
@@ -103,6 +112,8 @@
       <p class="field-error" role="alert">{{ stapleError }}</p>
     }
   </section>
+
+  <app-household-section />
 
   <section class="onboarding-replay">
     <p class="eyebrow">Hilfe</p>

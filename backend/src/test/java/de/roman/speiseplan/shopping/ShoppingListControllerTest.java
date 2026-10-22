@@ -47,7 +47,7 @@ class ShoppingListControllerTest {
         mockMvc.perform(put("/api/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new ProfileUpdateRequest(1.0, null, null, false, null, null, null, null, 1, null))))
+                                new ProfileUpdateRequest(1.0, null, null, false, null, null, null, null, 1, null, null, null))))
                 .andExpect(status().isOk());
     }
 
@@ -78,7 +78,7 @@ class ShoppingListControllerTest {
         mockMvc.perform(put("/api/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new ProfileUpdateRequest(1.0, null, null, false, null, null, null, null, 2, null))))
+                                new ProfileUpdateRequest(1.0, null, null, false, null, null, null, null, 2, null, null, null))))
                 .andExpect(status().isOk());
 
         // 400 g for 4 servings, household of two -> 200 g per cooking, and the dish appears twice.

@@ -27,5 +27,7 @@ public record DishDetailDto(
         int ratingCount,
         Integer myRating,
         boolean favorite,
-        String advancePrepNote) {
+        String advancePrepNote,
+        Double costEur,
+        boolean editable) {
 }

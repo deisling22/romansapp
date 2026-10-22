@@ -9,10 +9,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import de.roman.speiseplan.household.HouseholdContext;
+import de.roman.speiseplan.household.HouseholdScope;
 import java.time.Instant;
+import org.hibernate.annotations.Filter;
 
 @Entity
 @Table(name = "meal_plan")
+@Filter(name = HouseholdScope.FILTER, condition = HouseholdScope.SHARED_CONDITION)
 public class MealPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +47,13 @@ public class MealPlan {
     @Column(name = "leftovers_for_lunch", nullable = false)
     private boolean leftoversForLunch = false;
 
+    /** Null for public creator plans. */
+    @Column(name = "household_id")
+    private Long householdId = HouseholdContext.currentId();
+
+    @Column(name = "cost_eur")
+    private Double costEur;
+
     protected MealPlan() {
     }
 
@@ -53,6 +64,21 @@ public class MealPlan {
     public MealPlan(String name, Creator creator) {
         this.name = name;
         this.creator = creator;
+        if (creator != null) {
+            this.householdId = null;
+        }
+    }
+
+    public Long getHouseholdId() {
+        return householdId;
+    }
+
+    public Double getCostEur() {
+        return costEur;
+    }
+
+    public void setCostEur(Double costEur) {
+        this.costEur = costEur;
     }
 
     public MealPlan(String name, String clientId, String ownerEmail, Instant updatedAt) {

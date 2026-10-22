@@ -29,6 +29,8 @@
   <div id="quick-menu" class="quick-menu" role="menu" aria-label="Weitere Bereiche">
     <p class="menu-section">Hinzufügen</p>
     <a routerLink="/recipe-scan" role="menuitem" (click)="closeMenu()">Rezept scannen</a>
+    <a routerLink="/recipe-scan" [queryParams]="{ link: 1 }" role="menuitem" (click)="closeMenu()">Rezept per Link</a>
+    <a routerLink="/receipts" role="menuitem" (click)="closeMenu()">Beleg erfassen</a>
     <a routerLink="/ingredient-scan" role="menuitem" (click)="closeMenu()">Zutaten scannen</a>
     <p class="menu-section">Mehr</p>
     <a routerLink="/pantry" role="menuitem" (click)="closeMenu()">Vorratsschrank</a>

@@ -1,5 +1,7 @@
 package de.roman.speiseplan.dashboard;
 
+import de.roman.speiseplan.cost.CostSummaryService;
+
 public record DashboardDto(
         double caloriesToday,
         Double calorieGoal,
@@ -18,5 +20,7 @@ public record DashboardDto(
         double folateToday,
         NextDishDto nextDish,
         long cartItemCount,
-        long pantryItemCount) {
+        long pantryItemCount,
+        boolean costTrackingEnabled,
+        CostSummaryService.CostSummaryDto cost) {
 }

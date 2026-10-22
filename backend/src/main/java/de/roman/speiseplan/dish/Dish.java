@@ -10,6 +10,9 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "dish")
+@org.hibernate.annotations.Filter(
+        name = de.roman.speiseplan.household.HouseholdScope.FILTER,
+        condition = de.roman.speiseplan.household.HouseholdScope.SHARED_CONDITION)
 public class Dish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,7 +75,30 @@ public class Dish {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
 
+    /** Null for public catalog dishes (used by creator plans). */
+    @Column(name = "household_id")
+    private Long householdId = de.roman.speiseplan.household.HouseholdContext.currentId();
+
+    @Column(name = "cost_eur")
+    private Double costEur;
+
     protected Dish() {
+    }
+
+    public Long getHouseholdId() {
+        return householdId;
+    }
+
+    public void makePublic() {
+        this.householdId = null;
+    }
+
+    public Double getCostEur() {
+        return costEur;
+    }
+
+    public void setCostEur(Double costEur) {
+        this.costEur = costEur;
     }
 
     public Dish(String name, String imageUrl) {

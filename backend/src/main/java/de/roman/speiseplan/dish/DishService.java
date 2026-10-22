@@ -1,5 +1,7 @@
 package de.roman.speiseplan.dish;
 
+import de.roman.speiseplan.cost.CostDto;
+
 import de.roman.speiseplan.recommendation.ContentType;
 import de.roman.speiseplan.recommendation.TrendScoringService;
 import de.roman.speiseplan.storage.LocalImageStorage;
@@ -128,19 +130,28 @@ public class DishService {
                 summary == null ? 0 : summary.getRatingCount().intValue(),
                 myRating,
                 userEmail != null && dishFavoriteRepository.existsByDishIdAndUserEmail(dishId, userEmail),
-                dish.getAdvancePrepNote());
+                dish.getAdvancePrepNote(),
+                dish.getCostEur(),
+                dish.getHouseholdId() != null);
+    }
+
+    @Transactional
+    public CostDto updateCost(Long dishId, CostDto request) {
+        Dish dish = requireOwnDish(dishId);
+        dish.setCostEur(request.costEur());
+        return new CostDto(dish.getCostEur());
     }
 
     @Transactional
     public AdvancePrepRequest updateAdvancePrep(Long dishId, AdvancePrepRequest request) {
-        Dish dish = requireDish(dishId);
+        Dish dish = requireOwnDish(dishId);
         dish.setAdvancePrepNote(blankToNull(request.note()));
         return new AdvancePrepRequest(dish.getAdvancePrepNote());
     }
 
     @Transactional
     public DishDetailsDto updateDetails(Long dishId, DishDetailsUpdateRequest request) {
-        Dish dish = requireDish(dishId);
+        Dish dish = requireOwnDish(dishId);
         dish.setDescription(blankToNull(request.description()));
         dish.setPrepMinutes(request.prepMinutes());
         dish.setServings(request.servings());
@@ -150,7 +161,7 @@ public class DishService {
 
     @Transactional
     public NutritionDto updateNutrition(Long dishId, NutritionUpdateRequest request) {
-        Dish dish = requireDish(dishId);
+        Dish dish = requireOwnDish(dishId);
         dish.updateNutrition(
                 request.carbsGrams(),
                 request.fatGrams(),
@@ -216,7 +227,7 @@ public class DishService {
 
     @Transactional
     public String addImage(Long dishId, MultipartFile image) {
-        Dish dish = requireDish(dishId);
+        Dish dish = requireOwnDish(dishId);
         String imageUrl = imageStorage.store(image);
         int nextSortOrder = (int) dishImageRepository.countByDishId(dishId);
         dishImageRepository.save(new DishImage(dish, imageUrl, nextSortOrder));
@@ -225,7 +236,7 @@ public class DishService {
 
     @Transactional
     public PrepStepDto addStep(Long dishId, AddPrepStepRequest request) {
-        Dish dish = requireDish(dishId);
+        Dish dish = requireOwnDish(dishId);
         int nextStepOrder = (int) prepStepRepository.countByDishId(dishId);
         PrepStep step = prepStepRepository.save(
                 new PrepStep(dish, nextStepOrder, request.text().trim(), request.timerSeconds()));
@@ -234,7 +245,7 @@ public class DishService {
 
     @Transactional
     public DishIngredientDto addIngredient(Long dishId, AddDishIngredientRequest request) {
-        Dish dish = requireDish(dishId);
+        Dish dish = requireOwnDish(dishId);
         Ingredient ingredient = ingredientRepository.findById(request.ingredientId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Zutat wurde nicht gefunden."));
         DishIngredient dishIngredient = dishIngredientRepository.save(
@@ -246,6 +257,15 @@ public class DishService {
     private Dish requireDish(Long dishId) {
         return dishRepository.findById(dishId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gericht wurde nicht gefunden."));
+    }
+
+    /** Public catalog dishes are read-only for households. */
+    private Dish requireOwnDish(Long dishId) {
+        Dish dish = requireDish(dishId);
+        if (dish.getHouseholdId() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Öffentliche Gerichte können nicht bearbeitet werden.");
+        }
+        return dish;
     }
 
     private static String blankToNull(String value) {

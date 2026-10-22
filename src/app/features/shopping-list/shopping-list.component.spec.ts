@@ -1,3 +1,4 @@
+import { NgZone } from '@angular/core';
 import { fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
@@ -26,7 +27,8 @@ describe('ShoppingListComponent reminders', () => {
     const gamification = jasmine.createSpyObj<GamificationService>('GamificationService', ['record']);
     gamification.record.and.resolveTo();
     component = new ShoppingListComponent(
-      route, api, connectivity, outbox, notifications, gamification, {} as ScheduleApiService);
+      route, api, connectivity, outbox, notifications, gamification, {} as ScheduleApiService,
+      { run: (fn: () => void) => fn(), runOutsideAngular: (fn: () => void) => fn() } as unknown as NgZone);
     item = { id: 7, ingredientName: 'Milch', quantity: 1, unit: 'l', checked: false };
     component.items = [item];
   });

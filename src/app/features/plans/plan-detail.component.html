@@ -48,6 +48,13 @@
           [disabled]="savingSettings"
           (change)="updateSettings({ leftoversForLunch: !plan.leftoversForLunch })" />
       </label>
+      <form class="toggle-row" (ngSubmit)="saveCost()">
+        <label for="planCost">
+          Kosten für den Plan (€)
+          <small>Optional, sonst Summe der Gerichtskosten.</small>
+        </label>
+        <input id="planCost" name="planCost" type="number" min="0" step="0.01" [(ngModel)]="costEur" (blur)="saveCost()" />
+      </form>
     </section>
   }
 
