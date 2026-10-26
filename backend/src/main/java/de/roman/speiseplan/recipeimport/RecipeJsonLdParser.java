@@ -3,8 +3,10 @@ package de.roman.speiseplan.recipeimport;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -18,6 +20,11 @@ public final class RecipeJsonLdParser {
     private static final Pattern JSON_LD = Pattern.compile(
             "<script[^>]*type\\s*=\\s*[\"']application/ld\\+json[\"'][^>]*>(.*?)</script>",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern META_IMAGE = Pattern.compile(
+            "<meta\\b[^>]*(?:property|name)\\s*=\\s*[\"'](?:og:image|og:image:url|twitter:image)[\"'][^>]*>",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern META_CONTENT = Pattern.compile(
+            "\\bcontent\\s*=\\s*([\"'])(.*?)\\1", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Pattern FIRST_NUMBER = Pattern.compile("(\\d+)");
     private static final Pattern TAGS = Pattern.compile("<[^>]+>");
     private static final int MAX_ITEMS = 80;
@@ -26,20 +33,45 @@ public final class RecipeJsonLdParser {
     }
 
     public static Optional<RecipeImportDto> parse(String html, String sourceUrl, ObjectMapper objectMapper) {
+        List<JsonNode> roots = new ArrayList<>();
         Matcher matcher = JSON_LD.matcher(html);
         while (matcher.find()) {
-            JsonNode root;
             try {
-                root = objectMapper.readTree(matcher.group(1).trim());
+                roots.add(objectMapper.readTree(matcher.group(1).trim()));
             } catch (JacksonException invalidBlock) {
-                continue;
+                // Skip malformed blocks; other blocks on the page may still contain the recipe.
             }
+        }
+        Map<String, JsonNode> nodesById = new HashMap<>();
+        roots.forEach(root -> indexIds(root, nodesById, 0));
+        for (JsonNode root : roots) {
             Optional<JsonNode> recipe = findRecipe(root, 0);
             if (recipe.isPresent()) {
-                return Optional.of(toDto(recipe.get(), sourceUrl));
+                return Optional.of(toDto(recipe.get(), sourceUrl, nodesById, html));
             }
         }
         return Optional.empty();
+    }
+
+    /** Collects nodes carrying an {@code @id} so references like {@code "image":{"@id":"…#primaryimage"}} can be resolved. */
+    private static void indexIds(JsonNode node, Map<String, JsonNode> nodesById, int depth) {
+        if (node == null || depth > 6) {
+            return;
+        }
+        if (node.isArray()) {
+            for (JsonNode item : node) {
+                indexIds(item, nodesById, depth + 1);
+            }
+            return;
+        }
+        if (!node.isObject()) {
+            return;
+        }
+        String id = text(node.get("@id"));
+        if (id != null && node.size() > 1) {
+            nodesById.putIfAbsent(id, node);
+        }
+        indexIds(node.get("@graph"), nodesById, depth + 1);
     }
 
     private static Optional<JsonNode> findRecipe(JsonNode node, int depth) {
@@ -80,7 +112,11 @@ public final class RecipeJsonLdParser {
         return "Recipe".equalsIgnoreCase(text(type));
     }
 
-    private static RecipeImportDto toDto(JsonNode recipe, String sourceUrl) {
+    private static RecipeImportDto toDto(JsonNode recipe, String sourceUrl, Map<String, JsonNode> nodesById, String html) {
+        String imageUrl = image(recipe.get("image"), nodesById, 0);
+        if (imageUrl == null) {
+            imageUrl = metaImage(html);
+        }
         String name = clean(text(recipe.get("name")));
         Integer minutes = minutes(recipe.get("totalTime"));
         if (minutes == null) {
@@ -93,7 +129,7 @@ public final class RecipeJsonLdParser {
         return new RecipeImportDto(
                 name == null || name.isBlank() ? "Importiertes Rezept" : truncate(name, 120),
                 truncate(clean(text(recipe.get("description"))), 2000),
-                image(recipe.get("image")),
+                imageUrl,
                 servings(recipe.get("recipeYield")),
                 minutes == null || minutes <= 0 ? null : minutes,
                 strings(recipe.get("recipeIngredient")),
@@ -181,20 +217,50 @@ public final class RecipeJsonLdParser {
         return List.copyOf(tags);
     }
 
-    private static String image(JsonNode node) {
-        if (node == null) {
+    private static String image(JsonNode node, Map<String, JsonNode> nodesById, int depth) {
+        if (node == null || depth > 3) {
             return null;
         }
         if (node.isArray()) {
             for (JsonNode item : node) {
-                String url = image(item);
+                String url = image(item, nodesById, depth + 1);
                 if (url != null) {
                     return url;
                 }
             }
             return null;
         }
-        String url = node.isObject() ? text(node.get("url")) : text(node);
+        if (node.isObject()) {
+            String url = imageUrl(text(node.get("url")));
+            if (url == null) {
+                url = imageUrl(text(node.get("contentUrl")));
+            }
+            if (url == null) {
+                JsonNode referenced = nodesById.get(text(node.get("@id")));
+                if (referenced != null && referenced != node) {
+                    url = image(referenced, nodesById, depth + 1);
+                }
+            }
+            return url;
+        }
+        return imageUrl(text(node));
+    }
+
+    private static String metaImage(String html) {
+        Matcher tag = META_IMAGE.matcher(html);
+        while (tag.find()) {
+            Matcher content = META_CONTENT.matcher(tag.group());
+            if (content.find()) {
+                String url = imageUrl(clean(content.group(2)));
+                if (url != null) {
+                    return url;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String imageUrl(String url) {
         return url != null && (url.startsWith("https://") || url.startsWith("http://")) && url.length() <= 255 ? url : null;
     }
 

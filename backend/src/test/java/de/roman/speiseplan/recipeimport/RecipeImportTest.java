@@ -44,6 +44,37 @@ class RecipeImportTest {
     }
 
     @Test
+    void resolvesImageReferencedByIdInGraph() {
+        String html = """
+                <script type="application/ld+json">
+                {"@context":"https://schema.org","@graph":[
+                  {"@type":"Recipe","name":"Apfelkuchen","image":{"@id":"https://example.com/r#primaryimage"}},
+                  {"@type":"ImageObject","@id":"https://example.com/r#primaryimage",
+                   "contentUrl":"https://img.example.com/apfel.jpg"}
+                ]}
+                </script>
+                """;
+
+        RecipeImportDto recipe = RecipeJsonLdParser.parse(html, "https://example.com/r", mapper).orElseThrow();
+
+        assertThat(recipe.imageUrl()).isEqualTo("https://img.example.com/apfel.jpg");
+    }
+
+    @Test
+    void fallsBackToOpenGraphImage() {
+        String html = """
+                <html><head>
+                <meta content="https://img.example.com/og.jpg?w=960&amp;h=540" property="og:image">
+                <script type="application/ld+json">{"@type":"Recipe","name":"Suppe"}</script>
+                </head></html>
+                """;
+
+        RecipeImportDto recipe = RecipeJsonLdParser.parse(html, "https://example.com/r", mapper).orElseThrow();
+
+        assertThat(recipe.imageUrl()).isEqualTo("https://img.example.com/og.jpg?w=960&h=540");
+    }
+
+    @Test
     void returnsEmptyWithoutRecipe() {
         assertThat(RecipeJsonLdParser.parse("<html><script type='application/ld+json'>{broken</script></html>",
                 "https://example.com", mapper)).isEmpty();
