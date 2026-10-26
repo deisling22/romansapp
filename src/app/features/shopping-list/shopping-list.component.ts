@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, NgZone } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, concatMap, finalize, forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { ShoppingListItem } from '../../core/models';
 import { ConnectivityService } from '../../core/connectivity.service';
@@ -35,6 +35,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   adding = false;
   deletingItemId: number | null = null;
   finishingCheckout = false;
+  removingSelected = false;
   private readonly reminderTimers = new Map<number, ReturnType<typeof setTimeout>>();
   private readonly pendingToggles = new Map<number, { checked: boolean; timer: ReturnType<typeof setTimeout> }>();
 
@@ -70,7 +71,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   };
 
   private refreshInBackground(): void {
-    const busy = this.loading || this.adding || this.generating || this.finishingCheckout
+    const busy = this.loading || this.adding || this.generating || this.finishingCheckout || this.removingSelected
       || this.deletingItemId !== null || this.pendingToggles.size > 0;
     if (busy || document.visibilityState !== 'visible' || !navigator.onLine) {
       return;
@@ -116,6 +117,68 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     return this.items.filter((item) => item.checked);
   }
 
+  get allSelected(): boolean {
+    return this.items.length > 0 && this.checkedItems.length === this.items.length;
+  }
+
+  get bulkBusy(): boolean {
+    return this.removingSelected || this.finishingCheckout || this.deletingItemId !== null;
+  }
+
+  selectAll(): void {
+    if (this.bulkBusy) {
+      return;
+    }
+    const checked = !this.allSelected;
+    for (const item of this.items) {
+      if (item.checked !== checked) {
+        this.toggle(item);
+      }
+    }
+    this.successMessage = checked ? 'Alle Artikel sind ausgewählt.' : 'Die Auswahl wurde aufgehoben.';
+  }
+
+  removeSelected(): void {
+    if (this.bulkBusy || this.checkedItems.length === 0) {
+      return;
+    }
+    if (!this.connectivity.isOnline) {
+      this.errorMessage = 'Zum Entfernen der ausgewählten Artikel ist eine Internetverbindung erforderlich.';
+      return;
+    }
+    const selected = this.checkedItems;
+    this.removingSelected = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    for (const item of selected) {
+      this.cancelPendingToggle(item.id);
+    }
+    from(selected).pipe(
+      concatMap((item) => this.shoppingListApi.deleteItem(item.id).pipe(
+        tap(() => {
+          this.cancelReminder(item.id);
+          this.items = this.items.filter((entry) => entry.id !== item.id);
+        }),
+      )),
+      finalize(() => (this.removingSelected = false)),
+    ).subscribe({
+      complete: () => {
+        this.successMessage = `${selected.length} ${selected.length === 1 ? 'Artikel wurde' : 'Artikel wurden'} entfernt.`;
+      },
+      error: () => {
+        this.errorMessage = 'Nicht alle ausgewählten Artikel konnten entfernt werden. Bitte erneut versuchen.';
+      },
+    });
+  }
+
+  private cancelPendingToggle(itemId: number): void {
+    const pending = this.pendingToggles.get(itemId);
+    if (pending) {
+      clearTimeout(pending.timer);
+      this.pendingToggles.delete(itemId);
+    }
+  }
+
   load(): void {
     this.loading = true;
     const request = this.hasPlanContext
@@ -136,7 +199,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   addItem(): void {
     const name = this.newIngredientName.trim();
     const unit = this.newUnit.trim();
-    if (!name || !unit || this.newQuantity <= 0 || this.adding) {
+    if (!name || !unit || this.newQuantity <= 0 || this.adding || this.bulkBusy) {
       return;
     }
     this.adding = true;
@@ -160,7 +223,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   generate(): void {
-    if (this.generating) {
+    if (this.generating || this.bulkBusy) {
       return;
     }
     this.generating = true;
@@ -177,7 +240,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   generateUpcoming(): void {
-    if (this.generating) {
+    if (this.generating || this.bulkBusy) {
       return;
     }
     this.generating = true;
@@ -204,6 +267,9 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   toggle(item: ShoppingListItem): void {
+    if (this.bulkBusy) {
+      return;
+    }
     const checked = !item.checked;
     item.checked = checked;
     this.successMessage = checked
@@ -241,12 +307,13 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   remove(item: ShoppingListItem): void {
-    if (this.deletingItemId !== null) {
+    if (this.bulkBusy) {
       return;
     }
     this.deletingItemId = item.id;
     this.shoppingListApi.deleteItem(item.id).subscribe({
       next: () => {
+        this.cancelPendingToggle(item.id);
         this.cancelReminder(item.id);
         this.items = this.items.filter((entry) => entry.id !== item.id);
         this.successMessage = `${item.ingredientName} wurde entfernt.`;
@@ -279,13 +346,21 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   prepareForExit(): Observable<boolean> {
+    if (this.removingSelected) {
+      this.errorMessage = 'Bitte warte, bis die ausgewählten Artikel entfernt wurden.';
+      return of(false);
+    }
     const checkedItems = this.checkedItems;
     if (checkedItems.length === 0 || !this.connectivity.isOnline) {
       return of(true);
     }
 
+    for (const item of checkedItems) {
+      this.cancelPendingToggle(item.id);
+    }
     return forkJoin(checkedItems.map((item) => this.shoppingListApi.updateItem(item.id, true))).pipe(
       switchMap(() => this.shoppingListApi.checkout()),
+      tap(() => checkedItems.forEach((item) => this.cancelReminder(item.id))),
       tap(() => void this.gamification.record('COMPLETE_SHOPPING', this.planId ? String(this.planId) : undefined)),
       map(() => true),
       catchError(() => {
@@ -296,7 +371,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   finishShopping(): void {
-    if (this.finishingCheckout || this.checkedItems.length === 0) {
+    if (this.bulkBusy || this.checkedItems.length === 0) {
       return;
     }
     const movedCount = this.checkedItems.length;
@@ -318,4 +393,3 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     });
   }
 }
-

@@ -8,11 +8,11 @@
   </header>
 
   @if (hasPlanContext) {
-    <button type="button" class="generate" [disabled]="generating" (click)="generate()">
+    <button type="button" class="generate" [disabled]="generating || bulkBusy" (click)="generate()">
       {{ generating ? 'Wird erstellt ...' : 'Aus Plan neu erstellen' }}
     </button>
   } @else {
-    <button type="button" class="generate" [disabled]="generating" (click)="generateUpcoming()">
+    <button type="button" class="generate" [disabled]="generating || bulkBusy" (click)="generateUpcoming()">
       {{ generating ? 'Wird erstellt ...' : 'Für die nächsten Tage ergänzen' }}
     </button>
     <form class="add-form" (ngSubmit)="addItem()">
@@ -35,7 +35,7 @@
           <option>Packung</option>
         </select>
       </label>
-      <button type="submit" [disabled]="adding">
+      <button type="submit" [disabled]="adding || bulkBusy">
         {{ adding ? 'Wird ergänzt ...' : 'Hinzufügen' }}
       </button>
     </form>
@@ -58,6 +58,28 @@
   }
 
   @if (!loading) {
+    @if (items.length > 0) {
+      <section class="bulk-actions" aria-label="Artikel gemeinsam bearbeiten" [attr.aria-busy]="bulkBusy">
+        <label class="select-all">
+          <input
+            type="checkbox"
+            [checked]="allSelected"
+            [indeterminate]="checkedItems.length > 0 && !allSelected"
+            [disabled]="bulkBusy"
+            (change)="selectAll()" />
+          Alles auswählen
+        </label>
+        <span>{{ checkedItems.length }} ausgewählt</span>
+        <div class="bulk-buttons">
+          <button type="button" class="remove-selected" [disabled]="bulkBusy || checkedItems.length === 0" (click)="removeSelected()">
+            {{ removingSelected ? 'Wird entfernt ...' : 'Ausgewählte entfernen' }}
+          </button>
+          <button type="button" class="move-selected" [disabled]="bulkBusy || checkedItems.length === 0" (click)="finishShopping()">
+            {{ finishingCheckout ? 'Wird gebucht ...' : 'In den Vorratsschrank' }}
+          </button>
+        </div>
+      </section>
+    }
     <section class="list-section" aria-labelledby="open-items-heading">
       <div class="section-heading">
         <h2 id="open-items-heading">Noch einzukaufen</h2>
@@ -67,11 +89,11 @@
         @for (item of openItems; track item.id) {
           <li class="item-row">
             <label>
-              <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
+              <input type="checkbox" [checked]="item.checked" [disabled]="bulkBusy" (change)="toggle(item)" />
               <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
               <strong>{{ item.ingredientName }}</strong>
             </label>
-            <button type="button" class="remove-button" [disabled]="deletingItemId === item.id" (click)="remove(item)">
+            <button type="button" class="remove-button" [disabled]="bulkBusy" (click)="remove(item)">
               Entfernen
             </button>
           </li>
@@ -92,18 +114,18 @@
           @for (item of checkedItems; track item.id) {
             <li class="item-row checked">
               <label>
-                <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
+                <input type="checkbox" [checked]="item.checked" [disabled]="bulkBusy" (change)="toggle(item)" />
                 <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
                 <strong>{{ item.ingredientName }}</strong>
               </label>
-              <button type="button" class="remove-button" [disabled]="deletingItemId === item.id" (click)="remove(item)">
+              <button type="button" class="remove-button" [disabled]="bulkBusy" (click)="remove(item)">
                 Entfernen
               </button>
             </li>
           }
         </ul>
         <p class="checkout-note">Beim Verlassen der Einkaufsliste wandern diese Artikel automatisch in den Vorratsschrank.</p>
-        <button type="button" class="finish-shopping" [disabled]="finishingCheckout" (click)="finishShopping()">
+        <button type="button" class="finish-shopping" [disabled]="bulkBusy" (click)="finishShopping()">
           {{ finishingCheckout ? 'Wird gebucht ...' : 'Einkauf abschließen' }}
         </button>
       </section>

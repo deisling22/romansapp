@@ -4,6 +4,41 @@
   display: block;
 }
 
+.bulk-actions {
+  @include ios.card;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px;
+}
+
+.select-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.bulk-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.bulk-buttons button {
+  @include ios.button-tinted;
+  flex: 1 1 180px;
+  min-height: 44px;
+}
+
+.bulk-buttons .remove-selected {
+  color: var(--red);
+}
+
 .generate {
   @include ios.button-filled;
   width: 100%;

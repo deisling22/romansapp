@@ -39,6 +39,11 @@ and restores the previous state with an error message if saving fails.
 
 ## Development server
 
+In the shopping list, “Alles auswählen” checks all visible items. Checked items
+can be removed together or moved into the pantry with “In den Vorratsschrank”.
+As with individually checked items, leaving the page also checks out the cart.
+Bulk removal requires an internet connection.
+
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
 ## Code scaffolding
