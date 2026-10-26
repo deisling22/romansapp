@@ -39,8 +39,8 @@
           <span>{{ dish.prepMinutes }} Min.</span>
         }
         <span>{{ dish.servings }} {{ dish.servings === 1 ? 'Portion' : 'Portionen' }}</span>
-        <span>{{ dish.caloriesPerServing }} kcal / Portion</span>
-        <span>{{ dish.proteinPerServing }} g Protein / Portion</span>
+        <span>{{ ceil(dish.caloriesPerServing) }} kcal / Portion</span>
+        <span>{{ ceil(dish.proteinPerServing) }} g Protein / Portion</span>
         @if (dish.carbsGrams !== null) {
           <span>{{ dish.carbsGrams }} g Kohlenhydrate / Portion</span>
         }

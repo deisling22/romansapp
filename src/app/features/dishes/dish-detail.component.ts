@@ -20,6 +20,8 @@ import { DecimalPipe } from '@angular/common';
     imports: [RouterLink, StarRatingComponent, FormsModule, ReactiveFormsModule, DecimalPipe]
 })
 export class DishDetailComponent implements OnInit, OnDestroy {
+  readonly ceil = Math.ceil;
+
   readonly ingredientForm = this.formBuilder.nonNullable.group({
     ingredientId: [0, [Validators.required, Validators.min(1)]],
     quantityGrams: [100, [Validators.required, Validators.min(1)]],
