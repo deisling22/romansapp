@@ -23,6 +23,7 @@ export class PlanListComponent implements OnInit {
   newPlanName = '';
   creating = false;
   busyPlanId: number | null = null;
+  readonly savingPlanIds = new Set<number>();
 
   constructor(
     private readonly mealPlanApi: MealPlanApiService,
@@ -37,6 +38,7 @@ export class PlanListComponent implements OnInit {
 
   load(): void {
     this.loading = true;
+    this.errorMessage = '';
     void this.loadLocalPlans();
     this.mealPlanApi.getPlans().subscribe({
       next: (plans) => {
@@ -86,18 +88,23 @@ export class PlanListComponent implements OnInit {
   toggleActive(plan: MealPlan, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    if (this.busyPlanId !== null) {
+    if (this.busyPlanId === plan.id || this.savingPlanIds.has(plan.id)) {
       return;
     }
-    this.busyPlanId = plan.id;
-    this.scheduleApi.updatePlanSettings(plan.id, { active: !plan.active }).subscribe({
+    const previousActive = plan.active;
+    const active = !previousActive;
+    this.errorMessage = '';
+    this.savingPlanIds.add(plan.id);
+    this.plans = this.plans.map((entry) => entry.id === plan.id ? { ...entry, active } : entry);
+    this.scheduleApi.updatePlanSettings(plan.id, { active }).subscribe({
       next: (updated) => {
         this.plans = this.plans.map((entry) => (entry.id === updated.id ? updated : entry));
-        this.busyPlanId = null;
+        this.savingPlanIds.delete(plan.id);
       },
       error: () => {
-        this.errorMessage = 'Der Plan konnte nicht aktiviert werden.';
-        this.busyPlanId = null;
+        this.plans = this.plans.map((entry) => entry.id === plan.id ? { ...entry, active: previousActive } : entry);
+        this.errorMessage = `Der Plan „${plan.name}“ konnte nicht ${active ? 'aktiviert' : 'pausiert'} werden. Bitte erneut versuchen.`;
+        this.savingPlanIds.delete(plan.id);
       },
     });
   }
@@ -105,7 +112,7 @@ export class PlanListComponent implements OnInit {
   copyPlan(plan: MealPlan, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    if (this.busyPlanId !== null) {
+    if (this.busyPlanId !== null || this.savingPlanIds.has(plan.id)) {
       return;
     }
     this.busyPlanId = plan.id;
@@ -124,7 +131,7 @@ export class PlanListComponent implements OnInit {
   deletePlan(plan: MealPlan, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    if (this.busyPlanId !== null || !confirm(`Plan "${plan.name}" wirklich löschen?`)) {
+    if (this.busyPlanId !== null || this.savingPlanIds.has(plan.id) || !confirm(`Plan "${plan.name}" wirklich löschen?`)) {
       return;
     }
     this.busyPlanId = plan.id;

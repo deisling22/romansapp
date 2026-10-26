@@ -46,14 +46,16 @@
 
   @if (!loading) {
     <section class="plan-list" aria-label="Vorhandene Speisepläne">
-      @for (plan of plans; track plan) {
+      @for (plan of plans; track plan.id) {
         <a class="plan-row" [routerLink]="['/plans', plan.id]">
           <span class="plan-mark">{{ plan.name.charAt(0) }}</span>
           <span class="plan-copy">
             <strong>{{ plan.name }}</strong>
             <small>
               {{ plan.dishCount }} {{ plan.dishCount === 1 ? 'Gericht' : 'Gerichte' }}
-              @if (plan.active) {
+              @if (savingPlanIds.has(plan.id)) {
+                · <span role="status">Wird gespeichert …</span>
+              } @else if (plan.active) {
                 · aktiv
               }
             </small>
@@ -64,13 +66,15 @@
               class="active-toggle"
               [class.is-active]="plan.active"
               [attr.aria-pressed]="plan.active"
-              [disabled]="busyPlanId !== null"
+              [disabled]="busyPlanId === plan.id || savingPlanIds.has(plan.id)"
+              [attr.aria-busy]="savingPlanIds.has(plan.id)"
+              [attr.aria-label]="plan.active ? 'Plan pausieren' : 'Plan aktivieren'"
               (click)="toggleActive(plan, $event)"
               [title]="plan.active ? 'Plan pausieren' : 'Plan aktivieren'">
               {{ plan.active ? '●' : '○' }}
             </button>
-            <button type="button" [disabled]="busyPlanId !== null" (click)="copyPlan(plan, $event)" title="Plan kopieren">⧉</button>
-            <button type="button" [disabled]="busyPlanId !== null" (click)="deletePlan(plan, $event)" title="Plan löschen">✕</button>
+            <button type="button" [disabled]="busyPlanId !== null || savingPlanIds.has(plan.id)" (click)="copyPlan(plan, $event)" title="Plan kopieren">⧉</button>
+            <button type="button" [disabled]="busyPlanId !== null || savingPlanIds.has(plan.id)" (click)="deletePlan(plan, $event)" title="Plan löschen">✕</button>
           </span>
           <span class="chevron" aria-hidden="true">›</span>
         </a>

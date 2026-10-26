@@ -29,6 +29,14 @@ backend session.
 
 This project uses [Angular CLI](https://angular.dev) version 22.
 
+## Production responsiveness
+
+The Render free backend can take over a minute to wake after inactivity.
+API requests allow up to 90 seconds for a response; an always-on Render instance
+is needed to avoid this infrastructure delay. Plan activation shows the requested
+state immediately with a saving indicator, blocks duplicate clicks for that plan,
+and restores the previous state with an error message if saving fails.
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.

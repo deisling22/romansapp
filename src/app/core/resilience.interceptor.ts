@@ -3,7 +3,8 @@ import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest
 import { Observable, finalize, retry, share, throwError, timeout, timer } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-const REQUEST_TIMEOUT_MS = 20_000;
+// Render's free instance can take over a minute to wake after inactivity.
+const REQUEST_TIMEOUT_MS = 90_000;
 const MAX_RETRIES = 2;
 
 /**
