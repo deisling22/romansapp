@@ -80,7 +80,16 @@ public class ShoppingListService {
     @Transactional
     public ShoppingListItemDto addItem(CreateShoppingListItemRequest request) {
         return ShoppingListItemDto.from(mergeItem(
-            null, request.ingredientName().trim(), request.quantity(), request.unit().trim()));
+                currentItems(), null, request.ingredientName().trim(), request.quantity(), request.unit().trim()));
+    }
+
+    /** Adds several items while reading the list only once. */
+    @Transactional
+    public void addItems(List<CreateShoppingListItemRequest> requests) {
+        List<ShoppingListItem> items = currentItems();
+        for (CreateShoppingListItemRequest request : requests) {
+            mergeItem(items, null, request.ingredientName().trim(), request.quantity(), request.unit().trim());
+        }
     }
 
     @Transactional
@@ -115,6 +124,7 @@ public class ShoppingListService {
 
         // Only top up items still missing after pantry stock is subtracted, so re-running generate() is idempotent.
         Map<String, Double> pantryStock = ScheduleService.pantryStock(pantryItemRepository.findAll());
+        List<ShoppingListItem> items = currentItems();
         List<ShoppingListItemDto> updated = new ArrayList<>();
         for (ShoppingListItem need : aggregated.values()) {
             String key = IngredientMatcher.key(need.getIngredientName(), need.getUnit());
@@ -126,7 +136,7 @@ public class ShoppingListService {
                 continue;
             }
             updated.add(ShoppingListItemDto.from(
-                    ensureQuantity(plan, need.getIngredientName(), need.getUnit(), stillNeeded)));
+                    ensureQuantity(items, plan, need.getIngredientName(), need.getUnit(), stillNeeded)));
         }
         return updated;
     }
@@ -152,32 +162,42 @@ public class ShoppingListService {
         shoppingListItemRepository.deleteAll(shoppingListItemRepository.findAll());
     }
 
+    private List<ShoppingListItem> currentItems() {
+        return new ArrayList<>(shoppingListItemRepository.findAll());
+    }
+
+    /** {@code items} is the current list; it is kept in step so callers can merge several items in a row. */
     private ShoppingListItem mergeItem(
-            MealPlan plan, String ingredientName, double quantity, String unit) {
-        List<ShoppingListItem> matches = matches(ingredientName, unit);
+            List<ShoppingListItem> items, MealPlan plan, String ingredientName, double quantity, String unit) {
+        List<ShoppingListItem> matches = matches(items, ingredientName, unit);
         if (matches.isEmpty()) {
-            return shoppingListItemRepository.save(new ShoppingListItem(plan, ingredientName, quantity, unit));
+            ShoppingListItem created =
+                    shoppingListItemRepository.save(new ShoppingListItem(plan, ingredientName, quantity, unit));
+            items.add(created);
+            return created;
         }
 
         ShoppingListItem target = matches.getFirst();
         double combinedQuantity = convert(ingredientName, unit, quantity, target) + quantityIn(target, matches);
         target.addQuantity(combinedQuantity - target.getQuantity());
-        if (matches.size() > 1) {
-            shoppingListItemRepository.deleteAll(matches.subList(1, matches.size()));
-        }
+        removeDuplicates(items, matches);
         return target;
     }
 
-    private ShoppingListItem ensureQuantity(MealPlan plan, String ingredientName, String unit, double desiredQuantity) {
-        List<ShoppingListItem> matches = matches(ingredientName, unit);
+    private ShoppingListItem ensureQuantity(
+            List<ShoppingListItem> items, MealPlan plan, String ingredientName, String unit, double desiredQuantity) {
+        List<ShoppingListItem> matches = matches(items, ingredientName, unit);
         if (matches.isEmpty()) {
-            return shoppingListItemRepository.save(new ShoppingListItem(plan, ingredientName, desiredQuantity, unit));
+            ShoppingListItem created =
+                    shoppingListItemRepository.save(new ShoppingListItem(plan, ingredientName, desiredQuantity, unit));
+            items.add(created);
+            return created;
         }
         ShoppingListItem target = matches.getFirst();
         double existing = quantityIn(target, matches);
         if (matches.size() > 1) {
             target.setQuantity(existing);
-            shoppingListItemRepository.deleteAll(matches.subList(1, matches.size()));
+            removeDuplicates(items, matches);
         }
         double desired = convert(ingredientName, unit, desiredQuantity, target);
         if (existing < desired) {
@@ -186,10 +206,18 @@ public class ShoppingListService {
         return target;
     }
 
+    private void removeDuplicates(List<ShoppingListItem> items, List<ShoppingListItem> matches) {
+        if (matches.size() > 1) {
+            List<ShoppingListItem> duplicates = matches.subList(1, matches.size());
+            shoppingListItemRepository.deleteAll(duplicates);
+            items.removeAll(duplicates);
+        }
+    }
+
     /** Same ingredient regardless of spelling, plural or unit ("Tomate 3 Stk." matches "Tomaten 300 g"). */
-    private List<ShoppingListItem> matches(String ingredientName, String unit) {
+    private static List<ShoppingListItem> matches(List<ShoppingListItem> items, String ingredientName, String unit) {
         String key = IngredientMatcher.key(ingredientName, unit);
-        return shoppingListItemRepository.findAll().stream()
+        return items.stream()
                 .filter(item -> IngredientMatcher.key(item.getIngredientName(), item.getUnit()).equals(key))
                 .sorted(java.util.Comparator.comparing(ShoppingListItem::getId))
                 .toList();

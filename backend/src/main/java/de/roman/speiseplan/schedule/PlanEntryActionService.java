@@ -188,13 +188,16 @@ public class PlanEntryActionService {
     }
 
     List<ShoppingListItemDto> addToShoppingList(Map<String, Uncovered> uncovered) {
-        for (Uncovered item : uncovered.values()) {
-            // Scaled recipes yield e.g. 0.25 onions; shops only sell whole pieces.
-            double quantity = IngredientMatcher.isCountUnit(item.unit)
-                    ? Math.ceil(item.quantity - ScheduleService.EPSILON)
-                    : item.quantity;
-            shoppingListService.addItem(new CreateShoppingListItemRequest(item.name, quantity, item.unit));
-        }
+        List<CreateShoppingListItemRequest> additions = uncovered.values().stream()
+                .map(item -> {
+                    // Scaled recipes yield e.g. 0.25 onions; shops only sell whole pieces.
+                    double quantity = IngredientMatcher.isCountUnit(item.unit)
+                            ? Math.ceil(item.quantity - ScheduleService.EPSILON)
+                            : item.quantity;
+                    return new CreateShoppingListItemRequest(item.name, quantity, item.unit);
+                })
+                .toList();
+        shoppingListService.addItems(additions);
         return shoppingListService.getAllItems();
     }
 
