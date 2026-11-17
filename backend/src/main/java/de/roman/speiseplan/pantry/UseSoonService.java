@@ -79,8 +79,13 @@ public class UseSoonService {
     public UseSoonDto useSoon(String ownerEmail, Schedule upcoming) {
         LocalDate today = PantryService.today();
         long wastedThisMonth = pantryService.countWastedThisMonth();
-        List<PantryItem> expiring = pantryItemRepository.findByExpiresOnLessThanEqualOrderByExpiresOnAsc(
-                today.plusDays(PantryService.EXPIRING_SOON_DAYS));
+        LocalDate limit = today.plusDays(PantryService.EXPIRING_SOON_DAYS);
+        List<PantryItem> expiring = upcoming == null
+                ? pantryItemRepository.findByExpiresOnLessThanEqualOrderByExpiresOnAsc(limit)
+                : upcoming.pantryItems().stream()
+                        .filter(item -> item.getExpiresOn() != null && !item.getExpiresOn().isAfter(limit))
+                        .sorted(Comparator.comparing(PantryItem::getExpiresOn))
+                        .toList();
         if (expiring.isEmpty()) {
             return new UseSoonDto(List.of(), List.of(), null, wastedThisMonth);
         }
@@ -126,13 +131,14 @@ public class UseSoonService {
 
         return new UseSoonDto(
                 items,
-                openUrgency.isEmpty() ? List.of() : suggest(openUrgency, planned, ownerEmail),
+                openUrgency.isEmpty() ? List.of() : suggest(openUrgency, planned, schedule.pantryItems(), ownerEmail),
                 todayEntry(planned),
                 wastedThisMonth);
     }
 
     private List<UseSoonDto.DishSuggestion> suggest(
-            Map<String, Double> openUrgency, List<ScheduledMeal> planned, String ownerEmail) {
+            Map<String, Double> openUrgency, List<ScheduledMeal> planned, List<PantryItem> pantryItems,
+            String ownerEmail) {
         Set<Long> excluded = new HashSet<>(tasteService.hiddenDishIds());
         excluded.addAll(recommendationService.dislikedDishIds(ownerEmail));
         // Dishes of the next days are already accounted for in the planned use
@@ -147,7 +153,7 @@ public class UseSoonService {
                 .findByDishIdIn(dishes.stream().map(Dish::getId).toList())
                 .stream()
                 .collect(Collectors.groupingBy(entry -> entry.getDish().getId()));
-        Map<String, Double> pantry = ScheduleService.pantryStock(pantryItemRepository.findAll());
+        Map<String, Double> pantry = ScheduleService.pantryStock(pantryItems);
         Map<String, Double> taste = recommendationService.tasteProfile(ownerEmail);
         double portions = PortionCalculator.householdPortions(profileService.getProfile());
 

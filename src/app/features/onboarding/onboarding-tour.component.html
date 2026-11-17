@@ -24,7 +24,7 @@
                 role="radio"
                 [attr.aria-checked]="shoppingTripsPerWeek === option.value"
                 [class.selected]="shoppingTripsPerWeek === option.value"
-                (click)="shoppingTripsPerWeek = option.value">{{ option.label }}</button>
+                (click)="setShoppingTrips(option.value)">{{ option.label }}</button>
             }
           </div>
         </div>

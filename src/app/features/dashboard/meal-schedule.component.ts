@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { DashboardApiService } from '../../core/dashboard-api.service';
 import { GamificationService } from '../../core/gamification.service';
 import { toAbsoluteImageUrl } from '../../core/image-url';
-import { MEAL_SLOT_LABELS, ReplacementSuggestion, Schedule, ScheduleDay, ScheduledMeal } from '../../core/models';
+import { Home, MEAL_SLOT_LABELS, ReplacementSuggestion, Schedule, ScheduleDay, ScheduledMeal } from '../../core/models';
 import { NotificationService } from '../../core/notification.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
 import { DatePipe } from '@angular/common';
@@ -30,8 +30,11 @@ export class MealScheduleComponent implements OnChanges {
   /** A snapshot is on screen while the server answer is still on its way. */
   @Input() refreshing = false;
   @Input() loadError = '';
-  /** Something changed on the server; the parent reloads and passes the new plan in. */
-  @Output() readonly changed = new EventEmitter<void>();
+  /**
+   * Something changed on the server. If the answer already carried the fresh screen state it is passed
+   * along; otherwise the parent reloads.
+   */
+  @Output() readonly changed = new EventEmitter<Home | undefined>();
 
   readonly slotLabels = MEAL_SLOT_LABELS;
   errorMessage = '';
@@ -182,10 +185,11 @@ export class MealScheduleComponent implements OnChanges {
     meal.status = 'COOKED';
     this.run(
       key,
-      this.dashboardApi.markCooked(meal.planEntryId),
+      this.dashboardApi.markCookedForHome(meal.planEntryId),
       `${meal.dishName} ist als gekocht gespeichert.`,
       () => void this.gamification.record('COOK_DISH', String(meal.dishId)),
       () => (meal.status = previousStatus),
+      true,
     );
   }
 
@@ -245,6 +249,7 @@ export class MealScheduleComponent implements OnChanges {
     success: string,
     afterSuccess?: () => void,
     rollback?: () => void,
+    answerIsHome = false,
   ): void {
     if (this.busyKey) {
       return;
@@ -253,13 +258,13 @@ export class MealScheduleComponent implements OnChanges {
     this.errorMessage = '';
     this.successMessage = '';
     request.subscribe({
-      next: () => {
+      next: (answer) => {
         afterSuccess?.();
         this.busyKey = null;
         this.panel = null;
         this.menuKey = null;
         this.successMessage = success;
-        this.changed.emit();
+        this.changed.emit(answerIsHome ? (answer as Home) : undefined);
       },
       error: () => {
         rollback?.();

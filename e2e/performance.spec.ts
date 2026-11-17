@@ -110,7 +110,9 @@ test.describe('Reaktionsfähigkeit bei schnellem Klicken', () => {
     await expect(button).toBeVisible();
     await hammer(page, button, 10);
     await expect(page.getByRole('status').filter({ hasText: 'ist als gekocht gespeichert' })).toBeVisible();
-    expect(countRequests(apiRequests, 'PATCH', /\/plan-entries\/\d+\/cook$/)).toBe(1);
+    expect(countRequests(apiRequests, 'PATCH', /\/plan-entries\/\d+\/cook(\?|$)/)).toBe(1);
+    // The answer carries the fresh start screen, so no reload follows
+    expect(countRequests(apiRequests, 'GET', /\/home(\?|$)/)).toBe(1);
   });
 
   test('"Später" mehrfach angetippt verschiebt nur einmal', async ({ page, apiRequests }) => {

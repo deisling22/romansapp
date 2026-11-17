@@ -15,6 +15,7 @@ import { AsyncPipe, DecimalPipe } from '@angular/common';
 
 const TOGGLE_SYNC_DELAY_MS = 300;
 const OTHER_CATEGORY = 'Sonstiges';
+const INGREDIENT_NAMES_SNAPSHOT = 'ingredient-names';
 /** Order of a typical walk through the supermarket. */
 const CATEGORY_ORDER = [
   'Obst & Gemüse',
@@ -146,10 +147,12 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
       return;
     }
     this.ingredientNamesRequested = true;
+    this.ingredientNames = this.snapshots.read<string[]>(INGREDIENT_NAMES_SNAPSHOT) ?? [];
     this.dishApi.getIngredients().subscribe({
       next: (ingredients) => {
         this.ingredientNames = [...new Set(ingredients.map((ingredient) => ingredient.name))]
           .sort((a, b) => a.localeCompare(b, 'de'));
+        this.snapshots.write(INGREDIENT_NAMES_SNAPSHOT, this.ingredientNames);
       },
       error: () => (this.ingredientNamesRequested = false),
     });

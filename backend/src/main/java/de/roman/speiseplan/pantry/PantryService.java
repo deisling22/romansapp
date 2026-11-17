@@ -130,11 +130,6 @@ public class PantryService {
     }
 
     @Transactional(readOnly = true)
-    public long countExpiringSoon() {
-        return pantryItemRepository.countByExpiresOnLessThanEqual(today().plusDays(EXPIRING_SOON_DAYS));
-    }
-
-    @Transactional(readOnly = true)
     public long countWastedThisMonth() {
         Instant startOfMonth = today().withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
         return pantryRemovalRepository.countByReasonAndRemovedAtGreaterThanEqual(
@@ -180,11 +175,6 @@ public class PantryService {
             }
         }
         pantryItemRepository.deleteAll(depleted);
-    }
-
-    @Transactional(readOnly = true)
-    public long countItems() {
-        return pantryItemRepository.count();
     }
 
     private PantryItem requireItem(Long itemId) {

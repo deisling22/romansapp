@@ -44,4 +44,12 @@ public class DashboardController {
         dashboardService.markCooked(planEntryId);
         return dashboardService.getDashboard();
     }
+
+    /** For the start screen: answers with the fresh screen state, so no second request is needed. */
+    @PatchMapping(value = "/api/plan-entries/{planEntryId}/cook", params = "view=home")
+    public HomeDto markCookedForHome(
+            @PathVariable Long planEntryId, @AuthenticationPrincipal(errorOnInvalidType = false) OAuth2User user) {
+        dashboardService.markCooked(planEntryId);
+        return getHome(7, user);
+    }
 }

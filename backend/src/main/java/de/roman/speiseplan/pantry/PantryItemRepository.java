@@ -8,6 +8,4 @@ public interface PantryItemRepository extends JpaRepository<PantryItem, Long> {
     List<PantryItem> findAllByOrderByPurchasedAtDescIngredientNameAsc();
 
     List<PantryItem> findByExpiresOnLessThanEqualOrderByExpiresOnAsc(LocalDate limit);
-
-    long countByExpiresOnLessThanEqual(LocalDate limit);
 }

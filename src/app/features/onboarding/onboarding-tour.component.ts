@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, shareReplay, switchMap } from 'rxjs';
 import { CreatorApiService } from '../../core/creator-api.service';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { Profile } from '../../core/models';
@@ -51,7 +51,10 @@ export class OnboardingTourComponent implements OnInit {
   saving = false;
   errorMessage = '';
 
-  private profile: Profile | null = null;
+  /** Shared so that saving can wait for a profile that is still loading (sleeping backend). */
+  private readonly profile$: Observable<Profile> = this.profileApi.getProfile().pipe(shareReplay(1));
+  private householdTouched = false;
+  private shoppingTouched = false;
 
   constructor(
     readonly onboarding: OnboardingService,
@@ -63,11 +66,15 @@ export class OnboardingTourComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.profileApi.getProfile().subscribe({
+    this.profile$.subscribe({
       next: (profile) => {
-        this.profile = profile;
-        this.householdSize = Math.max(1, profile.householdSize);
-        this.shoppingTripsPerWeek = profile.shoppingTripsPerWeek;
+        // Never overwrite what the user already chose while the profile was loading.
+        if (!this.householdTouched) {
+          this.householdSize = Math.max(1, profile.householdSize);
+        }
+        if (!this.shoppingTouched) {
+          this.shoppingTripsPerWeek = profile.shoppingTripsPerWeek;
+        }
       },
       error: () => undefined,
     });
@@ -114,7 +121,13 @@ export class OnboardingTourComponent implements OnInit {
   }
 
   changeHousehold(delta: number): void {
+    this.householdTouched = true;
     this.householdSize = Math.max(1, Math.min(12, this.householdSize + delta));
+  }
+
+  setShoppingTrips(trips: number): void {
+    this.shoppingTouched = true;
+    this.shoppingTripsPerWeek = trips;
   }
 
   toggleTag(tag: string): void {
@@ -145,14 +158,14 @@ export class OnboardingTourComponent implements OnInit {
     }
     this.saving = true;
     this.errorMessage = '';
-    const steps: Observable<unknown>[] = [this.recommendationApi.setLikedTags([...this.likedTags])];
-    if (this.profile) {
-      steps.push(this.profileApi.updateProfile({
-        ...this.profile,
+    const steps: Observable<unknown>[] = [
+      this.recommendationApi.setLikedTags([...this.likedTags]),
+      this.profile$.pipe(switchMap((profile) => this.profileApi.updateProfile({
+        ...profile,
         householdSize: this.householdSize,
         shoppingTripsPerWeek: this.shoppingTripsPerWeek,
-      }));
-    }
+      }))),
+    ];
     const starter = this.starterPlans.find((plan) => plan.key === this.selectedPlanKey);
     if (starter) {
       const planId$ = starter.creatorId

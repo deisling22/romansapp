@@ -11,7 +11,7 @@
       [loading]="loading"
       [refreshing]="refreshing"
       [loadError]="errorMessage"
-      (changed)="load()"></app-meal-schedule>
+      (changed)="onScheduleChanged($event)"></app-meal-schedule>
 
     <app-use-soon-card [useSoon]="useSoon" [limit]="3" (changed)="load()" />
 

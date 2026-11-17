@@ -180,7 +180,7 @@ PUT    /api/plans/{planId}/settings          { active?, leftoversForLunch? }
 GET    /api/plans/{planId}/dishes
 POST   /api/plans/{planId}/dishes            multipart/form-data: name, image
 POST   /api/plans/{planId}/entries           { dishId, mealSlot? }   (Katalog-Gericht uebernehmen)
-PATCH  /api/plan-entries/{entryId}/cook
+PATCH  /api/plan-entries/{entryId}/cook      (?view=home: Antwort ist der frische Startscreen-Zustand)
 POST   /api/plan-entries/{entryId}/swap      { otherEntryId }
 POST   /api/plan-entries/{entryId}/skip
 PUT    /api/plan-entries/{entryId}/dish      { dishId }

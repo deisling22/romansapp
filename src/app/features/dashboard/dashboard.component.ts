@@ -104,6 +104,19 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  /** Some actions answer with the fresh screen state; then no extra request is needed. */
+  onScheduleChanged(home: Home | undefined): void {
+    if (!home) {
+      this.load();
+      return;
+    }
+    // Invalidates answers of older requests that are still on their way.
+    this.requestId++;
+    this.refreshing = false;
+    this.apply(home);
+    this.snapshots.write(HOME_SNAPSHOT, home);
+  }
+
   lessOf(dish: DishCatalogEntry, event: Event): void {
     event.preventDefault();
     event.stopPropagation();

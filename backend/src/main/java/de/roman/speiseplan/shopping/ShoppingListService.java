@@ -147,11 +147,6 @@ public class ShoppingListService {
         shoppingListItemRepository.deleteById(itemId);
     }
 
-    @Transactional(readOnly = true)
-    public long countItems() {
-        return shoppingListItemRepository.count();
-    }
-
     @Transactional
     public void clear() {
         shoppingListItemRepository.deleteAll(shoppingListItemRepository.findAll());

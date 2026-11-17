@@ -97,10 +97,14 @@ public class ScheduleService {
             List<IngredientNeed> needs) {
     }
 
-    /** Stock maps hold what is still unallocated after all meals of the schedule were served. */
+    /**
+     * Stock maps hold what is still unallocated after all meals of the schedule were served. The raw
+     * rows the computation read are kept so callers building on the schedule need not query them again.
+     */
     public record Schedule(
             LocalDate startDate, int days, List<ScheduledMeal> meals,
-            Map<String, Double> pantryLeft, Map<String, Double> listLeft) {
+            Map<String, Double> pantryLeft, Map<String, Double> listLeft,
+            List<PantryItem> pantryItems, List<ShoppingListItem> shoppingItems, List<CookLog> cookedToday) {
     }
 
     @Transactional(readOnly = true)
@@ -161,8 +165,10 @@ public class ScheduleService {
         }
         Map<Long, MealPlan> plansById = ownPlans.stream().collect(Collectors.toMap(MealPlan::getId, plan -> plan));
 
-        Map<String, Double> pantryLeft = pantryStock(pantryItemRepository.findAll());
-        Map<String, Double> listLeft = listStock(shoppingListItemRepository.findAll());
+        List<PantryItem> pantryItems = pantryItemRepository.findAll();
+        List<ShoppingListItem> shoppingItems = shoppingListItemRepository.findAll();
+        Map<String, Double> pantryLeft = pantryStock(pantryItems);
+        Map<String, Double> listLeft = listStock(shoppingItems);
 
         List<ScheduledMeal> meals = new ArrayList<>();
         for (int offset = 0; offset < days; offset++) {
@@ -206,7 +212,10 @@ public class ScheduleService {
             }
             pendingLeftover = leftoverForTomorrow;
         }
-        return new Schedule(today, days, meals, pantryLeft, listLeft);
+        List<CookLog> cookedToday = recentLogs.stream()
+                .filter(log -> !log.getCookedAt().isBefore(startOfToday))
+                .toList();
+        return new Schedule(today, days, meals, pantryLeft, listLeft, pantryItems, shoppingItems, cookedToday);
     }
 
     /** Without an explicitly active plan the oldest plan with dishes is used, matching the previous behaviour. */

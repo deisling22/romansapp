@@ -1,12 +1,15 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { MealPlan } from '../../core/models';
 import { LocalMealPlan } from '../../core/offline-db';
 import { RecipeSyncService } from '../../core/recipe-sync.service';
 import { GamificationService } from '../../core/gamification.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
+import { SnapshotCacheService } from '../../core/snapshot-cache.service';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+
+const PLANS_SNAPSHOT = 'plans';
 
 @Component({
     selector: 'app-plan-list',
@@ -24,6 +27,7 @@ export class PlanListComponent implements OnInit {
   creating = false;
   busyPlanId: number | null = null;
   readonly savingPlanIds = new Set<number>();
+  private readonly snapshots = inject(SnapshotCacheService);
 
   constructor(
     private readonly mealPlanApi: MealPlanApiService,
@@ -37,13 +41,19 @@ export class PlanListComponent implements OnInit {
   }
 
   load(): void {
-    this.loading = true;
+    // The last known list is shown at once and replaced by the server answer.
+    const snapshot = this.plans.length ? null : this.snapshots.read<MealPlan[]>(PLANS_SNAPSHOT);
+    if (snapshot) {
+      this.plans = snapshot;
+    }
+    this.loading = this.plans.length === 0;
     this.errorMessage = '';
     void this.loadLocalPlans();
     this.mealPlanApi.getPlans().subscribe({
       next: (plans) => {
         this.plans = plans;
         this.loading = false;
+        this.snapshots.write(PLANS_SNAPSHOT, plans);
       },
       error: () => {
         this.errorMessage = 'Serverpläne sind gerade nicht erreichbar. Lokale Pläne bleiben verfügbar.';

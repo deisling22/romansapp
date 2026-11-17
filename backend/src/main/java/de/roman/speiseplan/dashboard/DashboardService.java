@@ -13,7 +13,6 @@ import de.roman.speiseplan.profile.ProfileDto;
 import de.roman.speiseplan.profile.ProfileService;
 import de.roman.speiseplan.schedule.CookingService;
 import de.roman.speiseplan.schedule.ScheduleService;
-import de.roman.speiseplan.shopping.ShoppingListService;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -29,8 +28,6 @@ public class DashboardService {
     private final DishIngredientRepository dishIngredientRepository;
     private final DishRatingRepository dishRatingRepository;
     private final ProfileService profileService;
-    private final ShoppingListService shoppingListService;
-    private final PantryService pantryService;
     private final ScheduleService scheduleService;
     private final CookingService cookingService;
     private final CostSummaryService costSummaryService;
@@ -40,8 +37,6 @@ public class DashboardService {
             DishIngredientRepository dishIngredientRepository,
             DishRatingRepository dishRatingRepository,
             ProfileService profileService,
-            ShoppingListService shoppingListService,
-            PantryService pantryService,
             ScheduleService scheduleService,
             CookingService cookingService,
             CostSummaryService costSummaryService) {
@@ -50,8 +45,6 @@ public class DashboardService {
         this.dishIngredientRepository = dishIngredientRepository;
         this.dishRatingRepository = dishRatingRepository;
         this.profileService = profileService;
-        this.shoppingListService = shoppingListService;
-        this.pantryService = pantryService;
         this.scheduleService = scheduleService;
         this.cookingService = cookingService;
     }
@@ -67,12 +60,12 @@ public class DashboardService {
     public DashboardDto getDashboard(ScheduleService.Schedule schedule) {
         ProfileDto profile = profileService.getProfile();
 
-        LocalDate today = LocalDate.now(ZoneId.systemDefault());
-        Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
-        Instant endOfDay = today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
-
-        List<CookLog> cookedToday = cookLogRepository
-            .findByCookedAtGreaterThanEqualAndCookedAtLessThanOrderByCookedAtAsc(startOfDay, endOfDay);
+        // Today's cook log, pantry and shopping list were already read for the schedule.
+        List<CookLog> cookedToday = schedule.cookedToday();
+        LocalDate expiringLimit = schedule.startDate().plusDays(PantryService.EXPIRING_SOON_DAYS);
+        long expiringSoon = schedule.pantryItems().stream()
+                .filter(item -> item.getExpiresOn() != null && !item.getExpiresOn().isAfter(expiringLimit))
+                .count();
         Map<Long, List<DishIngredient>> ingredientsByDish = loadIngredients(
                 cookedToday.stream().map(entry -> entry.getDish().getId()).distinct().toList());
 
@@ -151,11 +144,11 @@ public class DashboardService {
             vitaminB12Today,
             folateToday,
             nextDish,
-            shoppingListService.countItems(),
-            pantryService.countItems(),
+            schedule.shoppingItems().size(),
+            schedule.pantryItems().size(),
             profile.costTrackingEnabled(),
             profile.costTrackingEnabled() ? costSummaryService.summarize(profile) : null,
-            pantryService.countExpiringSoon());
+            expiringSoon);
     }
 
     /** Nutrition of the last 7 days (today included), one entry per day, oldest first. */

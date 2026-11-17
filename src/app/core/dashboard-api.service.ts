@@ -23,6 +23,11 @@ export class DashboardApiService {
     return this.http.get<WeekNutrition>(`${this.apiUrl}/dashboard/week`);
   }
 
+  /** Ticks the entry off and returns the fresh start screen in the same round trip. */
+  markCookedForHome(planEntryId: number): Observable<Home> {
+    return this.http.patch<Home>(`${this.apiUrl}/plan-entries/${planEntryId}/cook`, {}, { params: { view: 'home' } });
+  }
+
   markCooked(planEntryId: number): Observable<DashboardData> {
     return this.http.patch<DashboardData>(`${this.apiUrl}/plan-entries/${planEntryId}/cook`, {});
   }
