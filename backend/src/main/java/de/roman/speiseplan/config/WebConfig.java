@@ -13,6 +13,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+    private static final long PREFLIGHT_MAX_AGE_SECONDS = 2 * 60 * 60;
+
     private final String[] allowedOrigins;
     private final String uploadDirectory;
 
@@ -38,6 +40,9 @@ public class WebConfig implements WebMvcConfigurer {
         configuration.addAllowedMethod("OPTIONS");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
+        // Without this browsers repeat the preflight after 5 seconds, i.e. before almost every write:
+        // one extra round trip to a server on another continent.
+        configuration.setMaxAge(PREFLIGHT_MAX_AGE_SECONDS);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

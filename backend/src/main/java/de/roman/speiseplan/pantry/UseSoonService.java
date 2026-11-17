@@ -3,6 +3,8 @@ package de.roman.speiseplan.pantry;
 import de.roman.speiseplan.dish.Dish;
 import de.roman.speiseplan.dish.DishIngredient;
 import de.roman.speiseplan.dish.DishIngredientRepository;
+import de.roman.speiseplan.dish.Ingredient;
+import de.roman.speiseplan.dish.IngredientRepository;
 import de.roman.speiseplan.dish.DishRepository;
 import de.roman.speiseplan.ingredient.IngredientMatcher;
 import de.roman.speiseplan.plan.MealSlot;
@@ -45,6 +47,7 @@ public class UseSoonService {
     private final PantryService pantryService;
     private final DishRepository dishRepository;
     private final DishIngredientRepository dishIngredientRepository;
+    private final IngredientRepository ingredientRepository;
     private final ScheduleService scheduleService;
     private final ProfileService profileService;
     private final RecommendationService recommendationService;
@@ -55,6 +58,7 @@ public class UseSoonService {
             PantryService pantryService,
             DishRepository dishRepository,
             DishIngredientRepository dishIngredientRepository,
+            IngredientRepository ingredientRepository,
             ScheduleService scheduleService,
             ProfileService profileService,
             RecommendationService recommendationService,
@@ -63,6 +67,7 @@ public class UseSoonService {
         this.pantryService = pantryService;
         this.dishRepository = dishRepository;
         this.dishIngredientRepository = dishIngredientRepository;
+        this.ingredientRepository = ingredientRepository;
         this.scheduleService = scheduleService;
         this.profileService = profileService;
         this.recommendationService = recommendationService;
@@ -143,7 +148,18 @@ public class UseSoonService {
         excluded.addAll(recommendationService.dislikedDishIds(ownerEmail));
         // Dishes of the next days are already accounted for in the planned use
         planned.forEach(meal -> excluded.add(meal.dish().getId()));
-        List<Dish> dishes = dishRepository.findAll().stream()
+        // Only dishes that contain one of the expiring ingredients are loaded, not the whole catalog.
+        List<Long> matchingIngredientIds = ingredientRepository.findAll().stream()
+                .filter(ingredient -> openUrgency.containsKey(
+                        IngredientMatcher.key(ingredient.getName(), ingredient.getUnit())))
+                .map(Ingredient::getId)
+                .toList();
+        if (matchingIngredientIds.isEmpty()) {
+            return List.of();
+        }
+        List<Dish> dishes = dishRepository
+                .findAllById(dishIngredientRepository.findDishIdsByIngredientIdIn(matchingIngredientIds))
+                .stream()
                 .filter(dish -> !excluded.contains(dish.getId()))
                 .toList();
         if (dishes.isEmpty()) {

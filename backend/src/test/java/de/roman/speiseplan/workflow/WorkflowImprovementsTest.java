@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,6 +50,16 @@ class WorkflowImprovementsTest {
     void ownHousehold() {
         token = tokenService.issueToken(Map.of("email", "workflow-" + UUID.randomUUID() + "@example.com"));
         suffix = UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    @Test
+    void preflightAnswersMayBeCachedSoWritesNeedNoExtraRoundTrip() throws Exception {
+        mockMvc.perform(options("/api/shopping-list/checkout")
+                        .header("Origin", "http://localhost:4200")
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Access-Control-Request-Headers", "content-type"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Max-Age", "7200"));
     }
 
     @Test
