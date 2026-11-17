@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ViewChild, inject } from '@angular/core';
 import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { MealPlan } from '../../core/models';
 import { LocalMealPlan } from '../../core/offline-db';
@@ -24,10 +24,16 @@ export class PlanListComponent implements OnInit {
   loading = true;
   errorMessage = '';
   newPlanName = '';
+  private nameValidationAttempted = false;
+  @ViewChild('planNameInput') private planNameInput?: ElementRef<HTMLInputElement>;
   creating = false;
   busyPlanId: number | null = null;
   readonly savingPlanIds = new Set<number>();
   private readonly snapshots = inject(SnapshotCacheService);
+
+  get planNameInvalid(): boolean {
+    return this.nameValidationAttempted && !this.newPlanName.trim();
+  }
 
   constructor(
     private readonly mealPlanApi: MealPlanApiService,
@@ -63,8 +69,13 @@ export class PlanListComponent implements OnInit {
   }
 
   async createPlan(): Promise<void> {
+    if (this.creating) {
+      return;
+    }
+    this.nameValidationAttempted = true;
     const name = this.newPlanName.trim();
-    if (!name || this.creating) {
+    if (!name) {
+      this.planNameInput?.nativeElement.focus();
       return;
     }
 
@@ -72,6 +83,7 @@ export class PlanListComponent implements OnInit {
     try {
       const plan = await this.recipeSync.createPlan(name);
       await this.gamification.record('CREATE_PLAN', plan.clientId);
+      this.nameValidationAttempted = false;
       this.newPlanName = '';
       await this.loadLocalPlans();
     } catch {

@@ -7,13 +7,25 @@
   </header>
 
   <form class="new-plan" (ngSubmit)="createPlan()" novalidate>
-    <input
-      type="text"
-      name="newPlanName"
-      placeholder="Name des neuen Plans"
-      maxlength="120"
-      [(ngModel)]="newPlanName"
-      />
+    <div class="plan-name-field">
+      <label class="visually-hidden" for="new-plan-name">Name des neuen Plans</label>
+      <input
+        #planNameInput
+        id="new-plan-name"
+        type="text"
+        name="newPlanName"
+        placeholder="Name des neuen Plans"
+        maxlength="120"
+        required
+        [class.invalid]="planNameInvalid"
+        [attr.aria-invalid]="planNameInvalid"
+        [attr.aria-describedby]="planNameInvalid ? 'plan-name-error' : null"
+        [(ngModel)]="newPlanName"
+        />
+      @if (planNameInvalid) {
+        <p id="plan-name-error" class="field-error" role="alert">Bitte fülle das Pflichtfeld „Name des neuen Plans“ aus.</p>
+      }
+    </div>
     <button type="submit" [disabled]="creating">{{ creating ? 'Wird erstellt ...' : 'Plan anlegen' }}</button>
   </form>
 

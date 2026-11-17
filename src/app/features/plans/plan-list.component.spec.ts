@@ -92,6 +92,60 @@ describe('PlanListComponent activation', () => {
     expect(component.errorMessage).toContain('nicht pausiert');
   });
 
+  for (const name of ['', '   ']) {
+    it(`shows a required-field error and focuses the name input for ${JSON.stringify(name)}`, async () => {
+      const createPlan = jasmine.createSpy('createPlan');
+      TestBed.overrideProvider(RecipeSyncService, {
+        useValue: { listPlans: () => Promise.resolve([]), createPlan },
+      });
+      const fixture = TestBed.createComponent(PlanListComponent);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const element: HTMLElement = fixture.nativeElement;
+      const input = element.querySelector<HTMLInputElement>('#new-plan-name')!;
+      expect(input.getAttribute('aria-invalid')).toBe('false');
+      fixture.componentInstance.newPlanName = name;
+      element.querySelector<HTMLButtonElement>('.new-plan button')!.click();
+      fixture.detectChanges();
+
+      expect(createPlan).not.toHaveBeenCalled();
+      expect(document.activeElement).toBe(input);
+      expect(input.classList.contains('invalid')).toBeTrue();
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+      expect(input.getAttribute('aria-describedby')).toBe('plan-name-error');
+      expect(element.querySelector('#plan-name-error')?.textContent).toContain('Pflichtfeld');
+      expect(getComputedStyle(input).borderTopColor).toBe(getComputedStyle(element.querySelector('#plan-name-error')!).color);
+
+      input.value = 'Wochenplan';
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      expect(element.querySelector('#plan-name-error')).toBeNull();
+      expect(input.classList.contains('invalid')).toBeFalse();
+      expect(input.getAttribute('aria-invalid')).toBe('false');
+    });
+  }
+
+  it('creates a valid plan with a trimmed name and clears validation after saving', async () => {
+    const createPlan = jasmine.createSpy('createPlan').and.resolveTo({
+      clientId: 'new-plan', name: 'Wochenplan', updatedAt: 1,
+    });
+    const record = jasmine.createSpy('record').and.resolveTo();
+    TestBed.overrideProvider(RecipeSyncService, {
+      useValue: { listPlans: () => Promise.resolve([]), createPlan },
+    });
+    TestBed.overrideProvider(GamificationService, { useValue: { record } });
+    const fixture = TestBed.createComponent(PlanListComponent);
+    fixture.detectChanges();
+    await fixture.componentInstance.createPlan();
+    fixture.componentInstance.newPlanName = ' Wochenplan ';
+    await fixture.componentInstance.createPlan();
+    fixture.detectChanges();
+    expect(createPlan).toHaveBeenCalledOnceWith('Wochenplan');
+    expect(fixture.componentInstance.newPlanName).toBe('');
+    expect(fixture.componentInstance.planNameInvalid).toBeFalse();
+    expect(fixture.nativeElement.querySelector('#plan-name-error')).toBeNull();
+  });
+
   it('links to creators when neither server nor local plans exist', () => {
     const fixture = TestBed.createComponent(PlanListComponent);
     fixture.detectChanges();

@@ -30,12 +30,30 @@
 
 .new-plan {
   display: flex;
+  align-items: flex-start;
   gap: 8px;
   margin-bottom: 20px;
 }
 
-.new-plan input {
+.plan-name-field {
   flex: 1;
+  min-width: 0;
+}
+
+.new-plan input.invalid {
+  border-color: var(--red);
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
+}
+
+.new-plan input.invalid:focus-visible {
+  box-shadow: 0 0 0 3px var(--red-soft);
+}
+
+.field-error {
+  margin: 8px 0 0;
+  color: var(--red);
+  font: var(--text-footnote);
 }
 
 .new-plan button {
