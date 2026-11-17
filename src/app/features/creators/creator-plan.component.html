@@ -29,6 +29,10 @@
       </p>
     }
 
+    <button class="copy-plan-button copy-plan-top" type="button" [disabled]="copying || copied" (click)="copyPlan()">
+      {{ copied ? 'Plan kopiert' : copying ? 'Wird kopiert ...' : 'In meine Pläne kopieren' }}
+    </button>
+
     <section class="creator-dish-grid" aria-label="Gerichte im Creator-Plan">
       @for (dish of dishes; track dish.id) {
         <a class="creator-dish" [routerLink]="['/dishes', dish.id]">
