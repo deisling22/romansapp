@@ -1,0 +1,74 @@
+<main class="screen">
+  <header class="page-header">
+    <p class="eyebrow">Einkauf übernehmen</p>
+    <h1>Kassenbon importieren</h1>
+    <p>Foto, PDF oder Einkaufsliste einlesen, Artikel prüfen und in den Vorratsschrank übernehmen.</p>
+  </header>
+
+  <section class="card" (dragover)="allowDrop($event)" (drop)="drop($event)" aria-label="Einkauf importieren">
+    <fieldset [disabled]="busy() || saving()">
+      <legend>Kassenbon oder Einkaufsliste</legend>
+      <div class="capture">
+        <label class="file-button">Kassenbon fotografieren
+          <input type="file" accept="image/*" capture="environment" (change)="selectFile($event)" />
+        </label>
+        <label class="file-button secondary">Foto / PDF aus Dateien
+          <input type="file" accept="image/*,application/pdf,.pdf,text/plain,.txt" (change)="selectFile($event)" />
+        </label>
+      </div>
+      <p class="hint">Du kannst hier auch eine Datei oder geteilten Einkaufstext ablegen. Maximal 20 MB, bei PDFs 10 Seiten. Die Erkennung erfolgt auf deinem Gerät.</p>
+      <label for="purchase-text">Einkaufstext (ein Artikel pro Zeile)</label>
+      <textarea id="purchase-text" rows="6" maxlength="100000" [(ngModel)]="text" placeholder="500 g Tomaten&#10;2 Zwiebeln&#10;Milch 1 l"></textarea>
+      <button type="button" (click)="parse()">Artikel aus Text erkennen</button>
+    </fieldset>
+    @if (busy()) {
+      <p role="status">{{ status() }}</p>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="review-title">
+    <h2 id="review-title">Artikel prüfen</h2>
+    <p class="hint">Erkennung kann Fehler enthalten. Preise werden nicht als Mengen verwendet. Gewichte werden, falls erkennbar, in Gramm übernommen, sonst Stückzahlen (ohne Angabe: 1 Stück). Flüssigkeiten behalten Liter / Milliliter. Entferne Häkchen bei Pfand, Haushaltsartikeln oder Fehl-Erkennungen.</p>
+    <fieldset [disabled]="busy() || saving()">
+      <legend class="sr-only">Artikel für den Vorrat</legend>
+      @for (item of items; track $index; let i = $index) {
+        <div class="item">
+          <label class="selection">
+            <input type="checkbox" [(ngModel)]="item.selected" [attr.aria-label]="'Artikel ' + (i + 1) + ' übernehmen'" />
+            <span>{{ i + 1 }}</span>
+          </label>
+          <label class="name">Artikel
+            <input [(ngModel)]="item.ingredientName" maxlength="120" [attr.aria-label]="'Artikelname ' + (i + 1)" />
+          </label>
+          <label>Menge
+            <input type="number" min="0.001" step="any" [(ngModel)]="item.quantity" [attr.aria-label]="'Menge ' + (i + 1)" />
+          </label>
+          <label>Einheit
+            <select [(ngModel)]="item.unit" [attr.aria-label]="'Einheit ' + (i + 1)">
+              @for (unit of units; track unit) {
+                <option [value]="unit">{{ unit }}</option>
+              }
+            </select>
+          </label>
+        </div>
+      } @empty {
+        <p>Noch keine Artikel zur Übernahme.</p>
+      }
+      <div class="actions">
+        <button type="button" class="secondary" (click)="addItem()">Artikel ergänzen</button>
+        <button type="button" (click)="save()" [disabled]="!items.length">In den Vorrat übernehmen</button>
+      </div>
+    </fieldset>
+    @if (saving()) {
+      <p role="status">Artikel werden gespeichert …</p>
+    }
+    @if (error()) {
+      <p class="field-error" role="alert">{{ error() }}</p>
+    }
+    @if (success()) {
+      <p role="status">{{ success() }}</p>
+    }
+    <a routerLink="/pantry">Zum Vorratsschrank</a>
+  </section>
+  <p class="hint">Teilen aus anderen Apps: Einkaufstext wird von unterstützten installierten Web-Apps angenommen. Falls deine App nur einen Link teilt, kopiere bitte die Artikelliste hierher. Eine native iPhone-Teilen-Erweiterung ist für später vorgesehen.</p>
+</main>

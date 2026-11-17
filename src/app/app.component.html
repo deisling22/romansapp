@@ -37,6 +37,7 @@
     <a routerLink="/recipe-scan" role="menuitem" (click)="closeMenu()">Rezept scannen</a>
     <a routerLink="/recipe-scan" [queryParams]="{ link: 1 }" role="menuitem" (click)="closeMenu()">Rezept per Link</a>
     <a routerLink="/receipts" role="menuitem" (click)="closeMenu()">Beleg erfassen</a>
+    <a routerLink="/purchase-import" role="menuitem" (click)="closeMenu()">Kassenbon importieren</a>
     <a routerLink="/ingredient-scan" role="menuitem" (click)="closeMenu()">Zutaten scannen</a>
     <p class="menu-section">Mehr</p>
     <a routerLink="/creators" role="menuitem" (click)="closeMenu()">Creator</a>
@@ -79,4 +80,3 @@
     <svg viewBox="0 0 24 24" aria-hidden="true" [class.open]="menuOpen"><path d="M12 5v14M5 12h14" /></svg>
   </button>
 </nav>
-

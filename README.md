@@ -68,6 +68,37 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+## Kassenbon und Einkauf importieren
+
+Im Plus-Menü öffnet **Kassenbon importieren** den Vorratsimport. Unterstützt
+werden Kamerafotos, Bilder, PDFs (auch gescannte Seiten) und Textdateien.
+Dateien dürfen höchstens 20 MB groß sein, PDFs höchstens 10 Seiten haben.
+PDF-Text und OCR werden auf dem Gerät verarbeitet; die OCR lädt bei Bedarf
+ihre Engine und das deutsche Sprachmodell herunter. Nur die bestätigten
+Artikel werden an die bestehende Vorrats-API gesendet.
+
+Vor dem Import können Namen, Mengen und Einheiten korrigiert und einzelne
+Positionen abgewählt werden. Explizite Gewichte werden in Gramm umgerechnet;
+ohne Mengenangabe wird 1 Stück vorgeschlagen. Flüssigkeiten behalten l/ml.
+Kassenbon-Abkürzungen und fehlende Packungsgrößen können nicht zuverlässig
+aufgelöst werden. Preise werden nicht als Gewicht interpretiert. Der Import
+erzeugt keine Rezepte und bucht keine Ausgaben; **Beleg erfassen** bleibt dafür
+unverändert verfügbar.
+
+Text lässt sich einfügen, Text/Bilder/PDFs lassen sich auf der Importseite
+ablegen. Der bestehende GET-Web-Share-Target nimmt jetzt auch Einkaufstexte
+entgegen, sofern Browser und installierte PWA dies unterstützen (typisch
+Android/Chromium). Rezeptlinks bleiben weiterhin mit dem Rezeptimport verbunden.
+Geteilte Einkaufslinks ohne Artikeldaten werden nicht automatisch abgerufen.
+Datei-Sharing über das Betriebssystem wird dadurch noch nicht unterstützt.
+
+**Zukünftiges natives Teilen:** Damit die iOS-App wie Tesla in „Teilen“ erscheint,
+ist ein eigener Share-Extension-Target mit App Group und Übergabe an Capacitor
+nötig. Dieser ist noch nicht implementiert. Die spätere Anbindung soll Text,
+Bilder und PDFs an denselben Prüf-/Importablauf übergeben; keine automatische
+Vorratsbuchung ohne Bestätigung. Ob Netto & Co. vollständige Artikeldaten teilen,
+hängt von der jeweiligen Quell-App ab.
+
 ## Native iOS app
 
 Prerequisites:

@@ -10,6 +10,8 @@ import { CreatorNotificationService } from './core/creator-notification.service'
 import { GamificationService } from './core/gamification.service';
 import { OnboardingService } from './core/onboarding.service';
 import { BackendStatusService } from './core/backend-status.service';
+import { PurchaseInboxService } from './core/purchase-inbox.service';
+import { resolveSharedImport } from './core/shared-import';
 
 @Component({
     selector: 'app-root',
@@ -34,6 +36,7 @@ export class AppComponent {
     private readonly creatorNotifications: CreatorNotificationService,
     private readonly gamification: GamificationService,
     private readonly router: Router,
+    private readonly purchaseInbox: PurchaseInboxService,
   ) {
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates
@@ -43,17 +46,19 @@ export class AppComponent {
     this.handleSharedLink();
   }
 
-  /** Web Share Target (manifest): shared recipe links arrive as ?url= / ?text= on the start URL. */
+  /** Shared shopping text and existing recipe links use the same Web Share Target. */
   private handleSharedLink(): void {
     const params = new URLSearchParams(window.location.search);
-    if (!params.has('url') && !params.has('text')) {
+    if (!params.has('url') && !params.has('text') && !params.has('title')) {
       return;
     }
-    const candidates = [params.get('url'), params.get('text'), params.get('title')].filter(Boolean).join(' ');
-    const sharedUrl = /https?:\/\/\S+/.exec(candidates)?.[0];
+    const shared = resolveSharedImport(params);
     window.history.replaceState(null, '', window.location.pathname + window.location.hash);
-    if (sharedUrl) {
-      void this.router.navigate(['/recipe-scan'], { queryParams: { url: sharedUrl } });
+    if (shared?.kind === 'purchase') {
+      this.purchaseInbox.text.set(shared.text);
+      void this.router.navigate(['/purchase-import']);
+    } else if (shared?.kind === 'recipe') {
+      void this.router.navigate(['/recipe-scan'], { queryParams: { url: shared.url } });
     }
   }
 
@@ -69,5 +74,4 @@ export class AppComponent {
     this.menuOpen = false;
   }
 }
-
 
