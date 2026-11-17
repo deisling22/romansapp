@@ -18,6 +18,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.support.TransactionTemplate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,8 @@ public class DevDataSeeder {
             PlanEntryRepository planEntryRepository,
             IngredientRepository ingredientRepository,
             DishIngredientRepository dishIngredientRepository,
-            PrepStepRepository prepStepRepository) {
+            PrepStepRepository prepStepRepository,
+            TransactionTemplate transactions) {
         return arguments -> {
             SeedRepositories repositories = new SeedRepositories(
                 dishRepository, dishIngredientRepository, prepStepRepository, mealPlanRepository, planEntryRepository);
@@ -42,6 +44,7 @@ public class DevDataSeeder {
                 seedAdditionalCreatorPlans(creatorRepository, repositories);
                 seedRomansPlanIfMissing(mealPlanRepository, dishRepository, planEntryRepository,
                     ingredientRepository, dishIngredientRepository, prepStepRepository);
+                transactions.executeWithoutResult(status -> seedGigaRoman(creatorRepository, repositories));
                 return;
             }
 
@@ -169,7 +172,32 @@ public class DevDataSeeder {
                 seedAdditionalCreatorPlans(creatorRepository, repositories);
                 seedRomansPlanIfMissing(mealPlanRepository, dishRepository, planEntryRepository,
                     ingredientRepository, dishIngredientRepository, prepStepRepository);
+                transactions.executeWithoutResult(status -> seedGigaRoman(creatorRepository, repositories));
         };
+    }
+
+    private void seedGigaRoman(CreatorRepository creators, SeedRepositories repositories) {
+        Creator creator = creators.findByHandle("gigaroman").orElseGet(() -> creators.save(new Creator(
+                "Giga Roman", "gigaroman",
+                "Großer Hunger, klare Ansage: Romans Lieblingsgerichte für deinen ewigen Speiseplan.",
+                "assets/creators/giga-roman.svg", "assets/creators/giga-roman.svg")));
+        if (!repositories.plans().findByCreatorIdOrderByCreatedAtAsc(creator.getId()).isEmpty()) {
+            return;
+        }
+        MealPlan source = repositories.plans().findAllByCreatorIsNullOrderByCreatedAtAsc().stream()
+                .filter(plan -> RomansPlanSeedData.PLAN_NAME.equals(plan.getName()))
+                .filter(plan -> repositories.entries().countByPlanId(plan.getId()) > 10)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Romans Plan mit mehr als zehn Gerichten fehlt."));
+        MealPlan published = new MealPlan(source.getName(), creator);
+        published.setLeftoversForLunch(source.isLeftoversForLunch());
+        published = repositories.plans().save(published);
+        int index = 0;
+        for (PlanEntry entry : repositories.entries().findByPlanIdOrderBySortOrderAsc(source.getId())) {
+            PlanEntry copy = new PlanEntry(published, publicCopy(entry.getDish(), repositories), index++);
+            copy.setMealSlot(entry.getMealSlot());
+            repositories.entries().save(copy);
+        }
     }
 
             private void seedRomansPlanIfMissing(

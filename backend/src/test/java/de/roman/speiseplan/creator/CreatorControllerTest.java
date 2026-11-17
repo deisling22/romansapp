@@ -39,10 +39,41 @@ class CreatorControllerTest {
         private MealPlanRepository mealPlanRepository;
 
     @Test
+    void gigaRomansPlanCanBeBrowsedPubliclyAndCopiedIntoASignedInHousehold() throws Exception {
+        Creator creator = creatorRepository.findByHandle("gigaroman").orElseThrow();
+        String response = mockMvc.perform(get("/api/creators/{id}", creator.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Giga Roman"))
+                .andExpect(jsonPath("$.plans[0].name").value("Romans Plan"))
+                .andExpect(jsonPath("$.plans[0].dishCount").value(48))
+                .andReturn().getResponse().getContentAsString();
+        long planId = objectMapper.readTree(response).path("plans").get(0).path("id").asLong();
+        String token = tokenService.issueToken(Map.of("email", "giga-fan@example.com"));
+        String dishes = mockMvc.perform(get("/api/creators/{id}/plans/{planId}/dishes", creator.getId(), planId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(48))
+                .andReturn().getResponse().getContentAsString();
+        long dishId = objectMapper.readTree(dishes).get(0).path("id").asLong();
+        mockMvc.perform(get("/api/dishes/{id}", dishId).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.ingredients").isNotEmpty())
+                .andExpect(jsonPath("$.steps").isNotEmpty());
+        mockMvc.perform(post("/api/creators/{id}/plans/{planId}/copy", creator.getId(), planId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Romans Plan (Kopie)"))
+                .andExpect(jsonPath("$.dishCount").value(48));
+        mockMvc.perform(get("/api/plans").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.name == 'Romans Plan (Kopie)')].dishCount").value(48));
+    }
+
+    @Test
     void creatorFeedProfilesAndPlanCopyAreAvailable() throws Exception {
         String creatorsResponse = mockMvc.perform(get("/api/creators"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(8))
+                .andExpect(jsonPath("$.length()").value(9))
                 .andExpect(jsonPath("$[0].planCount").value(1))
                 .andReturn()
                 .getResponse()

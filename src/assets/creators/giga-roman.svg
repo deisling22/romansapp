@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-labelledby="title description">
+  <title id="title">Giga Roman</title>
+  <desc id="description">Eigenständiges, stilisiertes Schwarz-Weiß-Porträt eines kräftigen Kochs mit markantem Kiefer, Bart und verschränkten Armen.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1">
+      <stop stop-color="#343a40"/>
+      <stop offset="1" stop-color="#0b0d0f"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0" x2="1" y2=".6">
+      <stop stop-color="#f0f0ec"/>
+      <stop offset=".5" stop-color="#b3b6b6"/>
+      <stop offset="1" stop-color="#666e73"/>
+    </linearGradient>
+    <linearGradient id="shirt" x2="1" y2="1">
+      <stop stop-color="#777e82"/>
+      <stop offset="1" stop-color="#242b30"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#background)" d="M0 0h800v1000H0z"/>
+  <circle cx="400" cy="370" r="290" fill="#ffffff" opacity=".045"/>
+  <path d="M50 880 95 650q25-75 145-100l87-50h146l87 50q120 25 145 100l45 230Z" fill="url(#shirt)"/>
+  <path d="m318 452-10 100 92 72 92-72-10-100" fill="url(#skin)" stroke="#40494e" stroke-width="8"/>
+  <path d="m310 525 90 55 90-55-20 112H330Z" fill="#1e2529"/>
+  <path d="M260 257q-15-112 83-133 104-45 178 31 39 40 22 107l-31 94-17 100-59 55h-72l-59-55-17-100Z" fill="url(#skin)" stroke="#3b4246" stroke-width="7"/>
+  <path d="m265 288-17-71 28-63 63-39 91-11 71 30 44 66-4 86-27-48-26-52-43 22-52-27-52 29-34 60-7 51Z" fill="#161c20"/>
+  <path d="m284 306 61-28 43 14-9 22-40-7-51 18Zm132-14 43-14 58 28-3 19-51-18-39 7Z" fill="#20282d"/>
+  <path d="m303 327 34-8 29 10-30 6Zm131 2 29-10 34 8-33 8Z" fill="#e1e4e3"/>
+  <path d="M337 322v11m126-11v11" stroke="#151b1f" stroke-width="10"/>
+  <path d="m400 307-18 76 21 9 23-10" fill="none" stroke="#626b70" stroke-width="9" stroke-linecap="round"/>
+  <path d="m292 355 24 83 53 53h62l53-53 24-83-37 47-29-9-42 17-42-17-29 9Z" fill="#30393e"/>
+  <path d="m345 418 56-13 54 13-27 21h-55Z" fill="#8a9397"/>
+  <path d="M366 421h69" stroke="#e0e2e0" stroke-width="5"/>
+  <path d="m324 458 45 39h62l45-39-22 48-54 21-54-21Z" fill="#161e23"/>
+  <path d="m262 584 65 34 73 66 73-66 65-34-35 255H297Z" fill="#d7d9d4"/>
+  <path d="m320 561-20 84m180-84 20 84" stroke="#e0e2dc" stroke-width="18"/>
+  <path d="m107 699 42-69q28-25 62 8l121 110 236-43q66-9 85 43 17 51-38 69l-292 72q-59 15-97-23L114 762Z" fill="url(#skin)" stroke="#414b51" stroke-width="9"/>
+  <path d="m691 693-40-63q-28-25-62 8L474 740l-208-43q-66-9-85 43-17 51 38 69l267 66q59 15 97-23l104-93Z" fill="url(#skin)" stroke="#414b51" stroke-width="9"/>
+  <path d="m257 711 22 55m-2-52 20 55m-3-50 20 54m213-38-25 56" stroke="#68747a" stroke-width="6" stroke-linecap="round"/>
+  <rect x="210" y="887" width="380" height="59" rx="8" fill="#d7d9d4"/>
+  <text x="400" y="927" text-anchor="middle" fill="#141b1f" font-family="system-ui, sans-serif" font-size="35" font-weight="900" letter-spacing="5">GIGA ROMAN</text>
+</svg>

@@ -68,6 +68,17 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+## Mock-Creator Giga Roman
+
+Die Demo-Daten (`dev`-Profil) ergänzen beim Start den Creator **Giga Roman**
+(`@gigaroman`) mit dem öffentlichen **Romans Plan**. Als Vorlage dient der
+bestehende anonyme Plan gleichen Namens mit mehr als zehn Gerichten
+(bei frischen Demo-Daten 48). Die Veröffentlichung kopiert Rezepte, Zutaten,
+Zubereitungsschritte und Mahlzeiten; der ursprüngliche Plan bleibt unverändert.
+Der Creator-Plan kann wie die anderen Creator-Pläne in den eigenen Haushalt
+kopiert werden. Wiederholte Starts erzeugen keine weiteren Creator oder Pläne.
+Der mitgelieferte Avatar ist eine eigenständige SVG-Illustration.
+
 ## Familienabfrage
 
 Über **Plus → Familienabfrage erstellen** können angemeldete Nutzer eine
