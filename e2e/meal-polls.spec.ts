@@ -58,6 +58,42 @@ test('public voting needs no login, hides onboarding, and allows named ranking c
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
+for (const colorScheme of ['light', 'dark'] as const) {
+  test(`anonymous voting shows dish photos on narrow phones in ${colorScheme} mode`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.route('**/api/public/meal-polls/public-poll-id', (route) => {
+      expect(route.request().headers()['authorization']).toBeUndefined();
+      return route.fulfill({
+        json: {
+          ...poll,
+          options: poll.options.map((option, index) => ({
+            ...option,
+            name: index === 0 ? 'Ofengemüse mit Kräuterquark und Kartoffelspalten' : option.name,
+          })),
+        },
+      });
+    });
+    for (const width of [320, 393]) {
+      await page.setViewportSize({ width, height: 852 });
+      await page.goto('/#/vote/public-poll-id');
+      const images = page.locator('.ranking img');
+      await expect(images).toHaveCount(3);
+      for (const image of await images.all()) {
+        await image.scrollIntoViewIfNeeded();
+        await expect(image).toBeVisible();
+        await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+        const bounds = await image.boundingBox();
+        expect(bounds?.width).toBeGreaterThanOrEqual(44);
+        expect(bounds?.height).toBeGreaterThanOrEqual(44);
+      }
+      const send = page.getByRole('button', { name: 'Rangliste absenden' });
+      await expect(send).toHaveCSS('min-height', '50px');
+      await expect(send).toHaveCSS('border-radius', '999px');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+  });
+}
+
 test('rankings can be sorted using actual mouse or mobile touch dragging', async ({ page, context }, testInfo) => {
   await page.goto('/#/vote/public-poll-id');
   const handle = page.getByRole('button', { name: 'Suppe ziehen' });
@@ -118,6 +154,12 @@ test('creator can create, share the public link, see results and apply a variabl
   const whatsapp = await page.getByRole('link', { name: 'Per WhatsApp teilen' }).getAttribute('href');
   expect(decodeURIComponent(whatsapp ?? '')).toContain('#/vote/public-poll-id');
   await expect(page.getByRole('heading', { name: 'Ergebnisse · 2 Stimmen' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Neue Abfrage erstellen' })).toHaveCSS('border-radius', '999px');
+  await expect(page.getByRole('button', { name: 'Neue Abfrage erstellen' })).toHaveCSS('min-height', '50px');
+  await expect(page.getByRole('button', { name: 'Abfrage löschen', exact: true })).toHaveCSS(
+    'background-color',
+    await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--red-soft').trim()),
+  );
   await expect(page.locator('.results li').first()).toContainText('Suppe');
   await expect(page.locator('.results li').first()).toContainText('1.50');
   await page.getByText('Anna', { exact: true }).click();
@@ -125,7 +167,7 @@ test('creator can create, share the public link, see results and apply a variabl
   await page.getByRole('combobox', { name: 'Anzahl Top-Gerichte' }).selectOption({ label: 'Top 2' });
   await page.getByRole('button', { name: 'Top 2 als Nächstes ansetzen' }).click();
   expect(applied).toEqual({ count: 2 });
-  await expect(page.getByRole('status')).toContainText('Top 2 sind jetzt');
+  await expect(page.getByRole('status').filter({ hasText: 'Top 2 sind jetzt' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Beendete Abfrage' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

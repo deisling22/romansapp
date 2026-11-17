@@ -88,6 +88,9 @@ ewigen Speisepläne erstellen. Sind weniger vorhanden, werden alle angeboten
 gespeichert; spätere Planänderungen ändern die öffentliche Abfrage nicht.
 Fehlt ein Plan, ein aktiver Plan oder fehlen darin Gerichte, zeigt die
 Abfrageseite einen passenden Einrichtungshinweis mit direktem Link zu den Plänen.
+Verwaltung und öffentliche Abstimmung nutzen die gemeinsamen App-Karten und
+Bedienelemente mit Hell-/Dunkelmodus. Gerichtsbilder bleiben auch ohne Anmeldung
+auf schmalen Handybildschirmen sichtbar.
 
 Der öffentliche Link kann über WhatsApp, das Teilen-Menü oder die Zwischenablage
 weitergegeben werden. Teilnehmer benötigen kein Konto: Sie sortieren alle
@@ -128,6 +131,8 @@ Dateien dürfen höchstens 20 MB groß sein, PDFs höchstens 10 Seiten haben.
 PDF-Text und OCR werden auf dem Gerät verarbeitet; die OCR lädt bei Bedarf
 ihre Engine und das deutsche Sprachmodell herunter. Nur die bestätigten
 Artikel werden an die bestehende Vorrats-API gesendet.
+Die Importseite nutzt die gemeinsamen App-Karten, Formularfelder und Buttons
+mit Hell-/Dunkelmodus; die Artikelprüfung passt sich schmalen Displays an.
 
 Vor dem Import können Namen, Mengen und Einheiten korrigiert und einzelne
 Positionen abgewählt werden. Explizite Gewichte werden in Gramm umgerechnet;

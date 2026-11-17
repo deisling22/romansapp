@@ -7,7 +7,7 @@
 
   <section class="card" (dragover)="allowDrop($event)" (drop)="drop($event)" aria-label="Einkauf importieren">
     <fieldset [disabled]="busy() || saving()">
-      <legend>Kassenbon oder Einkaufsliste</legend>
+      <legend>1. Einkauf einlesen</legend>
       <div class="capture">
         <label class="file-button">Kassenbon fotografieren
           <input type="file" accept="image/*" capture="environment" (change)="selectFile($event)" />
@@ -22,15 +22,16 @@
       <button type="button" (click)="parse()">Artikel aus Text erkennen</button>
     </fieldset>
     @if (busy()) {
-      <p role="status">{{ status() }}</p>
+      <p class="status" role="status">{{ status() }}</p>
     }
   </section>
 
   <section class="card" aria-labelledby="review-title">
-    <h2 id="review-title">Artikel prüfen</h2>
+    <h2 id="review-title">2. Artikel prüfen und übernehmen</h2>
     <p class="hint">Erkennung kann Fehler enthalten. Preise werden nicht als Mengen verwendet. Gewichte werden, falls erkennbar, in Gramm übernommen, sonst Stückzahlen (ohne Angabe: 1 Stück). Flüssigkeiten behalten Liter / Milliliter. Entferne Häkchen bei Pfand, Haushaltsartikeln oder Fehl-Erkennungen.</p>
     <fieldset [disabled]="busy() || saving()">
-      <legend class="sr-only">Artikel für den Vorrat</legend>
+      <legend class="visually-hidden">Artikel für den Vorrat</legend>
+      <div class="item-list">
       @for (item of items; track $index; let i = $index) {
         <div class="item">
           <label class="selection">
@@ -52,21 +53,22 @@
           </label>
         </div>
       } @empty {
-        <p>Noch keine Artikel zur Übernahme.</p>
+        <p class="status">Noch keine Artikel zur Übernahme. Lies zuerst einen Einkauf ein oder ergänze Artikel manuell.</p>
       }
+      </div>
       <div class="actions">
         <button type="button" class="secondary" (click)="addItem()">Artikel ergänzen</button>
         <button type="button" (click)="save()" [disabled]="!items.length">In den Vorrat übernehmen</button>
       </div>
     </fieldset>
     @if (saving()) {
-      <p role="status">Artikel werden gespeichert …</p>
+      <p class="status" role="status">Artikel werden gespeichert …</p>
     }
     @if (error()) {
-      <p class="field-error" role="alert">{{ error() }}</p>
+      <p class="status error" role="alert">{{ error() }}</p>
     }
     @if (success()) {
-      <p role="status">{{ success() }}</p>
+      <p class="status success" role="status">{{ success() }}</p>
     }
     <a routerLink="/pantry">Zum Vorratsschrank</a>
   </section>

@@ -1,32 +1,291 @@
-.card { background: var(--surface, #fff); border-radius: 14px; padding: 16px; margin: 16px 0; display: grid; gap: 12px; }
-h2 { font-size: 1.15rem; margin: 0; }
-.actions, .poll-list { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.poll-list { margin: 16px 0; }
-.poll-list [aria-pressed="true"] { outline: 2px solid var(--tint); outline-offset: 2px; }
-.hint { color: var(--label-2); font-size: 0.85rem; line-height: 1.5; }
-.secondary { background: var(--fill-strong); color: inherit; }
-.button { display: inline-block; padding: 12px 14px; border-radius: 10px; background: var(--tint); color: var(--on-tint); text-decoration: none; font-weight: 600; }
-label { display: grid; gap: 6px; font-size: 0.9rem; font-weight: 600; min-width: 0; }
-input, select { width: 100%; box-sizing: border-box; min-width: 0; }
-form, fieldset { display: grid; gap: 12px; min-width: 0; }
-fieldset { margin: 8px 0; padding: 12px; border: 1px solid var(--fill-strong); border-radius: 10px; }
-legend { font-weight: 600; padding: 0 4px; }
-.ranking { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
-.ranking li, .cdk-drag-preview { display: flex; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--fill-strong); min-width: 0; }
-.rank { width: 22px; flex-shrink: 0; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; }
-.ranking img, .cdk-drag-preview img { width: 48px; height: 48px; object-fit: cover; border-radius: 10px; }
-.dish-copy { flex: 1; display: grid; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
-small { font-size: 0.75rem; opacity: 0.7; }
-.average { max-width: 110px; font-size: 0.85rem; text-align: right; font-variant-numeric: tabular-nums; }
-.drag-handle { cursor: grab; touch-action: none; padding: 10px 6px; min-height: 44px; flex-shrink: 0; }
-.move-actions { display: grid; gap: 4px; }
-.move-actions button { min-width: 44px; min-height: 44px; padding: 4px 10px; }
-.cdk-drag-preview { box-sizing: border-box; padding: 12px; background: var(--surface, #fff); color: var(--label); border-radius: 12px; box-shadow: var(--shadow-float); list-style: none; }
-.cdk-drag-placeholder { opacity: 0.25; }
-.public-poll { max-width: 720px; margin-inline: auto; }
-details { border-bottom: 1px solid var(--fill-strong); padding-bottom: 8px; }
-summary { cursor: pointer; font-weight: 600; padding: 8px 0; }
+@use '../../../styles/ios';
+
+:host {
+  display: block;
+}
+
+.page-header h1 {
+  overflow-wrap: anywhere;
+}
+
+.card {
+  @include ios.card;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin-bottom: 20px;
+  padding: 20px 16px;
+}
+
+h2 {
+  margin: 0;
+  color: var(--label);
+  font: var(--text-title3);
+}
+
+.card p {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+button,
+.button {
+  @include ios.button-filled;
+}
+
+.secondary {
+  @include ios.button-tinted;
+}
+
+.destructive {
+  @include ios.button-destructive;
+}
+
+.hint {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.poll-list {
+  @include ios.grouped-list;
+  margin-bottom: 20px;
+}
+
+.poll-list button {
+  @include ios.grouped-row;
+  justify-content: space-between;
+  width: 100%;
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--label);
+  text-align: left;
+  font: var(--text-subhead-strong);
+}
+
+.poll-list button[aria-pressed='true'] {
+  background: var(--tint-soft);
+  color: var(--tint-text);
+  box-shadow: inset 3px 0 var(--tint);
+}
+
+.poll-state {
+  @include ios.chip;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  font: var(--text-subhead-strong);
+}
+
+input,
+select {
+  min-width: 0;
+}
+
+form,
+fieldset {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+fieldset {
+  margin: 0;
+  padding: 16px;
+  border: 0.5px solid var(--separator);
+  border-radius: var(--radius-m);
+}
+
+legend {
+  padding: 0 6px;
+  font: var(--text-headline);
+}
+
+.ranking {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ranking li,
+.cdk-drag-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 0;
+}
+
+.ranking li + li {
+  border-top: 0.5px solid var(--separator);
+}
+
+.rank {
+  flex: none;
+  width: 24px;
+  color: var(--tint-text);
+  font: var(--text-headline);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.ranking img,
+.cdk-drag-preview img {
+  @include ios.thumb(56px);
+}
+
+.dish-copy {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dish-copy strong {
+  font: var(--text-headline);
+}
+
+.dish-copy small {
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+.average {
+  max-width: 90px;
+  color: var(--label-2);
+  font: var(--text-footnote);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.drag-handle,
+.move-actions button {
+  @include ios.button-gray;
+  flex: none;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: var(--radius-s);
+}
+
+.drag-handle {
+  cursor: grab;
+  touch-action: none;
+  font-size: 1.5rem;
+}
+
+.move-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.public-poll .ranking li,
+.cdk-drag-preview {
+  display: grid;
+  grid-template-columns: 24px 56px minmax(0, 1fr) 44px;
+  gap: 8px;
+}
+
+.public-poll .rank,
+.cdk-drag-preview .rank {
+  grid-area: 1 / 1;
+}
+
+.public-poll .ranking img,
+.cdk-drag-preview img {
+  grid-area: 1 / 2;
+}
+
+.public-poll .dish-copy,
+.cdk-drag-preview .dish-copy {
+  grid-area: 1 / 3;
+}
+
+.public-poll .drag-handle,
+.cdk-drag-preview .drag-handle {
+  grid-area: 1 / 4;
+}
+
+.public-poll .move-actions,
+.cdk-drag-preview .move-actions {
+  grid-area: 2 / 3 / auto / 5;
+  justify-content: flex-end;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  color: var(--label);
+  box-shadow: var(--shadow-float);
+  list-style: none;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.25;
+}
+
+.public-poll {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+details + details {
+  border-top: 0.5px solid var(--separator);
+}
+
+summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+  font: var(--text-headline);
+}
+
+details ol {
+  margin: 0 0 16px;
+  padding-left: 24px;
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
 @media (max-width: 400px) {
-  .ranking li { gap: 6px; }
-  .public-poll .ranking img { display: none; }
+  .card {
+    padding: 16px 12px;
+  }
+
+  .ranking li {
+    gap: 6px;
+  }
+
+  .public-poll .ranking li,
+  .cdk-drag-preview {
+    grid-template-columns: 20px 44px minmax(0, 1fr) 44px;
+    gap: 6px;
+  }
+
+  .ranking img,
+  .cdk-drag-preview img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .results {
+    .dish-copy strong {
+      font: var(--text-subhead-strong);
+    }
+
+    .average {
+      max-width: 64px;
+    }
+  }
 }

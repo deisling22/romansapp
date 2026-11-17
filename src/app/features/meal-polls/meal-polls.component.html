@@ -6,40 +6,45 @@
   </header>
   @if (planHint()) {
     <aside class="card" aria-label="Voraussetzungen für eine Familienabfrage" role="status">
+      <h2>Zuerst den Speiseplan einrichten</h2>
       <p>{{ planHint() }}</p>
       <a routerLink="/plans">Zu meinen Plänen</a>
     </aside>
   }
   @if (plansError()) {
-    <p class="field-error" role="alert">{{ plansError() }} <a routerLink="/plans">Zu meinen Plänen</a></p>
+    <p class="status error" role="alert">{{ plansError() }} <a routerLink="/plans">Zu meinen Plänen</a></p>
   }
-  <div class="actions">
-    <button type="button" [disabled]="loading() || busy()" (click)="create()">Neue Abfrage erstellen</button>
-    <button type="button" class="secondary" [disabled]="loading() || busy()" (click)="load()">Ergebnisse aktualisieren</button>
-  </div>
-  <p class="hint">Bei weniger als 10 Gerichten werden alle verfügbaren angeboten (mindestens 2). Jede Abfrage wird mit allen Stimmen nach 5 Tagen gelöscht, auch wenn sie bereits beendet ist.</p>
-  @if (loading()) { <p role="status">Abfragen werden geladen …</p> }
-  @if (busy()) { <p role="status">Wird gespeichert …</p> }
-  @if (error()) { <p class="field-error" role="alert">{{ error() }}</p> }
-  @if (message()) { <p role="status">{{ message() }}</p> }
+  <section class="card" aria-labelledby="create-title">
+    <h2 id="create-title">Was kommt als Nächstes auf den Tisch?</h2>
+    <p class="hint">Bei weniger als 10 Gerichten werden alle verfügbaren angeboten (mindestens 2). Jede Abfrage wird mit allen Stimmen nach 5 Tagen gelöscht, auch wenn sie bereits beendet ist.</p>
+    <div class="actions">
+      <button type="button" [disabled]="loading() || busy()" (click)="create()">Neue Abfrage erstellen</button>
+      <button type="button" class="secondary" [disabled]="loading() || busy()" (click)="load()">Ergebnisse aktualisieren</button>
+    </div>
+  </section>
+  @if (loading()) { <p class="status" role="status">Abfragen werden geladen …</p> }
+  @if (busy()) { <p class="status" role="status">Wird gespeichert …</p> }
+  @if (error()) { <p class="status error" role="alert">{{ error() }}</p> }
+  @if (message()) { <p class="status success" role="status">{{ message() }}</p> }
 
   @if (polls().length) {
     <nav class="poll-list" aria-label="Meine Abfragen">
       @for (poll of polls(); track poll.poll.id) {
         <button type="button" class="secondary" [attr.aria-pressed]="selected()?.poll?.id === poll.poll.id"
           [disabled]="busy() || loading()" (click)="select(poll)">
-          {{ poll.poll.createdAt | date:'dd.MM. HH:mm' }} · {{ poll.poll.closed ? 'Beendet' : 'Offen' }} · {{ poll.voteCount }} Stimmen
+          <span>{{ poll.poll.createdAt | date:'dd.MM. HH:mm' }} · {{ poll.voteCount }} Stimmen</span>
+          <span class="poll-state">{{ poll.poll.closed ? 'Beendet' : 'Offen' }}</span>
         </button>
       }
     </nav>
   } @else if (!loading()) {
-    <p>Noch keine Abfragen. Erstelle eine neue und teile den Link.</p>
+    <p class="status">Noch keine Abfragen. Erstelle eine neue und teile den Link.</p>
   }
 
   @if (selected(); as current) {
     <section class="card" aria-labelledby="share-title">
       <h2 id="share-title">{{ current.poll.closed ? 'Beendete Abfrage' : 'Familie einladen' }}</h2>
-      <p>Löschung am {{ current.poll.expiresAt | date:'dd.MM.yyyy HH:mm' }}.</p>
+      <p class="hint">Löschung am {{ current.poll.expiresAt | date:'dd.MM.yyyy HH:mm' }}.</p>
       <label>Öffentlicher Abstimmungslink
         <input type="text" readonly [value]="voteUrl(current.poll.id)" aria-label="Öffentlicher Abstimmungslink" />
       </label>
@@ -93,7 +98,7 @@
         @if (!current.poll.closed) {
           <button type="button" class="secondary" [disabled]="busy() || loading()" (click)="change('close')">Abfrage beenden</button>
         }
-        <button type="button" class="secondary" [disabled]="busy() || loading()" (click)="change('delete')">Abfrage löschen</button>
+        <button type="button" class="destructive" [disabled]="busy() || loading()" (click)="change('delete')">Abfrage löschen</button>
       </div>
     </section>
   }

@@ -51,6 +51,31 @@ test('plus menu opens import; edited selection is sent only after confirmation',
   await expect(page.getByRole('button', { name: 'In den Vorrat übernehmen' })).toBeDisabled();
 });
 
+for (const colorScheme of ['light', 'dark'] as const) {
+  test(`import uses app controls without horizontal overflow in ${colorScheme} mode`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme });
+    for (const width of [320, 393, 760]) {
+      await page.setViewportSize({ width, height: 852 });
+      await page.goto('/#/purchase-import');
+      const parse = page.getByRole('button', { name: 'Artikel aus Text erkennen' });
+      await expect(parse).toHaveCSS('min-height', '50px');
+      await expect(parse).toHaveCSS('border-radius', '999px');
+      const camera = page.locator('.file-button').first();
+      await expect(camera).toHaveCSS('border-radius', '999px');
+      await expect(camera).toHaveCSS('color', await parse.evaluate((button) => getComputedStyle(button).color));
+      await page.getByLabel('Einkaufstext (ein Artikel pro Zeile)').fill('500 g Tomaten\n2 Zwiebeln');
+      await parse.click();
+      for (const label of ['Artikelname 1', 'Menge 1', 'Einheit 1']) {
+        const field = page.getByLabel(label, { exact: true });
+        await expect(field).toBeVisible();
+        await expect(field).toHaveCSS('min-height', '44px');
+      }
+      await expect(page.getByRole('button', { name: 'In den Vorrat übernehmen' })).toHaveCSS('min-height', '50px');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+  });
+}
+
 test('extracts actual PDF text through the bundled PDF worker', async ({ page }) => {
   await page.goto('/#/purchase-import');
   await page.locator('input[accept*="application/pdf"]').setInputFiles({
