@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1794940631458,
+  "timestamp": 1794941338336,
   "index": "/romansapp/index.html",
   "assetGroups": [
     {
@@ -65,6 +65,7 @@
         "ignoreVary": true
       },
       "urls": [
+        "/romansapp/assets/creators/giga-roman.svg",
         "/romansapp/assets/icons/icon-128x128.png",
         "/romansapp/assets/icons/icon-144x144.png",
         "/romansapp/assets/icons/icon-152x152.png",
@@ -312,6 +313,7 @@
     }
   ],
   "hashTable": {
+    "/romansapp/assets/creators/giga-roman.svg": "3dcd36bbb525b1892074f5c248723affc79422a1",
     "/romansapp/assets/icons/icon-128x128.png": "b1f06c7d714abb4a0cc4d1f7c954feb26826e4c4",
     "/romansapp/assets/icons/icon-144x144.png": "96a0d629765c1bc85d9263c6bc83094ca776d267",
     "/romansapp/assets/icons/icon-152x152.png": "b1fbbee3902eb96a7658e3bb006f31f78ca5a44c",
