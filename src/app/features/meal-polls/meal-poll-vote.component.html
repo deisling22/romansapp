@@ -1,0 +1,52 @@
+<main class="screen public-poll">
+  <header class="page-header">
+    <p class="eyebrow">Was wollen wir essen?</p>
+    <h1>Deine Wunschreihenfolge</h1>
+    <p>Schiebe dein Lieblingsgericht auf Platz 1. Danach kommen die Gerichte, auf die du als Nächstes Lust hast.</p>
+  </header>
+  @if (loading()) { <p role="status">Abfrage wird geladen …</p> }
+  @if (error()) {
+    <p class="field-error" role="alert">{{ error() }}</p>
+    @if (!poll()) { <button type="button" (click)="load()" [disabled]="loading()">Erneut laden</button> }
+  }
+  @if (poll(); as current) {
+    <section class="card">
+      <p class="hint">Verfügbar bis {{ current.expiresAt | date:'dd.MM.yyyy HH:mm' }}. Danach werden Abfrage und Stimmen gelöscht.</p>
+      @if (current.closed) {
+        <p role="status">Diese Abfrage ist beendet. Die Gerichte kannst du noch ansehen, aber nicht mehr abstimmen.</p>
+      } @else if (submitted()) {
+        <p role="status">Danke, {{ name }}! Deine Rangliste wurde gespeichert.</p>
+        <button type="button" class="secondary" (click)="submitted.set(false)">Meine Stimme ändern</button>
+      }
+      <p class="hint" id="sort-help">Am Griff ziehen (am Handy kurz gedrückt halten) oder mit den Pfeiltasten-Schaltflächen verschieben.</p>
+      <ol class="ranking" cdkDropList [cdkDropListData]="options()" (cdkDropListDropped)="drop($event)"
+        [cdkDropListDisabled]="busy() || current.closed || submitted()" aria-describedby="sort-help" aria-label="Deine Rangliste">
+        @for (option of options(); track option.entryId; let i = $index) {
+          <li cdkDrag [cdkDragStartDelay]="{ touch: 180, mouse: 0 }">
+            <span class="rank">{{ i + 1 }}</span>
+            <button type="button" cdkDragHandle class="drag-handle secondary" [disabled]="busy() || current.closed || submitted()"
+              [attr.aria-label]="option.name + ' ziehen'">⠿</button>
+            <img [src]="imageUrl(option.imageUrl)" alt="" loading="lazy" />
+            <span class="dish-copy"><strong>{{ option.name }}</strong><small>{{ slotLabels[option.mealSlot] }}</small></span>
+            <span class="move-actions">
+              <button type="button" class="secondary" [disabled]="i === 0 || busy() || current.closed || submitted()"
+                (click)="move(i, i - 1)" [attr.aria-label]="option.name + ' nach oben'">↑</button>
+              <button type="button" class="secondary" [disabled]="i === options().length - 1 || busy() || current.closed || submitted()"
+                (click)="move(i, i + 1)" [attr.aria-label]="option.name + ' nach unten'">↓</button>
+            </span>
+          </li>
+        }
+      </ol>
+      @if (!current.closed && !submitted()) {
+        <form (ngSubmit)="submit()">
+          <label for="voter-name">Dein Name
+            <input id="voter-name" name="name" [(ngModel)]="name" maxlength="80" autocomplete="given-name" required [disabled]="busy()" />
+          </label>
+          <p class="hint">Keine Anmeldung nötig. Dein Name und deine Rangliste sind für den Ersteller sichtbar. Pro Name zählt eine Stimme: Erneutes Absenden unter demselben Namen ersetzt die vorherige Stimme (Groß-/Kleinschreibung egal). Es gibt keine Identitätsprüfung.</p>
+          <button type="submit" [disabled]="busy() || !name.trim()">{{ busy() ? 'Wird gesendet …' : 'Rangliste absenden' }}</button>
+        </form>
+      }
+    </section>
+  }
+  <a routerLink="/">Zur Romansapp</a>
+</main>

@@ -35,6 +35,8 @@ const routes: Routes = [
   { path: 'recipe-scan', loadComponent: loadRecipeScan },
   { path: 'receipts', loadComponent: () => import('./features/receipts/receipts.component').then((m) => m.ReceiptsComponent) },
   { path: 'purchase-import', loadComponent: () => import('./features/purchase-import/purchase-import.component').then((m) => m.PurchaseImportComponent) },
+  { path: 'meal-polls', loadComponent: () => import('./features/meal-polls/meal-polls.component').then((m) => m.MealPollsComponent), canActivate: [AuthGuard] },
+  { path: 'vote/:id', loadComponent: () => import('./features/meal-polls/meal-poll-vote.component').then((m) => m.MealPollVoteComponent) },
   { path: 'shopping-list', loadComponent: loadShoppingList },
   { path: 'pantry', loadComponent: () => import('./features/pantry/pantry.component').then((m) => m.PantryComponent) },
   { path: 'creators', loadComponent: () => import('./features/creators/creator-feed.component').then((m) => m.CreatorFeedComponent) },

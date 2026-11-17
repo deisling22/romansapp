@@ -73,5 +73,8 @@ export class AppComponent {
   closeMenu(): void {
     this.menuOpen = false;
   }
-}
 
+  get publicPollPage(): boolean {
+    return this.router.url.startsWith('/vote/');
+  }
+}

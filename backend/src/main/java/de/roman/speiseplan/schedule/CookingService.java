@@ -68,6 +68,7 @@ public class CookingService {
                 dishIngredientRepository.findByDishId(dish.getId()), PortionCalculator.ingredientFactor(dish, portions));
         Instant now = Instant.now();
         entry.markCooked(now);
+        entry.setPriorityOrder(null);
         cookLogRepository.save(new CookLog(entry, PortionCalculator.cooksLeftovers(plan, entry.getMealSlot()), now));
         trendScoringService.bump(ContentType.DISH, dish.getId(), 4);
     }

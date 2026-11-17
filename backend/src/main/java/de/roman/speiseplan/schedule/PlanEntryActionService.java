@@ -81,6 +81,7 @@ public class PlanEntryActionService {
     @Transactional
     public void skip(Long entryId) {
         PlanEntry entry = requireOwnEntry(entryId);
+        entry.setPriorityOrder(null);
         int lastSortOrder = planEntryRepository.findTopByPlanIdOrderBySortOrderDesc(entry.getPlan().getId())
                 .map(PlanEntry::getSortOrder)
                 .orElse(entry.getSortOrder());

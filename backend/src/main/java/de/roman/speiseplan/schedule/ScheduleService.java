@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,7 +130,31 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public Schedule compute(int requestedDays) {
-        int days = Math.max(1, Math.min(MAX_DAYS, requestedDays));
+        return computeDays(Math.max(1, Math.min(MAX_DAYS, requestedDays)));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PlanEntry> nextPollEntries() {
+        List<MealPlan> plans = activePlans();
+        if (plans.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, Long> firstEntryByDish = new LinkedHashMap<>();
+        // Even when short and long plans alternate, inspect enough turns for ten distinct dishes.
+        for (ScheduledMeal meal : computeDays(10 * plans.size() + 1).meals()) {
+            if (meal.status() == MealStatus.PLANNED) {
+                firstEntryByDish.putIfAbsent(meal.dish().getId(), meal.planEntryId());
+                if (firstEntryByDish.size() == 10) {
+                    break;
+                }
+            }
+        }
+        Map<Long, PlanEntry> byId = planEntryRepository.findAllById(firstEntryByDish.values()).stream()
+                .collect(Collectors.toMap(PlanEntry::getId, entry -> entry));
+        return firstEntryByDish.values().stream().map(byId::get).toList();
+    }
+
+    private Schedule computeDays(int days) {
         ProfileDto profile = profileService.getProfile();
         ZoneId zone = ZoneId.systemDefault();
         LocalDate today = LocalDate.now(zone);
@@ -284,7 +309,11 @@ public class ScheduleService {
                 rotation.addAll(planEntries.stream().filter(PlanEntry::isCooked).toList());
                 rotations.add(rotation);
             }
-            queues.put(slot, new SlotQueue(rotations));
+            List<PlanEntry> priority = entries.stream()
+                    .filter(entry -> entry.getMealSlot() == slot && entry.getPriorityOrder() != null)
+                    .sorted(Comparator.comparing(PlanEntry::getPriorityOrder))
+                    .toList();
+            queues.put(slot, new SlotQueue(rotations, priority));
         }
         return queues;
     }
@@ -377,17 +406,30 @@ public class ScheduleService {
     private static final class SlotQueue {
         private final List<List<PlanEntry>> rotations;
         private final int[] positions;
+        private final List<PlanEntry> priority;
+        private final Set<Long> skipOnce;
+        private int priorityPosition;
         private int turn;
 
-        SlotQueue(List<List<PlanEntry>> rotations) {
+        SlotQueue(List<List<PlanEntry>> rotations, List<PlanEntry> priority) {
             this.rotations = rotations;
             this.positions = new int[rotations.size()];
+            this.priority = priority;
+            this.skipOnce = priority.stream().map(PlanEntry::getId).collect(Collectors.toSet());
         }
 
         PlanEntry next() {
-            int planIndex = turn++ % rotations.size();
-            List<PlanEntry> rotation = rotations.get(planIndex);
-            return rotation.get(positions[planIndex]++ % rotation.size());
+            if (priorityPosition < priority.size()) {
+                return priority.get(priorityPosition++);
+            }
+            while (true) {
+                int planIndex = turn++ % rotations.size();
+                List<PlanEntry> rotation = rotations.get(planIndex);
+                PlanEntry entry = rotation.get(positions[planIndex]++ % rotation.size());
+                if (!skipOnce.remove(entry.getId())) {
+                    return entry;
+                }
+            }
         }
     }
 }

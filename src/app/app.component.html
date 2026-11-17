@@ -1,6 +1,6 @@
 <router-outlet></router-outlet>
 
-@if (onboarding.visible$ | async) {
+@if (!publicPollPage && (onboarding.visible$ | async)) {
   <app-onboarding-tour></app-onboarding-tour>
 }
 
@@ -30,7 +30,7 @@
   </p>
 }
 
-@if (menuOpen) {
+@if (menuOpen && !publicPollPage) {
   <button type="button" class="menu-backdrop" aria-label="Menü schließen" (click)="closeMenu()"></button>
   <div id="quick-menu" class="quick-menu" role="menu" aria-label="Weitere Bereiche">
     <p class="menu-section">Hinzufügen</p>
@@ -38,6 +38,7 @@
     <a routerLink="/recipe-scan" [queryParams]="{ link: 1 }" role="menuitem" (click)="closeMenu()">Rezept per Link</a>
     <a routerLink="/receipts" role="menuitem" (click)="closeMenu()">Beleg erfassen</a>
     <a routerLink="/purchase-import" role="menuitem" (click)="closeMenu()">Kassenbon importieren</a>
+    <a routerLink="/meal-polls" role="menuitem" (click)="closeMenu()">Familienabfrage erstellen</a>
     <a routerLink="/ingredient-scan" role="menuitem" (click)="closeMenu()">Zutaten scannen</a>
     <p class="menu-section">Mehr</p>
     <a routerLink="/creators" role="menuitem" (click)="closeMenu()">Creator</a>
@@ -47,6 +48,7 @@
   </div>
 }
 
+@if (!publicPollPage) {
 <nav class="tab-bar" aria-label="Hauptnavigation">
   <div class="tabs">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">
@@ -80,3 +82,4 @@
     <svg viewBox="0 0 24 24" aria-hidden="true" [class.open]="menuOpen"><path d="M12 5v14M5 12h14" /></svg>
   </button>
 </nav>
+}

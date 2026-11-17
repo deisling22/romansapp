@@ -68,6 +68,45 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+## Familienabfrage
+
+Über **Plus → Familienabfrage erstellen** können angemeldete Nutzer eine
+Abfrage aus den nächsten zehn unterschiedlichen Gerichten ihrer aktiven
+ewigen Speisepläne erstellen. Sind weniger vorhanden, werden alle angeboten
+(mindestens zwei). Die Gerichte werden als unveränderliche Momentaufnahme
+gespeichert; spätere Planänderungen ändern die öffentliche Abfrage nicht.
+
+Der öffentliche Link kann über WhatsApp, das Teilen-Menü oder die Zwischenablage
+weitergegeben werden. Teilnehmer benötigen kein Konto: Sie sortieren alle
+Gerichte per Drag-and-drop (auch am Handy) oder Pfeil-Schaltflächen, geben
+ihren Namen an und senden ihre Rangliste ab. Pro normalisiertem Namen zählt
+eine Stimme; erneutes Absenden ersetzt sie. Das ist ausdrücklich keine
+Identitätsprüfung: Wer den Namen kennt, kann dessen Stimme überschreiben.
+Namen und einzelne Ranglisten sind nur für den Ersteller sichtbar.
+In der nativen App zeigen geteilte Links auf die öffentliche Website
+(`publicAppUrl` in den Frontend-Umgebungsdateien), nicht auf eine lokale
+Capacitor-Adresse. Dafür müssen Frontend und Backend veröffentlicht sein.
+
+Die Ergebnisreihenfolge ergibt sich aus dem arithmetischen Mittel der
+Platzierungen aller vollständigen Stimmen (kleiner ist besser). Bei identischen
+Mittelwerten bleibt die ursprüngliche Reihenfolge der Abfrage bestehen.
+Der Ersteller kann die Ergebnisse aktualisieren, die Abfrage beenden oder
+löschen und eine frei wählbare Anzahl der Top-Gerichte übernehmen. Die
+Übernahme beendet die Abfrage und zieht diese Gerichte innerhalb ihrer
+jeweiligen Mahlzeit (Frühstück/Mittag/Abend) vor; alle übrigen Gerichte behalten
+ihre relative Rotationsreihenfolge. Eine vorherige Top-Auswahl wird ersetzt.
+Beim Kochen oder Überspringen wird die jeweilige Priorität verbraucht.
+Gelöschte, ausgetauschte oder inzwischen inaktive ausgewählte Gerichte führen
+zu einer verständlichen Fehlermeldung statt einer Teilübernahme.
+
+Abfragen und Stimmen werden **fünf Tage nach Erstellung** gelöscht, auch
+beendete. Der Zugriff endet exakt zur Ablaufzeit; die physische Bereinigung
+läuft minütlich sowie nach einem Serverneustart. Bereits übernommene
+Planprioritäten bleiben davon unberührt. Verwaltung und Ergebnisse sind
+serverseitig auf den angemeldeten Ersteller und dessen Haushalt beschränkt.
+Öffentlich sind ausschließlich der zufällige Abfragelink und die darin
+enthaltene Gerichte-Momentaufnahme erreichbar.
+
 ## Kassenbon und Einkauf importieren
 
 Im Plus-Menü öffnet **Kassenbon importieren** den Vorratsimport. Unterstützt

@@ -10,6 +10,8 @@ public interface PlanEntryRepository extends JpaRepository<PlanEntry, Long> {
 
     List<PlanEntry> findByPlanIdOrderBySortOrderAsc(Long planId);
 
+    List<PlanEntry> findByPriorityOrderIsNotNull();
+
     List<PlanEntry> findByPlanIdInOrderBySortOrderAsc(List<Long> planIds);
 
     List<PlanEntry> findByPlanIdAndMealSlot(Long planId, MealSlot mealSlot);

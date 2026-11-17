@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/household").permitAll()
                         .requestMatchers("/api/household/**").authenticated()
                         .requestMatchers("/api/auth/**").authenticated()
+                        .requestMatchers("/api/meal-polls", "/api/meal-polls/**").authenticated()
                         .requestMatchers("/api/sync/**").authenticated()
                         .requestMatchers("/api/creator-subscriptions/**").authenticated()
                         .requestMatchers("/api/gamification/**").authenticated()

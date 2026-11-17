@@ -1,0 +1,91 @@
+<main class="screen">
+  <header class="page-header">
+    <p class="eyebrow">Gemeinsam planen</p>
+    <h1>Familienabfrage</h1>
+    <p>Die nächsten 10 unterschiedlichen Gerichte aus deinem ewigen Speiseplan. Deine Familie sortiert ihre Favoriten nach oben – ganz ohne Anmeldung.</p>
+  </header>
+  <div class="actions">
+    <button type="button" [disabled]="loading() || busy()" (click)="create()">Neue Abfrage erstellen</button>
+    <button type="button" class="secondary" [disabled]="loading() || busy()" (click)="load()">Ergebnisse aktualisieren</button>
+  </div>
+  <p class="hint">Bei weniger als 10 Gerichten werden alle verfügbaren angeboten (mindestens 2). Jede Abfrage wird mit allen Stimmen nach 5 Tagen gelöscht, auch wenn sie bereits beendet ist.</p>
+  @if (loading()) { <p role="status">Abfragen werden geladen …</p> }
+  @if (busy()) { <p role="status">Wird gespeichert …</p> }
+  @if (error()) { <p class="field-error" role="alert">{{ error() }}</p> }
+  @if (message()) { <p role="status">{{ message() }}</p> }
+
+  @if (polls().length) {
+    <nav class="poll-list" aria-label="Meine Abfragen">
+      @for (poll of polls(); track poll.poll.id) {
+        <button type="button" class="secondary" [attr.aria-pressed]="selected()?.poll?.id === poll.poll.id"
+          [disabled]="busy() || loading()" (click)="select(poll)">
+          {{ poll.poll.createdAt | date:'dd.MM. HH:mm' }} · {{ poll.poll.closed ? 'Beendet' : 'Offen' }} · {{ poll.voteCount }} Stimmen
+        </button>
+      }
+    </nav>
+  } @else if (!loading()) {
+    <p>Noch keine Abfragen. Erstelle eine neue und teile den Link.</p>
+  }
+
+  @if (selected(); as current) {
+    <section class="card" aria-labelledby="share-title">
+      <h2 id="share-title">{{ current.poll.closed ? 'Beendete Abfrage' : 'Familie einladen' }}</h2>
+      <p>Löschung am {{ current.poll.expiresAt | date:'dd.MM.yyyy HH:mm' }}.</p>
+      <label>Öffentlicher Abstimmungslink
+        <input type="text" readonly [value]="voteUrl(current.poll.id)" aria-label="Öffentlicher Abstimmungslink" />
+      </label>
+      <div class="actions">
+        <a class="button" [href]="whatsappUrl(current.poll.id)" target="_blank" rel="noopener noreferrer">Per WhatsApp teilen</a>
+        <button type="button" class="secondary" (click)="share(current.poll.id)">Link teilen</button>
+        <button type="button" class="secondary" (click)="share(current.poll.id, true)">Link kopieren</button>
+        <a [routerLink]="['/vote', current.poll.id]">Selbst abstimmen</a>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="results-title">
+      <h2 id="results-title">Ergebnisse · {{ current.voteCount }} Stimmen</h2>
+      <p class="hint">Mittelwert der Platzierungen aller abgegebenen Stimmen: je kleiner, desto beliebter. Bei gleichem Mittelwert entscheidet die ursprüngliche Reihenfolge im Plan.</p>
+      <ol class="ranking results">
+        @for (result of current.results; track result.option.entryId; let i = $index) {
+          <li>
+            <span class="rank">{{ i + 1 }}</span>
+            <img [src]="imageUrl(result.option.imageUrl)" alt="" loading="lazy" />
+            <span class="dish-copy"><strong>{{ result.option.name }}</strong><small>{{ slotLabels[result.option.mealSlot] }}</small></span>
+            <span class="average">{{ result.averageRank === null ? 'Noch keine Stimme' : 'Ø ' + (result.averageRank | number:'1.2-2') }}</span>
+          </li>
+        }
+      </ol>
+      <fieldset [disabled]="busy() || loading() || !current.voteCount">
+        <legend>Favoriten als Nächstes kochen</legend>
+        <label>Wie viele Top-Gerichte?
+          <select [(ngModel)]="count" aria-label="Anzahl Top-Gerichte">
+            @for (option of current.poll.options; track option.entryId; let i = $index) {
+              <option [ngValue]="i + 1">Top {{ i + 1 }}</option>
+            }
+          </select>
+        </label>
+        <p class="hint">Die ausgewählten Gerichte werden innerhalb von Frühstück, Mittag- bzw. Abendessen vorgezogen. Der restliche Plan bleibt erhalten. Eine vorherige Top-Auswahl wird ersetzt. Die Übernahme beendet zugleich die Abfrage.</p>
+        <button type="button" (click)="change('apply')">Top {{ count }} als Nächstes ansetzen</button>
+      </fieldset>
+      <a routerLink="/">Zum aktuellen Speiseplan</a>
+    </section>
+
+    <section class="card" aria-labelledby="votes-title">
+      <h2 id="votes-title">Abgegebene Ranglisten</h2>
+      @for (vote of current.votes; track vote.name) {
+        <details>
+          <summary>{{ vote.name }}</summary>
+          <ol>
+            @for (id of vote.ranking; track id) { <li>{{ optionName(current, id) }}</li> }
+          </ol>
+        </details>
+      } @empty { <p>Noch niemand hat abgestimmt.</p> }
+      <div class="actions">
+        @if (!current.poll.closed) {
+          <button type="button" class="secondary" [disabled]="busy() || loading()" (click)="change('close')">Abfrage beenden</button>
+        }
+        <button type="button" class="secondary" [disabled]="busy() || loading()" (click)="change('delete')">Abfrage löschen</button>
+      </div>
+    </section>
+  }
+</main>

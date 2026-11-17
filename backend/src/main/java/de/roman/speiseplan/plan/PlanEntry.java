@@ -34,6 +34,9 @@ public class PlanEntry {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 
+    @Column(name = "priority_order")
+    private Integer priorityOrder;
+
     @Column(nullable = false)
     private boolean cooked = false;
 
@@ -74,6 +77,14 @@ public class PlanEntry {
 
     public int getSortOrder() {
         return sortOrder;
+    }
+
+    public Integer getPriorityOrder() {
+        return priorityOrder;
+    }
+
+    public void setPriorityOrder(Integer priorityOrder) {
+        this.priorityOrder = priorityOrder;
     }
 
     public boolean isCooked() {
