@@ -59,6 +59,12 @@ public class DashboardService {
 
     @Transactional(readOnly = true)
     public DashboardDto getDashboard() {
+        return getDashboard(scheduleService.compute(2));
+    }
+
+    /** Variant for callers that already computed the schedule of the next days. */
+    @Transactional(readOnly = true)
+    public DashboardDto getDashboard(ScheduleService.Schedule schedule) {
         ProfileDto profile = profileService.getProfile();
 
         LocalDate today = LocalDate.now(ZoneId.systemDefault());
@@ -107,7 +113,7 @@ public class DashboardService {
                 ? null
                 : (int) Math.round(caloriesToday / calorieGoal * 100);
 
-        NextDishDto nextDish = scheduleService.compute(2).meals().stream()
+        NextDishDto nextDish = schedule.meals().stream()
                 .filter(meal -> meal.status() == ScheduleService.MealStatus.PLANNED)
                 .findFirst()
                 .map(meal -> {

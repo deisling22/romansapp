@@ -20,6 +20,30 @@ Erweiterungen, damit sie bei Bedarf gezielt nachgezogen werden können.
   reinen Trending-Fallback.
 - Frontend: drei "Für dich"-Streifen (Gerichte, Creator, Pläne) auf dem Dashboard.
 
+## Aktueller Stand (v2, 17.11.2026)
+
+- **Geschmack ohne Konto** (`TasteService`): Das Profil gilt je Haushalt und speist sich aus
+  den in der Einrichtung gewählten Tags (`GET/PUT /api/taste`, Gewicht 8), aus "Weniger
+  davon" (Abzug 3 je Tag) und – ohne Anmeldung – aus dem Kochprotokoll des Haushalts
+  (Gewicht 4, Halbwertszeit 30 Tage). Angemeldete Nutzer behalten zusätzlich ihr
+  persönliches Profil.
+- **"Weniger davon"** (`POST /api/recommendations/dishes/{id}/less`): blendet das Gericht
+  für den Haushalt aus allen Vorschlägen aus und senkt das Gewicht seiner Tags. Getrennt
+  von der Sternebewertung.
+- **"Bald verbrauchen"** (`UseSoonService`, `GET /api/pantry/use-soon`): eine gemeinsame
+  Wertung statt zweier getrennter Listen:
+  `Wert = Dringlichkeit × (0,5 + 0,5 × Vorratsabdeckung) × (1 + 0,5 × tanh(Geschmack / 8))`.
+  - Dringlichkeit je ablaufender Zutat: `1 / (1 + Resttage)`, abgelaufen 1,2; Summe über
+    alle passenden Zutaten des Gerichts.
+  - Vorratsabdeckung: Anteil der Zutaten, die für die Haushaltsportionen vollständig da sind.
+  - Bestand, den der Plan bis zum Ablauftag verbraucht, zählt als "eingeplant" und löst
+    keinen Vorschlag aus (Zuordnung in Ablaufreihenfolge, wie beim Abbuchen).
+  - Ausgeschlossen: ausgeblendete Gerichte, Gerichte mit ≤ 2 Sternen des Nutzers, Gerichte
+    der nächsten Plantage; gleichnamige Kopien erscheinen einmal.
+  - Jede Empfehlung liefert ihre Begründung (passende Zutaten, fehlende Zutaten,
+    Geschmackstreffer) und den Planeintrag, den sie übernehmen kann (`todayEntry`).
+- Zutatenabgleich überall über `IngredientMatcher` (Schreibweise, Plural, Einheiten).
+
 ## Explizites Sichtbarkeits-Signal (Impressions)
 
 - Aktuell zählt nur das Öffnen der Detailseite als Signal; ein Gericht, das in der
@@ -42,12 +66,8 @@ Erweiterungen, damit sie bei Bedarf gezielt nachgezogen werden können.
 
 ## Explizite Negativ-Signale
 
-- Aktuell wirkt eine schlechte Bewertung (≤ 2 Sterne) leicht dämpfend, es gibt aber keine
-  direkte "Nicht interessiert"-Aktion für Nutzer.
-- Einen kompakten Button/Swipe "Weniger davon" auf Empfehlungskarten ergänzen, der einen
-  stark negativen Gewichtungs-Event auslöst und den Inhalt sofort aus dem aktuellen Feed entfernt.
-- Getrennt vom regulären Bewertungssystem behandeln, damit Rezept-Bewertungen und
-  Feed-Feedback nicht vermischt werden.
+- Umgesetzt für Gerichte ("Weniger davon", siehe v2). Offen: dieselbe Aktion für Creator
+  und Pläne sowie eine Möglichkeit, ausgeblendete Gerichte wieder einzublenden.
 
 ## Erklärbarkeit ("Warum wird mir das gezeigt?")
 
@@ -96,10 +116,9 @@ Erweiterungen, damit sie bei Bedarf gezielt nachgezogen werden können.
 
 ## Cold-Start-Onboarding
 
-- Neue Nutzer ohne jede Interaktion sehen ausschließlich den Trending-Fallback.
-- Ein kurzer, optionaler Onboarding-Schritt ("Welche Küchen magst du?") könnte das
-  Geschmacksprofil sofort mit ein paar Tags vorbelegen, statt erst nach mehreren Aktionen
-  zu personalisieren.
+- Umgesetzt: Die Einrichtung beim ersten Start fragt "Was schmeckt dir?" und belegt das
+  Haushaltsprofil mit den gewählten Tags vor. Offen: die Auswahl später in den
+  Einstellungen ändern.
 
 ## Weitere Oberflächen
 
@@ -111,7 +130,7 @@ Erweiterungen, damit sie bei Bedarf gezielt nachgezogen werden können.
 ## Empfohlene Reihenfolge
 
 1. Impression-/Klick-Erfassung ergänzen (Grundlage für alles Weitere).
-2. Explizites "Weniger davon"-Signal und Erklärbarkeits-Hinweis ergänzen.
+2. Erklärbarkeits-Hinweis auch im "Für dich"-Feed ergänzen ("Bald verbrauchen" hat ihn schon).
 3. Item-Item-Co-Occurrence als einfaches kollaboratives Signal einführen.
 4. Vielfaltsregel beim Zuschneiden der Ergebnislisten ergänzen.
 5. Zeit-/Saison-Kontext einbeziehen, sobald Nutzungsdaten über mehrere Monate vorliegen.

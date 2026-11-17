@@ -1,0 +1,62 @@
+@if (useSoon?.items?.length) {
+  <section class="use-soon" aria-labelledby="use-soon-title" data-testid="use-soon">
+    <h2 id="use-soon-title">Bald verbrauchen</h2>
+    <ul class="expiring-items">
+      @for (item of useSoon!.items; track item.id) {
+        <li [class.planned]="item.planned" [class.expired]="isExpired(item)">
+          <strong>{{ item.ingredientName }}</strong>
+          <span>{{ item.planned ? 'eingeplant' : expiryLabel(item) }}</span>
+        </li>
+      }
+    </ul>
+
+    @if (message) {
+      <p class="card-status success" role="status">{{ message }}</p>
+    }
+    @if (errorMessage) {
+      <p class="card-status error" role="alert">{{ errorMessage }}</p>
+    }
+
+    @if (dishes.length) {
+      <p class="hint">Das passt dazu:</p>
+      <ul class="suggestions">
+        @for (dish of dishes; track dish.id) {
+          <li data-testid="use-soon-dish">
+            <a class="dish" [routerLink]="['/dishes', dish.id]">
+              @if (dish.imageUrl) {
+                <img [src]="imageUrl(dish.imageUrl)" alt="" loading="lazy" />
+              }
+              <span>
+                <strong>{{ dish.name }}</strong>
+                <small>{{ reason(dish) }}</small>
+              </span>
+            </a>
+            <div class="dish-actions">
+              @if (useSoon!.todayEntry) {
+                <button type="button" class="primary" [disabled]="busyDishId !== null" (click)="planToday(dish)">
+                  {{ planDay }} einplanen
+                </button>
+              } @else {
+                <a class="primary" [routerLink]="['/dishes', dish.id]" [queryParams]="{ cook: 1 }">Jetzt kochen</a>
+              }
+              @if (dish.missingCount > 0) {
+                <button type="button" [disabled]="busyDishId !== null" (click)="addMissing(dish)">
+                  Fehlendes auf Liste
+                </button>
+              }
+              <button
+                type="button"
+                class="plain"
+                [attr.aria-label]="dish.name + ' nicht mehr vorschlagen'"
+                (click)="lessOf(dish)">Weniger davon</button>
+            </div>
+          </li>
+        }
+      </ul>
+    } @else if (allPlanned) {
+      <p class="hint">Dein Plan verbraucht das rechtzeitig.</p>
+    } @else {
+      <p class="hint">Kein gespeichertes Gericht nutzt diese Zutaten.</p>
+    }
+  </section>
+}

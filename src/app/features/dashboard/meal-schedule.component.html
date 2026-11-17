@@ -2,12 +2,18 @@
   <div class="schedule-heading">
     <div>
       <h2 id="meal-schedule-title">Als Nächstes</h2>
+      @if (refreshing && schedule) {
+        <span class="refreshing" role="status">Wird aktualisiert ...</span>
+      }
     </div>
     <a routerLink="/plans" class="plans-link">Pläne</a>
   </div>
 
   @if (loading) {
     <p class="status loading-placeholder">Nächste Gerichte werden geladen ...</p>
+  }
+  @if (loadError && !schedule) {
+    <p class="status error" role="alert">{{ loadError }}</p>
   }
   @if (errorMessage) {
     <p class="status error" role="alert">{{ errorMessage }}</p>
@@ -78,18 +84,36 @@
                 <p class="hint">Doppelte Menge – Reste gibt es am nächsten Tag zum Mittagessen.</p>
               }
               <div class="meal-actions">
-                <button type="button" class="primary" [disabled]="busyKey !== null" (click)="cook(meal, key)">
-                  {{ busyKey === key ? 'Wird gespeichert ...' : 'Gekocht' }}
-                </button>
+                <a class="primary" [routerLink]="['/dishes', meal.dishId]" [queryParams]="{ cook: 1 }">Jetzt kochen</a>
                 @if (meal.ingredientStatus === 'MISSING') {
                   <button type="button" [disabled]="busyKey !== null" (click)="addMissing(meal, key)">
                     Fehlende auf Liste
                   </button>
                 }
-                <button type="button" [disabled]="busyKey !== null" (click)="togglePanel(key, 'swap', meal)">Tauschen</button>
-                <button type="button" [disabled]="busyKey !== null" (click)="togglePanel(key, 'replace', meal)">Ersetzen</button>
-                <button type="button" [disabled]="busyKey !== null" (click)="skip(meal, key)">Später</button>
+                <button
+                  type="button"
+                  class="more"
+                  [attr.aria-expanded]="menuKey === key"
+                  [attr.aria-label]="'Weitere Aktionen für ' + meal.dishName"
+                  (click)="toggleMenu(key)">Mehr</button>
               </div>
+
+              @if (menuKey === key) {
+                <div class="more-menu" role="group" [attr.aria-label]="'Aktionen für ' + meal.dishName">
+                  <button type="button" [disabled]="busyKey !== null" (click)="cook(meal, key)">
+                    <span aria-hidden="true">✓</span> Als gekocht markieren
+                  </button>
+                  <button type="button" [disabled]="busyKey !== null" (click)="togglePanel(key, 'swap', meal)">
+                    <span aria-hidden="true">⇄</span> Mit anderem Tag tauschen
+                  </button>
+                  <button type="button" [disabled]="busyKey !== null" (click)="togglePanel(key, 'replace', meal)">
+                    <span aria-hidden="true">↻</span> Durch anderes Gericht ersetzen
+                  </button>
+                  <button type="button" [disabled]="busyKey !== null" (click)="skip(meal, key)">
+                    <span aria-hidden="true">→</span> Später kochen
+                  </button>
+                </div>
+              }
 
               @if (panel?.key === key && panel?.type === 'swap') {
                 <label class="panel">

@@ -98,8 +98,9 @@
   <div class="plan-footer">
     <a class="primary-action" [routerLink]="isLocal
         ? ['/local-plans', localClientId, 'dishes', 'new']
-        : ['/plans', planId, 'dishes', 'new']">Gericht hinzufügen</a>
+        : ['/plans', planId, 'dishes', 'new']">Neues Gericht anlegen</a>
     @if (!isLocal) {
+      <a class="secondary-action" routerLink="/dishes" [queryParams]="{ plan: planId }">Aus Gerichten wählen</a>
       <button
         type="button"
         class="secondary-action"

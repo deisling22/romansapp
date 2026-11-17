@@ -4,9 +4,8 @@ import { AuthService } from '../../core/auth.service';
 import { DishApiService } from '../../core/dish-api.service';
 import { GamificationService } from '../../core/gamification.service';
 import { DishDetail } from '../../core/models';
-import { PantryApiService } from '../../core/pantry-api.service';
+import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { ShareService } from '../../core/share.service';
-import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { DishDetailComponent } from './dish-detail.component';
 
 describe('DishDetailComponent nutrition display', () => {
@@ -17,8 +16,7 @@ describe('DishDetailComponent nutrition display', () => {
         provideRouter([]),
         { provide: AuthService, useValue: {} },
         { provide: DishApiService, useValue: { imageUrl: (url: string) => url } },
-        { provide: PantryApiService, useValue: {} },
-        { provide: ShoppingListApiService, useValue: {} },
+        { provide: MealPlanApiService, useValue: {} },
         { provide: ShareService, useValue: {} },
         { provide: GamificationService, useValue: {} },
       ],

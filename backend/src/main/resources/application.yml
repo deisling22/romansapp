@@ -13,6 +13,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        # Loads the dishes/ingredients referenced by a result list in one query instead of one per row.
+        default_batch_fetch_size: 100
   flyway:
     enabled: true
   servlet:

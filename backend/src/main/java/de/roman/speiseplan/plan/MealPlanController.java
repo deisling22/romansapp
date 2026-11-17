@@ -67,6 +67,15 @@ public class MealPlanController {
         return mealPlanService.getDishes(planId);
     }
 
+    @PostMapping("/{planId}/entries")
+    @ResponseStatus(HttpStatus.CREATED)
+    public DishDto addEntry(@PathVariable Long planId, @Valid @RequestBody AddPlanEntryRequest request) {
+        return mealPlanService.addEntry(planId, request.dishId(), request.mealSlot());
+    }
+
+    public record AddPlanEntryRequest(@jakarta.validation.constraints.NotNull Long dishId, MealSlot mealSlot) {
+    }
+
     @PostMapping(path = "/{planId}/dishes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public DishDto addDish(

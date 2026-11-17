@@ -4,7 +4,7 @@ import de.roman.speiseplan.dish.Dish;
 import de.roman.speiseplan.dish.DishIngredient;
 import de.roman.speiseplan.dish.DishIngredientRepository;
 import de.roman.speiseplan.dish.DishRepository;
-import de.roman.speiseplan.pantry.PantryItem;
+import de.roman.speiseplan.ingredient.IngredientMatcher;
 import de.roman.speiseplan.pantry.PantryItemRepository;
 import de.roman.speiseplan.plan.MealPlan;
 import de.roman.speiseplan.plan.MealSlot;
@@ -23,10 +23,8 @@ import de.roman.speiseplan.shopping.ShoppingListService;
 import de.roman.speiseplan.shopping.StapleItem;
 import de.roman.speiseplan.shopping.StapleItemRepository;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,7 +36,6 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class PlanEntryActionService {
     private static final int MAX_SUGGESTIONS = 12;
-    private static final Set<String> COUNT_UNITS = Set.of("stk.", "stk", "stück", "packung", "bund", "dose", "glas");
 
     private final PlanEntryRepository planEntryRepository;
     private final DishRepository dishRepository;
@@ -128,20 +125,13 @@ public class PlanEntryActionService {
                 .findByDishIdIn(candidates.stream().map(Dish::getId).toList())
                 .stream()
                 .collect(Collectors.groupingBy(ingredient -> ingredient.getDish().getId()));
-        Map<String, Double> pantry = new HashMap<>();
-        for (PantryItem item : pantryItemRepository.findAll()) {
-            pantry.merge(ScheduleService.key(item.getIngredientName(), item.getUnit()), item.getQuantity(), Double::sum);
-        }
+        Map<String, Double> pantry = ScheduleService.pantryStock(pantryItemRepository.findAll());
 
         return candidates.stream()
                 .map(dish -> {
                     List<DishIngredient> ingredients = ingredientsByDish.getOrDefault(dish.getId(), List.of());
                     double factor = PortionCalculator.ingredientFactor(dish, portions);
-                    int missing = (int) ingredients.stream()
-                            .filter(ingredient -> pantry.getOrDefault(
-                                    ScheduleService.key(ingredient.getIngredient().getName(), ingredient.getIngredient().getUnit()),
-                                    0.0) + ScheduleService.EPSILON < ingredient.getQuantityGrams() * factor)
-                            .count();
+                    int missing = ScheduleService.missingCount(ingredients, factor, pantry);
                     int coverage = ingredients.isEmpty()
                             ? 0
                             : (int) Math.round(100.0 * (ingredients.size() - missing) / ingredients.size());
@@ -184,9 +174,10 @@ public class PlanEntryActionService {
             }
         }
         for (StapleItem staple : stapleItemRepository.findAllByOrderByIngredientNameAsc()) {
-            String key = ScheduleService.key(staple.getIngredientName(), staple.getUnit());
-            double available = Math.max(0, schedule.pantryLeft().getOrDefault(key, 0.0))
-                    + Math.max(0, schedule.listLeft().getOrDefault(key, 0.0));
+            String key = IngredientMatcher.key(staple.getIngredientName(), staple.getUnit());
+            double available = (Math.max(0, schedule.pantryLeft().getOrDefault(key, 0.0))
+                            + Math.max(0, schedule.listLeft().getOrDefault(key, 0.0)))
+                    / IngredientMatcher.baseFactor(staple.getIngredientName(), staple.getUnit());
             double missing = staple.getQuantity() - available;
             if (missing >= ScheduleService.EPSILON) {
                 uncovered.computeIfAbsent(key, ignored -> new Uncovered(staple.getIngredientName(), staple.getUnit()))
@@ -196,10 +187,10 @@ public class PlanEntryActionService {
         return addToShoppingList(uncovered);
     }
 
-    private List<ShoppingListItemDto> addToShoppingList(Map<String, Uncovered> uncovered) {
+    List<ShoppingListItemDto> addToShoppingList(Map<String, Uncovered> uncovered) {
         for (Uncovered item : uncovered.values()) {
             // Scaled recipes yield e.g. 0.25 onions; shops only sell whole pieces.
-            double quantity = COUNT_UNITS.contains(item.unit.trim().toLowerCase(Locale.ROOT))
+            double quantity = IngredientMatcher.isCountUnit(item.unit)
                     ? Math.ceil(item.quantity - ScheduleService.EPSILON)
                     : item.quantity;
             shoppingListService.addItem(new CreateShoppingListItemRequest(item.name, quantity, item.unit));
@@ -207,11 +198,12 @@ public class PlanEntryActionService {
         return shoppingListService.getAllItems();
     }
 
-    private static void collect(Map<String, Uncovered> target, List<IngredientNeed> needs) {
+    static void collect(Map<String, Uncovered> target, List<IngredientNeed> needs) {
         for (IngredientNeed need : needs) {
             if (need.uncovered() > 0) {
+                // Keyed by name and unit so each recipe unit keeps its own, readable quantity
                 target.computeIfAbsent(
-                                ScheduleService.key(need.ingredientName(), need.unit()),
+                                need.key() + "|" + need.unit(),
                                 ignored -> new Uncovered(need.ingredientName(), need.unit()))
                         .quantity += need.uncovered();
             }
@@ -224,7 +216,7 @@ public class PlanEntryActionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan-Eintrag wurde nicht gefunden."));
     }
 
-    private static final class Uncovered {
+    static final class Uncovered {
         private final String name;
         private final String unit;
         private double quantity;

@@ -3,134 +3,165 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { of, Subject, throwError } from 'rxjs';
 import { ConnectivityService } from '../../core/connectivity.service';
+import { DishApiService } from '../../core/dish-api.service';
 import { GamificationService } from '../../core/gamification.service';
-import { ShoppingListItem } from '../../core/models';
-import { NotificationService } from '../../core/notification.service';
+import { PantryItem, ShoppingListItem } from '../../core/models';
 import { ScheduleApiService } from '../../core/schedule-api.service';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.service';
+import { SnapshotCacheService } from '../../core/snapshot-cache.service';
 import { ShoppingListComponent } from './shopping-list.component';
 
-describe('ShoppingListComponent reminders', () => {
+describe('ShoppingListComponent', () => {
   let component: ShoppingListComponent;
-  let notifications: jasmine.SpyObj<NotificationService>;
   let api: jasmine.SpyObj<ShoppingListApiService>;
-  let item: ShoppingListItem;
+  let outbox: jasmine.SpyObj<ShoppingListOutboxService>;
+  let connectivity: { isOnline: boolean };
+  let milk: ShoppingListItem;
+  let bread: ShoppingListItem;
 
   beforeEach(() => {
     const route = { snapshot: { paramMap: { get: () => null } } } as unknown as ActivatedRoute;
-    api = jasmine.createSpyObj<ShoppingListApiService>('ShoppingListApiService', ['updateItem', 'deleteItem', 'checkout', 'getAllItems']);
+    api = jasmine.createSpyObj<ShoppingListApiService>(
+      'ShoppingListApiService', ['updateItem', 'deleteItem', 'checkout', 'getAllItems', 'addItem', 'clear']);
     api.updateItem.and.returnValue(of({} as ShoppingListItem));
     api.deleteItem.and.returnValue(of(undefined));
     api.checkout.and.returnValue(of([]));
     api.getAllItems.and.returnValue(of([]));
-    const connectivity = { isOnline: true } as ConnectivityService;
-    const outbox = jasmine.createSpyObj<ShoppingListOutboxService>('ShoppingListOutboxService', ['queue']);
-    notifications = jasmine.createSpyObj<NotificationService>('NotificationService', ['show']);
+    api.clear.and.returnValue(of(undefined));
+    connectivity = { isOnline: true };
+    outbox = jasmine.createSpyObj<ShoppingListOutboxService>(
+      'ShoppingListOutboxService', ['queue', 'queueCheckout', 'notifyBooked']);
+    outbox.queue.and.resolveTo();
+    outbox.queueCheckout.and.resolveTo();
     const gamification = jasmine.createSpyObj<GamificationService>('GamificationService', ['record']);
     gamification.record.and.resolveTo();
+    const snapshots = jasmine.createSpyObj<SnapshotCacheService>('SnapshotCacheService', ['read', 'write']);
     component = new ShoppingListComponent(
-      route, api, connectivity, outbox, notifications, gamification, {} as ScheduleApiService,
+      route, api, connectivity as ConnectivityService, outbox, gamification, {} as ScheduleApiService,
+      {} as DishApiService, snapshots,
       { run: (fn: () => void) => fn(), runOutsideAngular: (fn: () => void) => fn() } as unknown as NgZone);
-    item = { id: 7, ingredientName: 'Milch', quantity: 1, unit: 'l', checked: false };
-    component.items = [item];
+    milk = { id: 7, ingredientName: 'Milch', quantity: 1, unit: 'l', checked: false, category: 'Kühlregal' };
+    bread = { id: 8, ingredientName: 'Brot', quantity: 1, unit: 'Stk.', checked: false, category: 'Brot & Backwaren' };
+    component.items = [milk, bread];
   });
 
   afterEach(() => component.ngOnDestroy());
 
-  it('reminds after one minute while the item remains in the cart', fakeAsync(() => {
-    component.toggle(item);
+  it('groups open items by aisle in walking order and keeps ticked items in the cart', () => {
+    component.items = [
+      { ...milk },
+      { ...bread },
+      { id: 9, ingredientName: 'Schraube', quantity: 1, unit: 'Stk.', checked: false },
+      { id: 10, ingredientName: 'Apfel', quantity: 2, unit: 'Stk.', checked: true, category: 'Obst & Gemüse' },
+    ];
 
-    tick(59_999);
-    expect(notifications.show).not.toHaveBeenCalled();
-    tick(1);
-
-    expect(notifications.show).toHaveBeenCalledOnceWith('Milch liegt seit einer Minute im Warenkorb.');
-  }));
-
-  it('cancels the reminder when the item is returned to the list', fakeAsync(() => {
-    component.toggle(item);
-    component.toggle(item);
-    tick(60_000);
-
-    expect(notifications.show).not.toHaveBeenCalled();
-  }));
+    expect(component.groups.map((group) => group.category)).toEqual(['Brot & Backwaren', 'Kühlregal', 'Sonstiges']);
+    expect(component.cartItems.map((item) => item.ingredientName)).toEqual(['Apfel']);
+    expect(component.openCount).toBe(3);
+  });
 
   it('sends only the final state when an item is tapped repeatedly', fakeAsync(() => {
-    component.toggle(item);
-    component.toggle(item);
-    component.toggle(item);
+    component.toggle(component.items[0]);
+    component.toggle(component.items[0]);
+    component.toggle(component.items[0]);
     tick(300);
 
     expect(api.updateItem).toHaveBeenCalledOnceWith(7, true);
+    expect(component.cartItems.map((item) => item.id)).toEqual([7]);
+  }));
+
+  it('ticking alone never books anything into the pantry', fakeAsync(() => {
+    component.toggle(component.items[0]);
     tick(60_000);
+    component.ngOnDestroy();
+
+    expect(api.checkout).not.toHaveBeenCalled();
+    expect(outbox.queueCheckout).not.toHaveBeenCalled();
   }));
 
-  it('selects all and clears all, including a partial selection', fakeAsync(() => {
-    component.items.push({ ...item, id: 8, ingredientName: 'Brot', checked: true });
-    expect(component.allSelected).toBeFalse();
-    component.selectAll();
-    expect(component.allSelected).toBeTrue();
-    component.selectAll();
-    expect(component.checkedItems).toEqual([]);
-    tick(300);
-    expect(api.updateItem.calls.allArgs()).toEqual([[7, false], [8, false]]);
-  }));
-
-  it('removes only selected items and cancels pending checkbox writes', fakeAsync(() => {
-    const other = { ...item, id: 8, ingredientName: 'Brot' };
-    component.items.push(other);
-    component.toggle(item);
-    component.removeSelected();
-    tick(60_000);
-    expect(api.deleteItem).toHaveBeenCalledOnceWith(7);
-    expect(api.updateItem).not.toHaveBeenCalled();
-    expect(component.items).toEqual([other]);
-    expect(notifications.show).not.toHaveBeenCalled();
-    expect(component.removingSelected).toBeFalse();
-  }));
-
-  it('blocks repeated removal and toggles while removing', () => {
-    item.checked = true;
-    const response = new Subject<void>();
-    api.deleteItem.and.returnValue(response);
-    component.removeSelected();
-    component.removeSelected();
-    component.toggle(item);
-    expect(api.deleteItem).toHaveBeenCalledTimes(1);
-    expect(item.checked).toBeTrue();
-    response.next();
-    response.complete();
-    expect(component.items).toEqual([]);
-  });
-
-  it('keeps failed and remaining items selected after a partial deletion', () => {
-    item.checked = true;
-    const other = { ...item, id: 8, ingredientName: 'Brot' };
-    component.items.push(other);
-    api.deleteItem.and.callFake((id) => id === 7 ? of(undefined) : throwError(() => new Error('Server unavailable')));
-    component.removeSelected();
-    expect(component.items).toEqual([other]);
-    expect(component.removingSelected).toBeFalse();
-    expect(component.errorMessage).toContain('Nicht alle');
-    expect(component.successMessage).toBe('');
-  });
-
-  it('moves selected items through checkout without delayed duplicate writes', fakeAsync(() => {
-    component.selectAll();
+  it('books exactly the cart with one request and without late tick writes', fakeAsync(() => {
+    component.toggle(component.items[0]);
     component.finishShopping();
     tick(60_000);
-    expect(api.updateItem).toHaveBeenCalledOnceWith(7, true);
-    expect(api.checkout).toHaveBeenCalledTimes(1);
-    expect(component.items).toEqual([]);
+
+    expect(api.checkout).toHaveBeenCalledOnceWith([7]);
+    expect(outbox.notifyBooked).toHaveBeenCalledTimes(1);
+    expect(api.updateItem).not.toHaveBeenCalled();
+    expect(component.items).toEqual([bread]);
     expect(component.successMessage).toContain('in den Vorratsschrank gebucht');
-    expect(notifications.show).not.toHaveBeenCalled();
   }));
 
-  it('does not select an empty list', () => {
-    component.items = [];
-    component.selectAll();
-    expect(component.allSelected).toBeFalse();
-    expect(api.updateItem).not.toHaveBeenCalled();
+  it('queues the purchase when offline and still empties the cart', fakeAsync(() => {
+    connectivity.isOnline = false;
+    component.toggle(component.items[0]);
+    component.finishShopping();
+    tick(300);
+
+    expect(api.checkout).not.toHaveBeenCalled();
+    expect(outbox.queueCheckout).toHaveBeenCalledOnceWith([7]);
+    expect(component.cartItems).toEqual([]);
+    expect(component.successMessage).toContain('Offline gespeichert');
+  }));
+
+  it('queues the purchase for a retry when the request fails', fakeAsync(() => {
+    api.checkout.and.returnValue(throwError(() => new Error('timeout')));
+    component.toggle(component.items[0]);
+    component.finishShopping();
+    tick(300);
+
+    expect(outbox.queueCheckout).toHaveBeenCalledOnceWith([7]);
+    expect(component.items).toEqual([bread]);
+  }));
+
+  it('ignores a second tap while the purchase is being booked', () => {
+    const response = new Subject<PantryItem[]>();
+    api.checkout.and.returnValue(response);
+    component.items = [{ ...milk, checked: true }, { ...bread, checked: true }];
+    component.finishShopping();
+    component.finishShopping();
+
+    expect(api.checkout).toHaveBeenCalledTimes(1);
+    response.next([]);
+    response.complete();
+    expect(component.checkingOut).toBeFalse();
+  });
+
+  it('shows a typed item at once and replaces it with the server answer', () => {
+    const response = new Subject<ShoppingListItem>();
+    api.addItem.and.returnValue(response);
+    component.quickAddText = '2 Zwiebeln';
+    component.addQuickItem();
+
+    expect(api.addItem).toHaveBeenCalledOnceWith('Zwiebeln', 2, 'Stk.');
+    expect(component.quickAddText).toBe('');
+    expect(component.items.map((item) => item.ingredientName)).toEqual(['Milch', 'Brot', 'Zwiebeln']);
+    expect(component.items[2].id).toBeLessThan(0);
+
+    response.next({ id: 11, ingredientName: 'Zwiebeln', quantity: 2, unit: 'Stk.', checked: false });
+    expect(component.items.map((item) => item.id)).toEqual([7, 8, 11]);
+  });
+
+  it('merges a typed item into the existing row the server returns', () => {
+    api.addItem.and.returnValue(of({ ...milk, quantity: 2 }));
+    component.quickAddText = '1 l Milch';
+    component.addQuickItem();
+
+    expect(component.items.length).toBe(2);
+    expect(component.items.find((item) => item.id === 7)?.quantity).toBe(2);
+  });
+
+  it('removes an item at once and restores it when the server refuses', () => {
+    api.deleteItem.and.returnValue(throwError(() => new Error('Server unavailable')));
+    component.remove(milk);
+
+    expect(component.items).toEqual([milk, bread]);
+    expect(component.errorMessage).toContain('Milch');
+  });
+
+  it('describes the pack that ends up in the pantry', () => {
+    expect(component.packHint({ ...milk, quantity: 120, unit: 'g', purchaseQuantity: 250, packSize: 250 })).toBe('1 × 250 g');
+    expect(component.packHint({ ...milk, quantity: 250, unit: 'g', purchaseQuantity: 250, packSize: 250 })).toBe('');
+    expect(component.packHint(milk)).toBe('');
   });
 });

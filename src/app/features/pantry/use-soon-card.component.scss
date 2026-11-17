@@ -1,0 +1,132 @@
+@use '../../../styles/ios';
+
+:host {
+  display: block;
+}
+
+/* Nothing expires: the card must not leave a gap in grid layouts. */
+:host(:empty) {
+  display: none;
+}
+
+.use-soon {
+  @include ios.card;
+  padding: 14px 16px;
+  border-left: 4px solid var(--orange);
+}
+
+h2 {
+  margin: 0 0 8px;
+  font: var(--text-headline);
+}
+
+.expiring-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.expiring-items li {
+  @include ios.chip;
+  background: var(--orange-soft);
+  color: var(--orange);
+  white-space: normal;
+}
+
+.expiring-items li strong {
+  color: var(--label);
+}
+
+.expiring-items li.expired {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.expiring-items li.planned {
+  background: var(--fill);
+  color: var(--label-2);
+}
+
+.hint,
+.card-status {
+  margin: 0 0 8px;
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.card-status.success {
+  color: var(--green);
+}
+
+.card-status.error {
+  color: var(--red);
+}
+
+.suggestions {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestions li + li {
+  padding-top: 12px;
+  border-top: 0.5px solid var(--separator);
+}
+
+.dish {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--label);
+  text-decoration: none;
+}
+
+.dish img {
+  @include ios.thumb(48px);
+}
+
+.dish span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dish strong {
+  font: var(--text-headline);
+}
+
+.dish small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.dish-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dish-actions button,
+.dish-actions a {
+  @include ios.button-tinted;
+  @include ios.button-small;
+  min-height: 44px;
+}
+
+.dish-actions .primary {
+  background: var(--tint);
+  color: var(--on-tint);
+}
+
+.dish-actions .plain {
+  margin-left: auto;
+  background: transparent;
+  color: var(--label-2);
+}

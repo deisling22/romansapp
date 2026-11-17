@@ -4,6 +4,13 @@
     <h1>Gerichte</h1>
   </header>
 
+  @if (targetPlanId) {
+    <p class="status" role="status">
+      Wähle ein Gericht und tippe dort auf „Zum Plan hinzufügen“.
+      <a [routerLink]="['/plans', targetPlanId]">Zurück zum Plan</a>
+    </p>
+  }
+
   <div class="filter-row">
     <input
       type="search"
@@ -39,7 +46,7 @@
   @if (!loading && !errorMessage) {
     <section class="dish-grid" aria-label="Gerichtkatalog">
       @for (dish of dishes; track dish) {
-        <a class="dish-card" [routerLink]="['/dishes', dish.id]">
+        <a class="dish-card" [routerLink]="['/dishes', dish.id]" queryParamsHandling="preserve">
           <img [src]="dishApi.imageUrl(dish.imageUrl)" [alt]="dish.name" />
           <div class="dish-copy">
             <h2>{{ dish.name }}</h2>

@@ -13,6 +13,7 @@ const ROUTES = [
   { path: '/#/plans', heading: 'Speisepläne' },
   { path: '/#/dishes', heading: 'Gerichte' },
   { path: '/#/shopping-list', heading: 'Einkaufsliste' },
+  { path: '/#/pantry', heading: 'Vorratsschrank' },
 ];
 
 async function collectWebVitals(page: Page): Promise<{ lcp: number; cls: number }> {
@@ -67,7 +68,7 @@ test.describe('Ladezeiten und Layout', () => {
 
   test('Tab-Leiste hat ausreichend große Touch-Ziele', async ({ page }) => {
     await page.goto('/');
-    for (const name of ['Heute', 'Pläne', 'Gerichte', 'Einkauf'] as const) {
+    for (const name of ['Heute', 'Pläne', 'Gerichte', 'Einkauf', 'Vorrat'] as const) {
       const box = await tabLink(page, name).boundingBox();
       expect(box, name).not.toBeNull();
       expect(box!.height, `${name} Höhe`).toBeGreaterThanOrEqual(44);
@@ -90,7 +91,7 @@ test.describe('Reaktionsfähigkeit bei schnellem Klicken', () => {
       }).observe({ type: 'event', buffered: true, durationThreshold: 16 } as PerformanceObserverInit);
     });
 
-    const tabs = ['Pläne', 'Gerichte', 'Einkauf', 'Heute'] as const;
+    const tabs = ['Pläne', 'Gerichte', 'Einkauf', 'Vorrat', 'Heute'] as const;
     for (let round = 0; round < 5; round++) {
       for (const tab of tabs) {
         await openTab(page, tab);
@@ -103,7 +104,9 @@ test.describe('Reaktionsfähigkeit bei schnellem Klicken', () => {
 
   test('"Gekocht" mehrfach angetippt löst genau eine Buchung aus', async ({ page, apiRequests }) => {
     await page.goto('/');
-    const button = page.getByRole('button', { name: 'Gekocht' }).first();
+    const card = page.locator('article.meal-card:not(.done)').first();
+    await card.getByRole('button', { name: /Weitere Aktionen/ }).click();
+    const button = card.getByRole('button', { name: 'Als gekocht markieren' });
     await expect(button).toBeVisible();
     await hammer(page, button, 10);
     await expect(page.getByRole('status').filter({ hasText: 'ist als gekocht gespeichert' })).toBeVisible();
@@ -112,7 +115,9 @@ test.describe('Reaktionsfähigkeit bei schnellem Klicken', () => {
 
   test('"Später" mehrfach angetippt verschiebt nur einmal', async ({ page, apiRequests }) => {
     await page.goto('/');
-    const button = page.getByRole('button', { name: 'Später' }).first();
+    const card = page.locator('article.meal-card:not(.done)').first();
+    await card.getByRole('button', { name: /Weitere Aktionen/ }).click();
+    const button = card.getByRole('button', { name: 'Später kochen' });
     await expect(button).toBeVisible();
     await hammer(page, button, 10);
     await expect(page.getByRole('status').filter({ hasText: 'nach hinten verschoben' })).toBeVisible();
@@ -131,16 +136,32 @@ test.describe('Reaktionsfähigkeit bei schnellem Klicken', () => {
   test('Abhaken mehrfach hintereinander sendet nur den Endzustand', async ({ page, apiRequests }, testInfo) => {
     const itemName = `E2E-Toggle-${testInfo.project.name}-${Date.now()}`;
     await page.goto('/#/shopping-list');
-    await page.locator('input[name=ingredientName]').fill(itemName);
-    await page.locator('input[name=quantity]').fill('1');
+    await page.locator('#quickAdd').fill(itemName);
     await page.getByRole('button', { name: 'Hinzufügen', exact: true }).click();
     const checkbox = page.locator('li.item-row', { hasText: itemName }).getByRole('checkbox');
-    await expect(checkbox).toBeVisible();
+    await expect(checkbox).toBeEnabled();
 
     await hammer(page, checkbox, 5);
     await expect(page.locator('li.item-row.checked', { hasText: itemName })).toBeVisible();
     await page.waitForTimeout(800);
     expect(countRequests(apiRequests, 'PATCH', /\/shopping-list\/\d+$/)).toBeLessThanOrEqual(1);
+  });
+
+  test('"Einkauf abschließen" mehrfach angetippt bucht genau einmal', async ({ page, apiRequests }, testInfo) => {
+    const itemName = `E2E-Checkout-${testInfo.project.name}-${Date.now()}`;
+    await page.goto('/#/shopping-list');
+    await page.locator('#quickAdd').fill(itemName);
+    await page.getByRole('button', { name: 'Hinzufügen', exact: true }).click();
+    const checkbox = page.locator('li.item-row', { hasText: itemName }).getByRole('checkbox');
+    await expect(checkbox).toBeEnabled();
+    await checkbox.check();
+
+    const button = page.getByRole('button', { name: /Einkauf abschließen/ });
+    await hammer(page, button, 10);
+    await expect(page.getByRole('status')).toContainText('in den Vorratsschrank gebucht');
+    await expect(page.locator('li.item-row', { hasText: itemName })).toHaveCount(0);
+    await page.waitForTimeout(500);
+    expect(countRequests(apiRequests, 'POST', /\/shopping-list\/checkout$/)).toBe(1);
   });
 
   test('Suche schickt beim Tippen nicht pro Taste eine Anfrage', async ({ page, apiRequests }) => {

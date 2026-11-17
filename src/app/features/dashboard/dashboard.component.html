@@ -4,90 +4,18 @@
     <h1>Heute</h1>
   </header>
 
-  @if (loading) {
-    <p class="status">Übersicht wird geladen ...</p>
-  }
-  @if (errorMessage) {
-    <p class="status error" role="alert">{{ errorMessage }}</p>
-  }
+  <div class="dashboard">
+    <!-- What to cook comes first; the figures follow below. -->
+    <app-meal-schedule
+      [schedule]="schedule"
+      [loading]="loading"
+      [refreshing]="refreshing"
+      [loadError]="errorMessage"
+      (changed)="load()"></app-meal-schedule>
 
-  @if (!loading && !errorMessage && dashboard) {
-    <section class="dashboard">
-      <div class="stat-grid">
-        <div class="stat-card">
-          @if (dashboard.calorieGoal) {
-            <span
-              class="ring"
-              role="img"
-              [style.--p]="ringPercent(dashboard.caloriePercent)"
-              [attr.aria-label]="'Kalorienziel zu ' + dashboard.caloriePercent + ' Prozent erreicht'"></span>
-          }
-          <span class="stat-copy">
-            <span class="stat-label">Kalorien</span>
-            <span class="stat-value">{{ displayInteger(dashboard.caloriesToday) }}<small> kcal</small></span>
-            @if (dashboard.calorieGoal) {
-              <span class="stat-sub">von {{ dashboard.calorieGoal | number:'1.0-0' }} · {{ dashboard.caloriePercent }} %</span>
-            }
-          </span>
-        </div>
-        <div class="stat-card">
-          @if (dashboard.proteinGoal) {
-            <span
-              class="ring protein"
-              role="img"
-              [style.--p]="ringPercent(dashboard.proteinPercent)"
-              [attr.aria-label]="'Proteinziel zu ' + dashboard.proteinPercent + ' Prozent erreicht'"></span>
-          }
-          <span class="stat-copy">
-            <span class="stat-label">Protein</span>
-            <span class="stat-value">{{ displayInteger(dashboard.proteinToday) }}<small> g</small></span>
-            @if (dashboard.proteinGoal) {
-              <span class="stat-sub">von {{ dashboard.proteinGoal | number:'1.0-0' }} · {{ dashboard.proteinPercent }} %</span>
-            }
-          </span>
-        </div>
-      </div>
+    <app-use-soon-card [useSoon]="useSoon" [limit]="3" (changed)="load()" />
 
-      @if (dashboard.nutritionTrackingEnabled) {
-        <dl class="nutrition-list" aria-label="Weitere Nährwerte heute">
-          <div><dt>Kohlenhydrate</dt><dd>{{ displayInteger(dashboard.carbsToday) }} g</dd></div>
-          <div><dt>Fett</dt><dd>{{ displayInteger(dashboard.fatToday) }} g</dd></div>
-          <div><dt>Vitamin A</dt><dd>{{ displayInteger(dashboard.vitaminAToday) }} µg</dd></div>
-          <div><dt>Vitamin C</dt><dd>{{ displayInteger(dashboard.vitaminCToday) }} mg</dd></div>
-          <div><dt>Vitamin D</dt><dd>{{ displayInteger(dashboard.vitaminDToday) }} µg</dd></div>
-          <div><dt>Vitamin K</dt><dd>{{ displayInteger(dashboard.vitaminKToday) }} µg</dd></div>
-          <div><dt>Vitamin B12</dt><dd>{{ displayInteger(dashboard.vitaminB12Today) }} µg</dd></div>
-          <div><dt>Folat</dt><dd>{{ displayInteger(dashboard.folateToday) }} µg</dd></div>
-        </dl>
-        @if (week) {
-          <app-week-nutrition [week]="week" />
-        }
-      }
-      @if (dashboard.costTrackingEnabled && dashboard.cost; as cost) {
-        <a class="stat-card cost-card" routerLink="/receipts" data-testid="cost-card">
-          @if (cost.weeklyBudget) {
-            <span
-              class="ring"
-              role="img"
-              [style.--p]="ringPercent(cost.budgetPercent)"
-              [attr.aria-label]="'Wochenbudget zu ' + cost.budgetPercent + ' Prozent ausgegeben'"></span>
-          }
-          <span class="stat-copy">
-            <span class="stat-label">Ausgaben diese Woche</span>
-            <span class="stat-value">{{ cost.spentThisWeek | number:'1.2-2' }}<small> €</small></span>
-            <span class="stat-sub">
-              @if (cost.weeklyBudget) {
-                von {{ cost.weeklyBudget | number:'1.0-2' }} € · {{ cost.budgetPercent }} % ·
-              }
-              Monat {{ cost.spentThisMonth | number:'1.2-2' }} €
-              @if (cost.plannedCost !== null) {
-                · geplant {{ cost.plannedCost | number:'1.2-2' }} €
-              }
-            </span>
-          </span>
-        </a>
-      }
-      <app-meal-schedule (changed)="load()"></app-meal-schedule>
+    @if (dashboard) {
       <nav class="shortcut-list" aria-label="Einkauf und Vorrat">
         <a routerLink="/shopping-list">
           <span class="icon cart" aria-hidden="true">
@@ -114,54 +42,141 @@
         </a>
       </nav>
 
-      @if (recommendations?.dishes?.length) {
-        <section class="for-you-block" aria-labelledby="for-you-dishes-title">
-          <p class="eyebrow">Für dich</p>
-          <h2 id="for-you-dishes-title">Gerichte, die dir gefallen könnten</h2>
-          <div class="for-you-strip">
-            @for (dish of recommendations!.dishes; track dish.id) {
-              <a class="for-you-card" [routerLink]="['/dishes', dish.id]">
-                <img [src]="imageUrl(dish.imageUrl)" [alt]="dish.name" />
+
+
+      <section class="figures" aria-labelledby="figures-title">
+        <h2 id="figures-title">Heute gegessen</h2>
+        <div class="stat-grid">
+          <div class="stat-card">
+            @if (dashboard.calorieGoal) {
+              <span
+                class="ring"
+                role="img"
+                [style.--p]="ringPercent(dashboard.caloriePercent)"
+                [attr.aria-label]="'Kalorienziel zu ' + dashboard.caloriePercent + ' Prozent erreicht'"></span>
+            }
+            <span class="stat-copy">
+              <span class="stat-label">Kalorien</span>
+              <span class="stat-value">{{ displayInteger(dashboard.caloriesToday) }}<small> kcal</small></span>
+              @if (dashboard.calorieGoal) {
+                <span class="stat-sub">von {{ dashboard.calorieGoal | number:'1.0-0' }} · {{ dashboard.caloriePercent }} %</span>
+              }
+            </span>
+          </div>
+          <div class="stat-card">
+            @if (dashboard.proteinGoal) {
+              <span
+                class="ring protein"
+                role="img"
+                [style.--p]="ringPercent(dashboard.proteinPercent)"
+                [attr.aria-label]="'Proteinziel zu ' + dashboard.proteinPercent + ' Prozent erreicht'"></span>
+            }
+            <span class="stat-copy">
+              <span class="stat-label">Protein</span>
+              <span class="stat-value">{{ displayInteger(dashboard.proteinToday) }}<small> g</small></span>
+              @if (dashboard.proteinGoal) {
+                <span class="stat-sub">von {{ dashboard.proteinGoal | number:'1.0-0' }} · {{ dashboard.proteinPercent }} %</span>
+              }
+            </span>
+          </div>
+        </div>
+
+        @if (dashboard.nutritionTrackingEnabled) {
+          <dl class="nutrition-list" aria-label="Weitere Nährwerte heute">
+            <div><dt>Kohlenhydrate</dt><dd>{{ displayInteger(dashboard.carbsToday) }} g</dd></div>
+            <div><dt>Fett</dt><dd>{{ displayInteger(dashboard.fatToday) }} g</dd></div>
+            <div><dt>Vitamin A</dt><dd>{{ displayInteger(dashboard.vitaminAToday) }} µg</dd></div>
+            <div><dt>Vitamin C</dt><dd>{{ displayInteger(dashboard.vitaminCToday) }} mg</dd></div>
+            <div><dt>Vitamin D</dt><dd>{{ displayInteger(dashboard.vitaminDToday) }} µg</dd></div>
+            <div><dt>Vitamin K</dt><dd>{{ displayInteger(dashboard.vitaminKToday) }} µg</dd></div>
+            <div><dt>Vitamin B12</dt><dd>{{ displayInteger(dashboard.vitaminB12Today) }} µg</dd></div>
+            <div><dt>Folat</dt><dd>{{ displayInteger(dashboard.folateToday) }} µg</dd></div>
+          </dl>
+          @if (week) {
+            <app-week-nutrition [week]="week" />
+          }
+        }
+        @if (dashboard.costTrackingEnabled && dashboard.cost; as cost) {
+          <a class="stat-card cost-card" routerLink="/receipts" data-testid="cost-card">
+            @if (cost.weeklyBudget) {
+              <span
+                class="ring"
+                role="img"
+                [style.--p]="ringPercent(cost.budgetPercent)"
+                [attr.aria-label]="'Wochenbudget zu ' + cost.budgetPercent + ' Prozent ausgegeben'"></span>
+            }
+            <span class="stat-copy">
+              <span class="stat-label">Ausgaben diese Woche</span>
+              <span class="stat-value">{{ cost.spentThisWeek | number:'1.2-2' }}<small> €</small></span>
+              <span class="stat-sub">
+                @if (cost.weeklyBudget) {
+                  von {{ cost.weeklyBudget | number:'1.0-2' }} € · {{ cost.budgetPercent }} % ·
+                }
+                Monat {{ cost.spentThisMonth | number:'1.2-2' }} €
+                @if (cost.plannedCost !== null) {
+                  · geplant {{ cost.plannedCost | number:'1.2-2' }} €
+                }
+              </span>
+            </span>
+          </a>
+        }
+      </section>
+    }
+
+    @if (recommendations?.dishes?.length) {
+      <section class="for-you-block" aria-labelledby="for-you-dishes-title">
+        <p class="eyebrow">Für dich</p>
+        <h2 id="for-you-dishes-title">Gerichte, die dir gefallen könnten</h2>
+        <div class="for-you-strip">
+          @for (dish of recommendations!.dishes; track dish.id) {
+            <div class="for-you-card">
+              <a [routerLink]="['/dishes', dish.id]">
+                <img [src]="imageUrl(dish.imageUrl)" [alt]="dish.name" loading="lazy" />
                 <span>{{ dish.name }}</span>
               </a>
-            }
-          </div>
-        </section>
-      }
+              <button
+                type="button"
+                class="less"
+                [attr.aria-label]="dish.name + ' nicht mehr vorschlagen'"
+                (click)="lessOf(dish, $event)">Weniger davon</button>
+            </div>
+          }
+        </div>
+      </section>
+    }
 
-      @if (recommendations?.creators?.length) {
-        <section class="for-you-block" aria-labelledby="for-you-creators-title">
-          <p class="eyebrow">Neu für dich</p>
-          <h2 id="for-you-creators-title">Creator, die zu dir passen</h2>
-          <div class="for-you-strip">
-            @for (creator of recommendations!.creators; track creator.id) {
-              <a class="for-you-creator-card" [routerLink]="['/creators', creator.id]">
-                <img [src]="creator.avatarUrl" [alt]="creator.name" />
-                <span>{{ creator.name }}</span>
-                <small>&#64;{{ creator.handle }}</small>
-              </a>
-            }
-          </div>
-        </section>
-      }
+    @if (recommendations?.creators?.length) {
+      <section class="for-you-block" aria-labelledby="for-you-creators-title">
+        <p class="eyebrow">Neu für dich</p>
+        <h2 id="for-you-creators-title">Creator, die zu dir passen</h2>
+        <div class="for-you-strip">
+          @for (creator of recommendations!.creators; track creator.id) {
+            <a class="for-you-creator-card" [routerLink]="['/creators', creator.id]">
+              <img [src]="creator.avatarUrl" [alt]="creator.name" />
+              <span>{{ creator.name }}</span>
+              <small>&#64;{{ creator.handle }}</small>
+            </a>
+          }
+        </div>
+      </section>
+    }
 
-      @if (recommendations?.plans?.length) {
-        <section class="for-you-block" aria-labelledby="for-you-plans-title">
-          <p class="eyebrow">Beliebt gerade</p>
-          <h2 id="for-you-plans-title">Pläne zum Nachkochen</h2>
-          <div class="for-you-strip">
-            @for (plan of recommendations!.plans; track plan.id) {
-              <a class="for-you-card" [routerLink]="['/creators', plan.creatorId, 'plans', plan.id]">
-                @if (plan.coverImageUrl) {
-                  <img [src]="imageUrl(plan.coverImageUrl)" [alt]="plan.name" />
-                }
-                <span>{{ plan.name }}</span>
-                <small>&#64;{{ plan.creatorHandle }}</small>
-              </a>
-            }
-          </div>
-        </section>
-      }
-    </section>
-  }
+    @if (recommendations?.plans?.length) {
+      <section class="for-you-block" aria-labelledby="for-you-plans-title">
+        <p class="eyebrow">Beliebt gerade</p>
+        <h2 id="for-you-plans-title">Pläne zum Nachkochen</h2>
+        <div class="for-you-strip">
+          @for (plan of recommendations!.plans; track plan.id) {
+            <a class="for-you-card" [routerLink]="['/creators', plan.creatorId, 'plans', plan.id]">
+              @if (plan.coverImageUrl) {
+                <img [src]="imageUrl(plan.coverImageUrl)" [alt]="plan.name" />
+              }
+              <span>{{ plan.name }}</span>
+              <small>&#64;{{ plan.creatorHandle }}</small>
+            </a>
+          }
+        </div>
+      </section>
+    }
+  </div>
 </main>

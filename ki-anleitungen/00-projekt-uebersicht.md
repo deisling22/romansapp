@@ -24,6 +24,40 @@ Ziel ist eine mobile-first Web-App fuer wiederkehrende Speiseplaene:
 9. Koch- und Einkaufs-Workflow ("Als Naechstes"): aus allen aktiven Plaenen werden die
    naechsten Tage automatisch befuellt; Gerichte lassen sich mit wenigen Klicks kochen,
    tauschen, verschieben oder ersetzen, fehlende Zutaten landen per Klick auf der Liste.
+10. Der Kreislauf Plan -> Einkaufsliste -> Vorrat -> Kochen ist an jeder Stelle geschlossen
+    (siehe "Leitlinien fuer den Kreislauf").
+
+## Leitlinien fuer den Kreislauf
+
+Diese Regeln gelten fuer jede neue Funktion; sie sind aus dem Workflow-Review entstanden.
+
+1. **Erst der Plan, dann die Zahlen.** "Heute" beantwortet zuerst "Was koche ich und habe ich
+   alles?". Naehrwerte und Kosten stehen darunter.
+2. **Eine Hauptaktion pro Karte.** Mahlzeit-Karten zeigen "Jetzt kochen" (plus "Fehlende auf
+   Liste", wenn etwas fehlt); alles Weitere liegt hinter "Mehr".
+3. **Keine Sackgassen.** Jedes Gericht laesst sich von seiner Detailseite kochen
+   (`POST /api/dishes/{id}/cook`) und in einen Plan uebernehmen
+   (`POST /api/plans/{id}/entries`). Der Kochmodus endet mit "Fertig – gekocht" und bucht ab.
+4. **Zutaten werden ueber einen kanonischen Schluessel verglichen**, nie ueber exakten Namen
+   und Einheit (`IngredientMatcher`): Plural, Schreibweise, Synonyme und Einheiten
+   (g/kg/ml/l, Stueck ueber typisches Stueckgewicht, Packung ueber Packungsgroesse) fuehren
+   zum selben Bestand. "Tomate 3 Stk." deckt "Tomaten 300 g".
+5. **Der Vorrat bildet ab, was zu Hause liegt.** Ein Einkauf bucht verpackte Ware als ganze
+   Packung (120 g Butter auf der Liste = 250 g im Vorrat). Der Vorrat ist von Hand
+   ergaenzbar und korrigierbar; "Aufgebraucht" und "Weggeworfen" werden unterschieden.
+6. **Abhaken heisst nur "im Wagen".** Gebucht wird ausschliesslich ueber "Einkauf
+   abschliessen" – ein Request mit den Artikel-IDs, offline vorgemerkt und automatisch
+   nachgeholt. Das Verlassen der Seite loest nichts aus; es gibt keine Erinnerungs-Toasts.
+7. **Vorschlaege sind begruendet und sofort ausfuehrbar.** "Bald verbrauchen" kombiniert
+   Dringlichkeit, Vorratsabdeckung und Geschmack und bietet "Heute einplanen" und
+   "Fehlendes auf Liste" direkt an (siehe `08-empfehlungsalgorithmus-ausblick.md`).
+8. **Sofort reagieren.** Listenaktionen wirken optimistisch; jeder Screen zeigt zuerst den
+   letzten bekannten Stand (`SnapshotCacheService`) und aktualisiert im Hintergrund, weil
+   das Backend im Free-Tier nach einer Pause mehrere Minuten zum Aufwachen braucht.
+9. **Sparsam mit Requests und Queries.** Die Produktionsinstanz hat 0,1 CPU: Der Startscreen
+   laedt alles ueber `GET /api/home` (ein Request, eine Plan-Berechnung), Listen werden mit
+   Batch-Fetching geladen (`hibernate.default_batch_fetch_size`), neue Endpunkte duerfen
+   keine Abfrage pro Zeile ausloesen.
 
 > **Hinweis Pro-Plan:** Die Funktionen des Koch- und Einkaufs-Workflows (aktive Plaene,
 > Rotation, Heute/Morgen-Ansicht mit Zutaten-Ampel, Tauschen/Ersetzen/Spaeter,
@@ -32,16 +66,18 @@ Ziel ist eine mobile-first Web-App fuer wiederkehrende Speiseplaene:
 > Sie sollen zukuenftig in einen kostenpflichtigen **Pro-Plan** wandern. Bis dahin gibt es
 > bewusst keine Feature-Flags oder Bezahlschranken im Code.
 
-Die App enthaelt weiterhin **keine** Benutzerkonten oder Authentifizierung; die
-Einstellungen gelten global fuer die eine Instanz der App (kein Mehrbenutzer-Login).
+Die App funktioniert ohne Konto (anonymer Standard-Haushalt). Optional meldet man sich
+mit Google an; Plaene, Einkaufsliste, Vorrat, Kochprotokoll, Geschmack und Profil gehoeren
+dann zu einem **Haushalt**, den mehrere Konten teilen koennen (Hibernate-Filter
+`householdFilter`, siehe `household/`).
 
 ## Tech-Stack
 
 | Schicht | Technologie |
 |---|---|
-| Frontend | Bestehendes Angular-16-Projekt `romansapp`, Tailwind CSS, Angular Service Worker (PWA) |
-| Backend | Spring Boot 3.x, Java 21, REST-API |
-| Datenbank | PostgreSQL, lokal via Docker Compose |
+| Frontend | Angular 22 (Standalone-Komponenten), SCSS-Designsystem, Angular Service Worker (PWA), Capacitor (iOS) |
+| Backend | Spring Boot 4.x, Java 25, REST-API |
+| Datenbank | PostgreSQL (Flyway); ohne `SPRING_DATASOURCE_URL` H2 im Speicher (lokal, Tests, Render Free) |
 | Bildspeicher | Lokales Dateisystem des Backends |
 | Offline-Speicher (Frontend) | IndexedDB via Dexie, Outbox-Pattern fuer Einkaufsliste |
 | Bereitstellung | GitHub Pages (Frontend), Render (Backend) |
@@ -54,9 +90,12 @@ Dish     1---n DishIngredient n---1 Ingredient
 Dish     1---n DishImage
 Dish     1---n PrepStep
 MealPlan 1---n ShoppingListItem
-CookLog n---1 Dish            (Kochprotokoll, ueberlebt Plan-Rotation)
+CookLog n---1 Dish            (Kochprotokoll, ueberlebt Plan-Rotation; ohne Plan = spontan gekocht)
 StapleItem                    (Grundbedarf)
-UserProfile (Singleton)
+PantryItem                    (Vorrat mit Ablaufdatum)
+PantryRemoval                 (aufgebraucht / weggeworfen)
+TastePreference, DishFeedback (Geschmack des Haushalts, "Weniger davon")
+UserProfile (je Haushalt)
 ```
 
 | Entity | Felder |
@@ -69,8 +108,12 @@ UserProfile (Singleton)
 | `DishImage` | id, dish, imageUrl, sortOrder |
 | `PrepStep` | id, dish, stepOrder, text, timerSeconds |
 | `ShoppingListItem` | id, plan, ingredientName, quantity, unit, checked |
-| `CookLog` | id, planEntryId, planId, dish, mealSlot, leftovers, cookedAt |
+| `CookLog` | id, planEntryId?, planId?, dish, mealSlot, leftovers, cookedAt |
 | `StapleItem` | id, ingredientName, quantity, unit |
+| `PantryItem` | id, ingredientName, quantity, unit, purchasedAt, expiresOn |
+| `PantryRemoval` | id, ingredientName, quantity, unit, reason (USED/WASTED), removedAt |
+| `TastePreference` | id, tag, liked, penalty |
+| `DishFeedback` | id, dishId, createdAt |
 | `UserProfile` | id (immer 1), defaultPortionSize, bodyWeightKg, bodyHeightCm, householdSize, shoppingTripsPerWeek |
 
 Naehrwerte pro Portion eines Gerichts ergeben sich aus der Summe der
@@ -101,7 +144,21 @@ betraegt $2\,g \times \text{Koerpergewicht in kg}$ pro Tag.
   pro Person (`defaultPortionSize`) und kommen aus dem `CookLog`.
 - **Zutaten-Ampel:** Vorrat wird chronologisch auf die anstehenden Gerichte verteilt,
   danach die Einkaufsliste: `AVAILABLE` (alles im Vorrat), `ON_LIST` (Rest steht auf der
-  Liste), `MISSING`, `UNKNOWN` (keine Zutaten hinterlegt).
+  Liste), `MISSING`, `UNKNOWN` (keine Zutaten hinterlegt). Verglichen wird ueber den
+  kanonischen Zutatenschluessel (Leitlinie 4), Mengen bleiben in der Rezepteinheit sichtbar.
+- **Kochen:** `PATCH /api/plan-entries/{id}/cook` hakt einen Planeintrag ab.
+  `POST /api/dishes/{id}/cook` kocht ein Gericht von ueberall: steht es in den naechsten
+  7 Tagen im Plan, wird dieser Eintrag abgehakt; sonst entsteht ein `CookLog` ohne Plan
+  (Standard-Slot Abendessen) und der heutige Plan rueckt einen Tag weiter. In beiden
+  Faellen wird der Vorrat reduziert – zuerst der Bestand, der am fruehesten ablaeuft.
+- **Einkauf abschliessen:** `POST /api/shopping-list/checkout { itemIds }` bucht genau diese
+  Artikel in einer Transaktion in den Vorrat; verpackte Ware wird auf ganze Packungen
+  aufgerundet, frische Lebensmittel bekommen ein geschaetztes Ablaufdatum (`ShelfLife`).
+- **Warengruppen:** Jeder Listeneintrag traegt `category` (Obst & Gemuese, Brot & Backwaren,
+  Kuehlregal, Fleisch & Fisch, Vorrat & Konserven, Tiefkuehl, Getraenke, Sonstiges); die
+  Liste ist in Laufreihenfolge gruppiert.
+- **Bald verbrauchen:** Bestand, der in hoechstens 3 Tagen ablaeuft. Was der Plan rechtzeitig
+  verbraucht, gilt als "eingeplant" und braucht keinen Vorschlag.
 - **Einkaufsfenster:** `ceil(7 / shoppingTripsPerWeek)` Tage (Standard 2 Einkaeufe/Woche ->
   4 Tage). Die Liste ergaenzt nur, was weder im Vorrat noch auf der Liste ist (idempotent),
   plus Grundbedarf (`StapleItem`). Stueck-Einheiten werden auf ganze Stueck aufgerundet.
@@ -122,6 +179,7 @@ POST   /api/plans/{planId}/copy
 PUT    /api/plans/{planId}/settings          { active?, leftoversForLunch? }
 GET    /api/plans/{planId}/dishes
 POST   /api/plans/{planId}/dishes            multipart/form-data: name, image
+POST   /api/plans/{planId}/entries           { dishId, mealSlot? }   (Katalog-Gericht uebernehmen)
 PATCH  /api/plan-entries/{entryId}/cook
 POST   /api/plan-entries/{entryId}/swap      { otherEntryId }
 POST   /api/plan-entries/{entryId}/skip
@@ -143,10 +201,14 @@ POST   /api/dishes/{dishId}/images           multipart/form-data: image
 POST   /api/dishes/{dishId}/steps
 POST   /api/dishes/{dishId}/ingredients
 PUT    /api/dishes/{dishId}/advance-prep     { note }
+GET    /api/dishes/{dishId}/availability?servings=
+POST   /api/dishes/{dishId}/missing-to-shopping-list?servings=
+POST   /api/dishes/{dishId}/cook             { servings?, mealSlot? }
 
 GET    /api/ingredients
 POST   /api/ingredients
 
+GET    /api/home?days=7                      (Startscreen: dashboard + schedule + useSoon + week in einem Request)
 GET    /api/dashboard
 
 GET    /api/profile
@@ -154,7 +216,24 @@ PUT    /api/profile
 
 GET    /api/plans/{planId}/shopping-list
 POST   /api/plans/{planId}/shopping-list/generate
-PATCH  /api/shopping-list/{itemId}
+GET    /api/shopping-list
+POST   /api/shopping-list                    { ingredientName, quantity, unit }
+PATCH  /api/shopping-list/{itemId}           { checked }
+DELETE /api/shopping-list/{itemId}
+DELETE /api/shopping-list                    (Liste leeren)
+POST   /api/shopping-list/checkout           { itemIds }
+
+GET    /api/pantry
+POST   /api/pantry/batches                   { items: [{ ingredientName, quantity, unit, expiresOn? }] }
+PUT    /api/pantry/{itemId}/quantity         { quantity }
+PUT    /api/pantry/{itemId}/expiry           { expiresOn }
+DELETE /api/pantry/{itemId}?reason=USED|WASTED
+GET    /api/pantry/use-soon
+
+GET    /api/recommendations
+POST   /api/recommendations/dishes/{dishId}/less
+GET    /api/taste
+PUT    /api/taste                            { likedTags }
 
 GET    /uploads/{filename}
 ```
@@ -165,7 +244,9 @@ nutzbaren `imageUrl`.
 ## Konventionen fuer alle KI-Sessions
 
 - Code, Klassen, Variablen und Endpoints auf Englisch; sichtbare UI-Texte auf Deutsch.
-- Keine Authentifizierung; keine Entities direkt serialisieren, DTOs verwenden.
+- Alle Kernfunktionen muessen ohne Anmeldung nutzbar bleiben; keine Entities direkt
+  serialisieren, DTOs verwenden.
+- Zutaten nie per Namens-/Einheitenvergleich abgleichen, sondern ueber `IngredientMatcher`.
 - Bilder im Browser ueber `accept="image/*"` und `capture="environment"` aufnehmen;
   das Ergebnis als `multipart/form-data` senden.
 

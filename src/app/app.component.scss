@@ -55,6 +55,7 @@
 }
 
 .offline-banner,
+.waking-banner,
 .update-banner {
   position: fixed;
   top: 0;
@@ -71,6 +72,13 @@
 .offline-banner {
   background: color-mix(in srgb, var(--orange) 18%, var(--bar));
   color: var(--orange);
+}
+
+.waking-banner {
+  background: var(--bar);
+  border-bottom: 0.5px solid var(--separator);
+  color: var(--label-2);
+  font-weight: 400;
 }
 
 .update-banner {
@@ -104,7 +112,7 @@
 .tabs {
   display: grid;
   flex: 1;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 2px;
   min-width: 0;
   padding: 4px;
@@ -151,8 +159,8 @@
 .menu-trigger {
   display: grid;
   flex: none;
-  width: 62px;
-  height: 62px;
+  width: 56px;
+  height: 56px;
   place-items: center;
   border: 0.5px solid var(--separator);
   border-radius: 50%;

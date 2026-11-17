@@ -107,11 +107,15 @@ class PantryExpiryTest {
                         .content("{\"ingredientId\":" + ingredientId + ",\"quantityGrams\":100}"))
                 .andExpect(status().isCreated());
 
+        // The only plan of the household cooks the bowl daily, so the yogurt is used up in time:
+        // it is flagged as planned and needs no extra suggestion.
         mockMvc.perform(auth(get("/api/pantry/use-soon"), token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items.length()").value(2))
-                .andExpect(jsonPath("$.dishes[0].id").value(dishId))
-                .andExpect(jsonPath("$.dishes[0].matchedIngredients[0]").value(yogurt));
+                .andExpect(jsonPath("$.items[?(@.ingredientName == '" + yogurt + "')].planned").value(true))
+                .andExpect(jsonPath("$.items[?(@.ingredientName == '" + rice + "')].planned").value(false))
+                .andExpect(jsonPath("$.todayEntry.dishId").value(dishId))
+                .andExpect(jsonPath("$.dishes").isEmpty());
 
         // Weekly nutrition: cooking today adds a tracked day
         long planEntryId = read(mockMvc.perform(auth(get("/api/plans/{planId}/dishes", planId), token)))

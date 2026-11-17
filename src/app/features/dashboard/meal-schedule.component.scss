@@ -64,10 +64,27 @@ a {
   padding: 14px;
 }
 
+/* Done meals shrink so the next open meal stays near the top. */
 .meal-card.done {
+  padding: 8px 14px;
   box-shadow: none;
   background: var(--surface);
   opacity: 0.85;
+}
+
+.meal-card.done .meal-row img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.meal-card.done .dish-name {
+  font: var(--text-subhead-strong);
+  -webkit-line-clamp: 1;
+}
+
+.meal-card.done .meta {
+  display: none;
 }
 
 .meal-row {
@@ -156,9 +173,50 @@ a {
   @include ios.button-small;
 }
 
-.meal-actions button.primary {
+.meal-actions .primary {
   @include ios.button-filled;
   @include ios.button-small;
+  flex: 1;
+  color: var(--on-tint);
+}
+
+.meal-actions button,
+.meal-actions .primary {
+  min-height: 44px;
+}
+
+.more-menu {
+  @include ios.grouped-list;
+  box-shadow: none;
+  background: var(--surface-2);
+}
+
+.more-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: var(--label);
+  cursor: pointer;
+  font: var(--text-body);
+  text-align: left;
+}
+
+.more-menu button + button {
+  border-top: 0.5px solid var(--separator);
+}
+
+.more-menu button:disabled {
+  opacity: 0.4;
+}
+
+.more-menu span {
+  width: 20px;
+  color: var(--tint-text);
+  text-align: center;
 }
 
 .panel {
@@ -271,4 +329,9 @@ a {
 .shopping-button {
   @include ios.button-filled;
   width: 100%;
+}
+
+.refreshing {
+  color: var(--label-2);
+  font: var(--text-caption);
 }

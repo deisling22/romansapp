@@ -1,27 +1,96 @@
 <div class="onboarding-overlay" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
   <div class="onboarding-card">
     <button type="button" class="skip-link" (click)="skip()">Überspringen</button>
+    <p class="step-count">Schritt {{ stepIndex + 1 }} von {{ stepCount }}</p>
 
-    <span class="step-icon" aria-hidden="true">{{ step.icon }}</span>
-    <h1 id="onboarding-title">{{ step.title }}</h1>
-    <p>{{ step.description }}</p>
-
-    <nav class="step-dots" aria-label="Fortschritt">
-      @for (dot of steps; track $index) {
-        <button
-          type="button"
-          class="dot"
-          [class.active]="$index === stepIndex"
-          [attr.aria-label]="'Schritt ' + ($index + 1)"
-          (click)="goToStep($index)"></button>
+    @switch (stepIndex) {
+      @case (0) {
+        <h1 id="onboarding-title">Für wen kochst du?</h1>
+        <p>Damit stimmen Portionen und Einkaufsmengen von Anfang an.</p>
+        <div class="field">
+          <span id="household-label">Personen im Haushalt</span>
+          <div class="stepper" role="group" aria-labelledby="household-label">
+            <button type="button" aria-label="Eine Person weniger" [disabled]="householdSize <= 1" (click)="changeHousehold(-1)">−</button>
+            <output data-testid="household-size">{{ householdSize }}</output>
+            <button type="button" aria-label="Eine Person mehr" [disabled]="householdSize >= 12" (click)="changeHousehold(1)">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <span id="shopping-label">Einkäufe pro Woche</span>
+          <div class="segments" role="radiogroup" aria-labelledby="shopping-label">
+            @for (option of shoppingOptions; track option.value) {
+              <button
+                type="button"
+                role="radio"
+                [attr.aria-checked]="shoppingTripsPerWeek === option.value"
+                [class.selected]="shoppingTripsPerWeek === option.value"
+                (click)="shoppingTripsPerWeek = option.value">{{ option.label }}</button>
+            }
+          </div>
+        </div>
       }
-    </nav>
+      @case (1) {
+        <h1 id="onboarding-title">Was schmeckt dir?</h1>
+        <p>Tippe an, was du gern isst. Vorschläge richten sich danach – auch ohne Konto.</p>
+        @if (tagsLoading) {
+          <p class="loading" role="status">Wird geladen ...</p>
+        } @else if (availableTags.length) {
+          <div class="chips" role="group" aria-label="Geschmack">
+            @for (tag of availableTags; track tag) {
+              <button
+                type="button"
+                [attr.aria-pressed]="likedTags.has(tag)"
+                [class.selected]="likedTags.has(tag)"
+                (click)="toggleTag(tag)">{{ tag }}</button>
+            }
+          </div>
+        } @else {
+          <p class="loading">Noch keine Gerichte vorhanden – das lernt die App beim Kochen.</p>
+        }
+      }
+      @default {
+        <h1 id="onboarding-title">Womit startest du?</h1>
+        <p>Der Plan füllt „Heute“ sofort mit Gerichten. Du kannst ihn jederzeit ändern.</p>
+        @if (plansLoading) {
+          <p class="loading" role="status">Pläne werden geladen ...</p>
+        } @else {
+          <div class="plan-options" role="radiogroup" aria-label="Startplan">
+            @for (plan of starterPlans; track plan.key) {
+              <button
+                type="button"
+                role="radio"
+                [attr.aria-checked]="selectedPlanKey === plan.key"
+                [class.selected]="selectedPlanKey === plan.key"
+                (click)="selectedPlanKey = plan.key">
+                <strong>{{ plan.name }}</strong>
+                <small>{{ plan.detail }}</small>
+              </button>
+            }
+            <button
+              type="button"
+              role="radio"
+              [attr.aria-checked]="selectedPlanKey === null"
+              [class.selected]="selectedPlanKey === null"
+              (click)="selectedPlanKey = null">
+              <strong>Später entscheiden</strong>
+              <small>Ohne Plan starten</small>
+            </button>
+          </div>
+        }
+      }
+    }
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
 
     <div class="step-actions">
       @if (stepIndex > 0) {
-        <button type="button" class="secondary" (click)="back()">Zurück</button>
+        <button type="button" class="secondary" [disabled]="saving" (click)="back()">Zurück</button>
       }
-      <button type="button" class="primary" (click)="next()">{{ isLastStep ? 'Los geht\'s' : 'Weiter' }}</button>
+      <button type="button" class="primary" [disabled]="saving" (click)="next()">
+        {{ saving ? 'Wird gespeichert ...' : isLastStep ? 'Los geht\'s' : 'Weiter' }}
+      </button>
     </div>
   </div>
 </div>

@@ -1,9 +1,7 @@
 package de.roman.speiseplan.pantry;
 
-import de.roman.speiseplan.dish.Dish;
 import de.roman.speiseplan.dish.DishIngredient;
-import de.roman.speiseplan.dish.DishIngredientRepository;
-import de.roman.speiseplan.dish.DishRepository;
+import de.roman.speiseplan.ingredient.IngredientMatcher;
 import de.roman.speiseplan.shopping.ShoppingListItem;
 import de.roman.speiseplan.shopping.ShoppingListItemRepository;
 import java.time.Instant;
@@ -15,8 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,24 +20,21 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class PantryService {
-    static final int EXPIRING_SOON_DAYS = 3;
+    public static final int EXPIRING_SOON_DAYS = 3;
     private static final Comparator<PantryItem> BY_EXPIRY = Comparator.comparing(
             PantryItem::getExpiresOn, Comparator.nullsLast(Comparator.naturalOrder()));
 
     private final PantryItemRepository pantryItemRepository;
+    private final PantryRemovalRepository pantryRemovalRepository;
     private final ShoppingListItemRepository shoppingListItemRepository;
-    private final DishRepository dishRepository;
-    private final DishIngredientRepository dishIngredientRepository;
 
     public PantryService(
             PantryItemRepository pantryItemRepository,
-            ShoppingListItemRepository shoppingListItemRepository,
-            DishRepository dishRepository,
-            DishIngredientRepository dishIngredientRepository) {
+            PantryRemovalRepository pantryRemovalRepository,
+            ShoppingListItemRepository shoppingListItemRepository) {
         this.pantryItemRepository = pantryItemRepository;
+        this.pantryRemovalRepository = pantryRemovalRepository;
         this.shoppingListItemRepository = shoppingListItemRepository;
-        this.dishRepository = dishRepository;
-        this.dishIngredientRepository = dishIngredientRepository;
     }
 
     @Transactional
@@ -68,26 +61,31 @@ public class PantryService {
                 .toList();
     }
 
+    /**
+     * Books a purchase into the pantry in one transaction: the given shopping list items (or, without
+     * ids, all checked ones) leave the list. Packaged goods arrive as whole packs.
+     */
     @Transactional
-    public List<PantryItemDto> checkoutCheckedItems() {
-        List<ShoppingListItem> checkedItems = shoppingListItemRepository.findByCheckedTrue();
+    public List<PantryItemDto> checkout(List<Long> itemIds) {
+        List<ShoppingListItem> purchased = itemIds == null
+                ? shoppingListItemRepository.findByCheckedTrue()
+                : shoppingListItemRepository.findAllById(itemIds);
         Instant purchasedAt = Instant.now();
         Map<String, PantryItem> pantryItems = new LinkedHashMap<>();
-        for (ShoppingListItem item : checkedItems) {
-            String key = item.getIngredientName().toLowerCase(Locale.ROOT)
-                + "|" + item.getUnit().toLowerCase(Locale.ROOT);
-            PantryItem existing = pantryItems.get(key);
+        for (ShoppingListItem item : purchased) {
+            double quantity =
+                    IngredientMatcher.purchaseQuantity(item.getIngredientName(), item.getUnit(), item.getQuantity());
+            PantryItem existing = pantryItems.get(exactKey(item.getIngredientName(), item.getUnit()));
             if (existing == null) {
-            PantryItem created = new PantryItem(
-                item.getIngredientName(), item.getQuantity(), item.getUnit(), purchasedAt);
-            created.setExpiresOn(ShelfLife.guess(item.getIngredientName(), today()));
-            pantryItems.put(key, created);
+                PantryItem created = new PantryItem(item.getIngredientName(), quantity, item.getUnit(), purchasedAt);
+                created.setExpiresOn(ShelfLife.guess(item.getIngredientName(), today()));
+                pantryItems.put(exactKey(item.getIngredientName(), item.getUnit()), created);
             } else {
-            existing.setQuantity(existing.getQuantity() + item.getQuantity());
+                existing.setQuantity(existing.getQuantity() + quantity);
             }
         }
         List<PantryItem> savedItems = pantryItemRepository.saveAll(pantryItems.values());
-        shoppingListItemRepository.deleteAll(checkedItems);
+        shoppingListItemRepository.deleteAll(purchased);
         return savedItems.stream().map(PantryItemDto::from).toList();
     }
 
@@ -98,7 +96,7 @@ public class PantryService {
         for (AddPantryItemRequest item : request.items()) {
             String ingredientName = item.ingredientName().trim();
             String unit = item.unit().trim();
-            String key = ingredientName.toLowerCase(Locale.ROOT) + "|" + unit.toLowerCase(Locale.ROOT);
+            String key = exactKey(ingredientName, unit);
             PantryItem existing = pantryItems.get(key);
             LocalDate expiresOn = item.expiresOn() != null
                     ? item.expiresOn()
@@ -119,45 +117,16 @@ public class PantryService {
 
     @Transactional
     public PantryItemDto updateExpiry(Long itemId, LocalDate expiresOn) {
-        PantryItem item = pantryItemRepository.findById(itemId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vorrat wurde nicht gefunden."));
+        PantryItem item = requireItem(itemId);
         item.setExpiresOn(expiresOn);
         return PantryItemDto.from(item);
     }
 
-    /** Items expiring within {@link #EXPIRING_SOON_DAYS} days (or already expired) plus dishes that use them. */
-    @Transactional(readOnly = true)
-    public UseSoonDto useSoon() {
-        LocalDate limit = today().plusDays(EXPIRING_SOON_DAYS);
-        List<PantryItem> expiring = pantryItemRepository.findByExpiresOnLessThanEqualOrderByExpiresOnAsc(limit);
-        if (expiring.isEmpty()) {
-            return new UseSoonDto(List.of(), List.of());
-        }
-        Set<String> names = expiring.stream()
-                .map(item -> item.getIngredientName().toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
-        List<Dish> dishes = dishRepository.findAll();
-        Map<Long, List<DishIngredient>> ingredientsByDish = dishes.isEmpty()
-                ? Map.of()
-                : dishIngredientRepository.findByDishIdIn(dishes.stream().map(Dish::getId).toList()).stream()
-                        .collect(Collectors.groupingBy(entry -> entry.getDish().getId()));
-        List<UseSoonDto.DishSuggestion> suggestions = dishes.stream()
-                .map(dish -> new UseSoonDto.DishSuggestion(
-                        dish.getId(),
-                        dish.getName(),
-                        dish.getImageUrl(),
-                        ingredientsByDish.getOrDefault(dish.getId(), List.of()).stream()
-                                .map(entry -> entry.getIngredient().getName())
-                                .filter(name -> names.contains(name.toLowerCase(Locale.ROOT)))
-                                .distinct()
-                                .toList()))
-                .filter(suggestion -> !suggestion.matchedIngredients().isEmpty())
-                .sorted(Comparator.comparingInt((UseSoonDto.DishSuggestion s) -> s.matchedIngredients().size())
-                        .reversed()
-                        .thenComparing(UseSoonDto.DishSuggestion::name, String.CASE_INSENSITIVE_ORDER))
-                .limit(6)
-                .toList();
-        return new UseSoonDto(expiring.stream().map(PantryItemDto::from).toList(), suggestions);
+    @Transactional
+    public PantryItemDto updateQuantity(Long itemId, double quantity) {
+        PantryItem item = requireItem(itemId);
+        item.setQuantity(quantity);
+        return PantryItemDto.from(item);
     }
 
     @Transactional(readOnly = true)
@@ -165,35 +134,52 @@ public class PantryService {
         return pantryItemRepository.countByExpiresOnLessThanEqual(today().plusDays(EXPIRING_SOON_DAYS));
     }
 
-    @Transactional
-    public void deleteItem(Long itemId) {
-        if (!pantryItemRepository.existsById(itemId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vorrat wurde nicht gefunden.");
-        }
-        pantryItemRepository.deleteById(itemId);
+    @Transactional(readOnly = true)
+    public long countWastedThisMonth() {
+        Instant startOfMonth = today().withDayOfMonth(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        return pantryRemovalRepository.countByReasonAndRemovedAtGreaterThanEqual(
+                PantryRemoval.Reason.WASTED, startOfMonth);
     }
 
     @Transactional
+    public void deleteItem(Long itemId, PantryRemoval.Reason reason) {
+        PantryItem item = requireItem(itemId);
+        if (reason != null) {
+            pantryRemovalRepository.save(new PantryRemoval(item, reason, Instant.now()));
+        }
+        pantryItemRepository.delete(item);
+    }
+
+    /** Takes the recipe quantities from matching stock, whatever its unit, soonest-expiring first. */
+    @Transactional
     public void consume(List<DishIngredient> ingredients, double factor) {
+        List<PantryItem> stock = new ArrayList<>(pantryItemRepository.findAll());
+        stock.sort(BY_EXPIRY.thenComparing(PantryItem::getPurchasedAt));
+        List<PantryItem> depleted = new ArrayList<>();
         for (DishIngredient ingredient : ingredients) {
-            double remaining = ingredient.getQuantityGrams() * factor;
-            List<PantryItem> stock = pantryItemRepository
-                    .findByIngredientNameIgnoreCaseAndUnitIgnoreCaseOrderByPurchasedAtAsc(
-                            ingredient.getIngredient().getName(), ingredient.getIngredient().getUnit());
-            List<PantryItem> depleted = new ArrayList<>();
+            IngredientMatcher.Amount need = IngredientMatcher.normalize(
+                    ingredient.getIngredient().getName(),
+                    ingredient.getIngredient().getUnit(),
+                    ingredient.getQuantityGrams() * factor);
+            double remaining = need.quantity();
             for (PantryItem item : stock) {
-                if (remaining <= 0) {
+                if (remaining <= 1e-6) {
                     break;
                 }
-                double consumed = Math.min(item.getQuantity(), remaining);
-                item.setQuantity(item.getQuantity() - consumed);
+                if (item.getQuantity() <= 1e-6
+                        || !IngredientMatcher.key(item.getIngredientName(), item.getUnit()).equals(need.key())) {
+                    continue;
+                }
+                double toBase = IngredientMatcher.baseFactor(item.getIngredientName(), item.getUnit());
+                double consumed = Math.min(item.getQuantity() * toBase, remaining);
+                item.setQuantity(item.getQuantity() - consumed / toBase);
                 remaining -= consumed;
                 if (item.getQuantity() <= 1e-6) {
                     depleted.add(item);
                 }
             }
-            pantryItemRepository.deleteAll(depleted);
         }
+        pantryItemRepository.deleteAll(depleted);
     }
 
     @Transactional(readOnly = true)
@@ -201,17 +187,24 @@ public class PantryService {
         return pantryItemRepository.count();
     }
 
+    private PantryItem requireItem(Long itemId) {
+        return pantryItemRepository.findById(itemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vorrat wurde nicht gefunden."));
+    }
+
     private String batchKey(PantryItem item) {
-        return item.getIngredientName().toLowerCase(Locale.ROOT)
-                + "|" + item.getUnit().toLowerCase(Locale.ROOT)
-                + "|" + item.getPurchasedAt();
+        return exactKey(item.getIngredientName(), item.getUnit()) + "|" + item.getPurchasedAt();
+    }
+
+    private static String exactKey(String ingredientName, String unit) {
+        return ingredientName.toLowerCase(Locale.ROOT) + "|" + unit.toLowerCase(Locale.ROOT);
     }
 
     private static LocalDate earliest(List<LocalDate> dates) {
         return dates.stream().filter(java.util.Objects::nonNull).min(Comparator.naturalOrder()).orElse(null);
     }
 
-    private static LocalDate today() {
+    static LocalDate today() {
         return LocalDate.now(ZoneId.systemDefault());
     }
 }

@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { pendingCartCheckoutGuard } from './features/shopping-list/pending-cart-checkout.guard';
 import { AuthGuard } from './core/auth.guard';
 
 const loadShoppingList = () =>
@@ -35,7 +34,7 @@ const routes: Routes = [
   { path: 'plans/:planId/dishes/scan', loadComponent: loadRecipeScan },
   { path: 'recipe-scan', loadComponent: loadRecipeScan },
   { path: 'receipts', loadComponent: () => import('./features/receipts/receipts.component').then((m) => m.ReceiptsComponent) },
-  { path: 'shopping-list', loadComponent: loadShoppingList, canDeactivate: [pendingCartCheckoutGuard] },
+  { path: 'shopping-list', loadComponent: loadShoppingList },
   { path: 'pantry', loadComponent: () => import('./features/pantry/pantry.component').then((m) => m.PantryComponent) },
   { path: 'creators', loadComponent: () => import('./features/creators/creator-feed.component').then((m) => m.CreatorFeedComponent) },
   {
@@ -50,7 +49,7 @@ const routes: Routes = [
     path: 'ingredient-scan',
     loadComponent: () => import('./features/ingredient-scan/ingredient-scan.component').then((m) => m.IngredientScanComponent),
   },
-  { path: 'plans/:planId/shopping-list', loadComponent: loadShoppingList, canDeactivate: [pendingCartCheckoutGuard] },
+  { path: 'plans/:planId/shopping-list', loadComponent: loadShoppingList },
   { path: '**', redirectTo: '' },
 ];
 

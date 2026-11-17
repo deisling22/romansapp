@@ -55,7 +55,7 @@ public class RecommendationService {
     private final PlanEntryRepository planEntryRepository;
     private final GamificationEventRepository gamificationEventRepository;
     private final TrendScoringService trendScoringService;
-    private final ContentTagResolver tagResolver;
+    private final TasteService tasteService;
 
     public RecommendationService(
             DishRepository dishRepository,
@@ -67,7 +67,7 @@ public class RecommendationService {
             PlanEntryRepository planEntryRepository,
             GamificationEventRepository gamificationEventRepository,
             TrendScoringService trendScoringService,
-            ContentTagResolver tagResolver) {
+            TasteService tasteService) {
         this.dishRepository = dishRepository;
         this.dishRatingRepository = dishRatingRepository;
         this.dishFavoriteRepository = dishFavoriteRepository;
@@ -77,16 +77,79 @@ public class RecommendationService {
         this.planEntryRepository = planEntryRepository;
         this.gamificationEventRepository = gamificationEventRepository;
         this.trendScoringService = trendScoringService;
-        this.tagResolver = tagResolver;
+        this.tasteService = tasteService;
     }
 
     @Transactional(readOnly = true)
     public RecommendationsDto getRecommendations(String ownerEmail) {
-        Map<String, Double> tasteProfile = ownerEmail == null ? Map.of() : buildTasteProfile(ownerEmail);
+        Map<String, Double> tasteProfile = tasteProfile(ownerEmail);
+        CreatorCatalog catalog = loadCreatorCatalog();
         return new RecommendationsDto(
                 recommendDishes(ownerEmail, tasteProfile),
-                recommendCreators(ownerEmail, tasteProfile),
-                recommendPlans(tasteProfile));
+                recommendCreators(ownerEmail, tasteProfile, catalog),
+                recommendPlans(tasteProfile, catalog));
+    }
+
+    /** All creator plans with their entries, loaded with two queries instead of one per plan and creator. */
+    private CreatorCatalog loadCreatorCatalog() {
+        List<MealPlan> plans = mealPlanRepository.findAllByCreatorIsNotNullOrderByCreatedAtAsc();
+        Map<Long, List<PlanEntry>> entriesByPlan = plans.isEmpty()
+                ? Map.of()
+                : planEntryRepository.findByPlanIdInOrderBySortOrderAsc(plans.stream().map(MealPlan::getId).toList())
+                        .stream()
+                        .collect(Collectors.groupingBy(entry -> entry.getPlan().getId()));
+        return new CreatorCatalog(plans, entriesByPlan);
+    }
+
+    private record CreatorCatalog(List<MealPlan> plans, Map<Long, List<PlanEntry>> entriesByPlan) {
+        List<PlanEntry> entries(Long planId) {
+            return entriesByPlan.getOrDefault(planId, List.of());
+        }
+
+        List<String> planTags(Long planId) {
+            return entries(planId).stream()
+                    .flatMap(entry -> ContentTagResolver.splitTags(entry.getDish().getTags()).stream())
+                    .distinct()
+                    .toList();
+        }
+
+        List<MealPlan> plansOf(Long creatorId) {
+            return plans.stream().filter(plan -> plan.getCreator().getId().equals(creatorId)).toList();
+        }
+
+        List<String> creatorTags(Long creatorId) {
+            return plansOf(creatorId).stream()
+                    .flatMap(plan -> planTags(plan.getId()).stream())
+                    .distinct()
+                    .toList();
+        }
+    }
+
+    /**
+     * Taste of the current user: personal actions of a signed-in user plus the household's explicit
+     * preferences; without an account the household's cook history stands in for the personal actions.
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Double> tasteProfile(String ownerEmail) {
+        Map<String, Double> profile = new HashMap<>(ownerEmail == null ? Map.of() : buildTasteProfile(ownerEmail));
+        tasteService.householdProfile(ownerEmail == null).forEach((tag, weight) -> profile.merge(tag, weight, Double::sum));
+        return profile;
+    }
+
+    /** Dishes the user rated with two stars or less. */
+    @Transactional(readOnly = true)
+    public Set<Long> dislikedDishIds(String ownerEmail) {
+        if (ownerEmail == null) {
+            return Set.of();
+        }
+        return dishRatingRepository.findByUserEmail(ownerEmail).stream()
+                .filter(rating -> rating.getStars() <= 2)
+                .map(rating -> rating.getDish().getId())
+                .collect(Collectors.toSet());
+    }
+
+    public static double personalScore(Map<String, Double> tasteProfile, String tags) {
+        return personalScore(tasteProfile, ContentTagResolver.splitTags(tags));
     }
 
     // --- personal taste profile, built from the user's own authoritative actions -----------------
@@ -175,7 +238,10 @@ public class RecommendationService {
     // --- dishes -------------------------------------------------------------------------------
 
     private List<DishCatalogEntryDto> recommendDishes(String ownerEmail, Map<String, Double> tasteProfile) {
-        List<Dish> dishes = dishRepository.findAll();
+        Set<Long> hiddenDishIds = tasteService.hiddenDishIds();
+        List<Dish> dishes = dishRepository.findAll().stream()
+                .filter(dish -> !hiddenDishIds.contains(dish.getId()))
+                .toList();
         if (dishes.isEmpty()) {
             return List.of();
         }
@@ -236,7 +302,8 @@ public class RecommendationService {
 
     // --- creators -------------------------------------------------------------------------------
 
-    private List<CreatorSummaryDto> recommendCreators(String ownerEmail, Map<String, Double> tasteProfile) {
+    private List<CreatorSummaryDto> recommendCreators(
+            String ownerEmail, Map<String, Double> tasteProfile, CreatorCatalog catalog) {
         Set<Long> subscribed = ownerEmail == null
                 ? Set.of()
                 : creatorSubscriptionRepository.findByOwnerEmail(ownerEmail).stream()
@@ -253,8 +320,8 @@ public class RecommendationService {
 
         return candidates.stream()
                 .map(creator -> {
-                    int planCount = mealPlanRepository.findByCreatorIdOrderByCreatedAtAsc(creator.getId()).size();
-                    double personal = personalScore(tasteProfile, tagResolver.creatorTags(creator.getId()));
+                    int planCount = catalog.plansOf(creator.getId()).size();
+                    double personal = personalScore(tasteProfile, catalog.creatorTags(creator.getId()));
                     double trendScore = trend.getOrDefault(creator.getId(), 0.0);
                     double score = personal * 1.2 + trendScore + planCount * 0.4 + Math.random() * 1.2;
                     return new ScoredCreator(creator, score, planCount);
@@ -278,8 +345,8 @@ public class RecommendationService {
 
     // --- creator plans --------------------------------------------------------------------------
 
-    private List<PlanRecommendationDto> recommendPlans(Map<String, Double> tasteProfile) {
-        List<MealPlan> plans = mealPlanRepository.findAllByCreatorIsNotNullOrderByCreatedAtAsc();
+    private List<PlanRecommendationDto> recommendPlans(Map<String, Double> tasteProfile, CreatorCatalog catalog) {
+        List<MealPlan> plans = catalog.plans();
         if (plans.isEmpty()) {
             return List.of();
         }
@@ -288,8 +355,8 @@ public class RecommendationService {
 
         return plans.stream()
                 .map(plan -> {
-                    List<PlanEntry> entries = planEntryRepository.findByPlanIdOrderBySortOrderAsc(plan.getId());
-                    double personal = personalScore(tasteProfile, tagResolver.planTags(plan.getId()));
+                    List<PlanEntry> entries = catalog.entries(plan.getId());
+                    double personal = personalScore(tasteProfile, catalog.planTags(plan.getId()));
                     double trendScore = trend.getOrDefault(plan.getId(), 0.0);
                     double score = personal * 1.3 + trendScore + Math.random() * 1.2;
                     String coverImageUrl = entries.isEmpty() ? "" : entries.getFirst().getDish().getImageUrl();

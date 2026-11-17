@@ -56,6 +56,14 @@ public class CookLog {
         this.cookedAt = cookedAt;
     }
 
+    /** A dish cooked spontaneously, outside of any plan. */
+    public CookLog(Dish dish, MealSlot mealSlot, Instant cookedAt) {
+        this.dish = dish;
+        this.mealSlot = mealSlot;
+        this.leftovers = false;
+        this.cookedAt = cookedAt;
+    }
+
     public Long getId() {
         return id;
     }

@@ -9,6 +9,16 @@
   gap: 24px;
 }
 
+.figures {
+  display: grid;
+  gap: 12px;
+}
+
+.figures h2 {
+  @include ios.section-title;
+  margin-bottom: 0;
+}
+
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -40,7 +50,6 @@
 }
 
 .cost-card {
-  margin-top: 12px;
   color: inherit;
   text-decoration: none;
 }
@@ -203,6 +212,25 @@
   color: var(--label);
   text-decoration: none;
   scroll-snap-align: start;
+}
+
+.for-you-card a {
+  display: grid;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.for-you-card .less {
+  justify-self: start;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--label-2);
+  cursor: pointer;
+  font: var(--text-caption);
+  text-decoration: underline;
 }
 
 .for-you-card img {

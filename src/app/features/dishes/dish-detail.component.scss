@@ -11,7 +11,9 @@
 .secondary-action,
 .cart-link,
 form button,
-.timer-action {
+.timer-action,
+.secondary-cook,
+.plan-picker-row button {
   @include ios.button-tinted;
 }
 
@@ -23,6 +25,7 @@ form button,
 }
 
 .missing-action,
+.cook-action,
 .cooking-mode footer button {
   @include ios.button-filled;
 }
@@ -382,4 +385,46 @@ form button {
     grid-column: 2;
     text-align: left;
   }
+}
+
+.dish-actions {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.cook-action {
+  width: 100%;
+}
+
+.plan-picker {
+  @include ios.card;
+  padding: 0 16px;
+}
+
+.plan-picker summary {
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  color: var(--tint-text);
+  cursor: pointer;
+  font: var(--text-headline);
+}
+
+.plan-picker-row {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 14px;
+}
+
+.plan-picker-row select {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-picker-hint {
+  margin: 0;
+  padding-bottom: 14px;
+  color: var(--label-2);
+  font: var(--text-subhead);
 }

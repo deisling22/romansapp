@@ -14,7 +14,8 @@ globales Nutzerprofil mit Portionsgroesse, Koerpergewicht und Koerpergroesse.
 
 ## Rahmenbedingungen
 
-- Spring Boot 3.x, Java 21, Maven.
+- Spring Boot 4.x, Java 25, Maven.
+- Performance: siehe Leitlinie 9 in `00-projekt-uebersicht.md` (ein Request je Screen, keine Abfrage pro Zeile).
 - Dependencies: `spring-boot-starter-web`, `spring-boot-starter-data-jpa`,
   `spring-boot-starter-validation`, `postgresql`, `flyway-core`,
   `flyway-database-postgresql` und `spring-boot-starter-test`.

@@ -17,6 +17,12 @@
   </p>
 }
 
+@if ((connectivity.online$ | async) && (backendStatus.waking$ | async)) {
+  <p class="waking-banner" role="status">
+    Der Server startet gerade – das dauert nach einer Pause bis zu drei Minuten. Du siehst solange den letzten Stand.
+  </p>
+}
+
 @if (updateAvailable) {
   <p class="update-banner" role="status">
     Neue Version verfügbar.
@@ -33,7 +39,6 @@
     <a routerLink="/receipts" role="menuitem" (click)="closeMenu()">Beleg erfassen</a>
     <a routerLink="/ingredient-scan" role="menuitem" (click)="closeMenu()">Zutaten scannen</a>
     <p class="menu-section">Mehr</p>
-    <a routerLink="/pantry" role="menuitem" (click)="closeMenu()">Vorratsschrank</a>
     <a routerLink="/creators" role="menuitem" (click)="closeMenu()">Creator</a>
     <a routerLink="/progress" role="menuitem" (click)="closeMenu()">Fortschritt &amp; Abzeichen</a>
     <a routerLink="/settings" role="menuitem" (click)="closeMenu()">Einstellungen</a>
@@ -58,6 +63,10 @@
     <a routerLink="/shopping-list" routerLinkActive="active" ariaCurrentWhenActive="page">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.5l2.2 11h10.6l2-8H6.6" /><circle cx="9" cy="19.5" r="1.5" /><circle cx="17" cy="19.5" r="1.5" /></svg>
       <span>Einkauf</span>
+    </a>
+    <a routerLink="/pantry" routerLinkActive="active" ariaCurrentWhenActive="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3.5" width="16" height="17" rx="2.5" /><path d="M4 12h16M10 8h4M10 16h4" /></svg>
+      <span>Vorrat</span>
     </a>
   </div>
   <button

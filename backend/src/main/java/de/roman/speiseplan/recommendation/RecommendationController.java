@@ -2,7 +2,11 @@ package de.roman.speiseplan.recommendation;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,9 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/recommendations")
 public class RecommendationController {
     private final RecommendationService recommendationService;
+    private final TasteService tasteService;
 
-    public RecommendationController(RecommendationService recommendationService) {
+    public RecommendationController(RecommendationService recommendationService, TasteService tasteService) {
         this.recommendationService = recommendationService;
+        this.tasteService = tasteService;
+    }
+
+    @PostMapping("/dishes/{dishId}/less")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void lessOf(@PathVariable Long dishId) {
+        tasteService.lessOf(dishId);
     }
 
     @GetMapping

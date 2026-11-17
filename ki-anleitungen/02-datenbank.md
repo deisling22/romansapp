@@ -41,6 +41,8 @@ volumes:
     `user_profile` an, siehe `00-projekt-uebersicht.md`.
   - `plan_entry` hat FKs auf Plan und Gericht; der Plan-FK nutzt `ON DELETE CASCADE`.
   - Unique-Index auf `(plan_id, sort_order)`, damit eine Planreihenfolge eindeutig bleibt.
+  - `V18__workflow_improvements.sql` legt `taste_preference`, `dish_feedback` und
+    `pantry_removal` an (jeweils mit `household_id`).
 - Seed-Daten ausschliesslich ueber einen `dev`-Profil-Runner anlegen.
 
 ## Akzeptanzkriterien

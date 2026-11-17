@@ -208,6 +208,14 @@ export interface DashboardData {
   expiringSoonCount?: number;
 }
 
+/** Everything the start screen shows, delivered by one request. */
+export interface Home {
+  dashboard: DashboardData;
+  schedule: Schedule;
+  useSoon: UseSoon;
+  week: WeekNutrition | null;
+}
+
 export interface WeekNutritionDay {
   date: string;
   meals: number;
@@ -293,6 +301,12 @@ export interface ShoppingListItem {
   quantity: number;
   unit: string;
   checked: boolean;
+  /** Supermarket aisle used to group the list. */
+  category?: string;
+  /** What a completed purchase books into the pantry (whole packs for packaged goods). */
+  purchaseQuantity?: number;
+  /** Assumed pack size in the item's unit; 0 for loose goods. */
+  packSize?: number;
 }
 
 export interface PantryItem {
@@ -304,9 +318,50 @@ export interface PantryItem {
   expiresOn?: string | null;
 }
 
+export interface UseSoonItem extends PantryItem {
+  /** The upcoming plan already uses this stock up before it expires. */
+  planned: boolean;
+}
+
+export interface UseSoonDish {
+  id: number;
+  name: string;
+  imageUrl: string | null;
+  prepMinutes: number | null;
+  matchedIngredients: string[];
+  missingCount: number;
+  coveragePercent: number;
+  liked: boolean;
+}
+
 export interface UseSoon {
-  items: PantryItem[];
-  dishes: Array<{ id: number; name: string; imageUrl: string | null; matchedIngredients: string[] }>;
+  items: UseSoonItem[];
+  dishes: UseSoonDish[];
+  /** Next open plan entry a suggestion can take over (dayOffset 0 = today). */
+  todayEntry: { planEntryId: number; dishId: number; dishName: string; dayOffset: number } | null;
+  wastedThisMonth: number;
+}
+
+export type PantryRemovalReason = 'USED' | 'WASTED';
+
+export interface IngredientAvailability {
+  ingredientName: string;
+  unit: string;
+  required: number;
+  /** Not in the pantry. */
+  missing: number;
+  /** Neither in the pantry nor on the shopping list. */
+  uncovered: number;
+}
+
+export interface DishAvailability {
+  servings: number;
+  ingredients: IngredientAvailability[];
+}
+
+export interface Taste {
+  availableTags: string[];
+  likedTags: string[];
 }
 
 export interface PlanRecommendation {

@@ -71,6 +71,39 @@
     @if (shareMessage) {
       <p class="status share-success" role="status">{{ shareMessage }}</p>
     }
+    <section class="dish-actions" aria-label="Kochen und planen">
+      @if (dish.steps.length) {
+        <button type="button" class="cook-action" (click)="startCookingMode()">Jetzt kochen</button>
+      }
+      <button
+        type="button"
+        [class]="dish.steps.length ? 'secondary-cook' : 'cook-action'"
+        [disabled]="cooking"
+        (click)="cook()">
+        {{ cooking ? 'Wird gespeichert ...' : 'Als gekocht markieren' }}
+      </button>
+      <details class="plan-picker" [open]="planPickerOpen" (toggle)="onPlanPickerToggle($event)">
+        <summary>Zum Plan hinzufügen</summary>
+        @if (plans.length) {
+          <div class="plan-picker-row">
+            <label class="visually-hidden" for="planSelect">Plan</label>
+            <select id="planSelect" name="planSelect" [(ngModel)]="selectedPlanId">
+              @for (plan of plans; track plan.id) {
+                <option [ngValue]="plan.id">{{ plan.name }}{{ plan.active ? ' (aktiv)' : '' }}</option>
+              }
+            </select>
+            <button type="button" [disabled]="addingToPlan" (click)="addToPlan()">
+              {{ addingToPlan ? 'Wird hinzugefügt ...' : 'Hinzufügen' }}
+            </button>
+          </div>
+        } @else {
+          <p class="plan-picker-hint">Pläne werden geladen ... Noch keinen? Lege unter „Pläne“ einen an.</p>
+        }
+      </details>
+      @if (actionMessage) {
+        <p class="status success" role="status">{{ actionMessage }}</p>
+      }
+    </section>
     @if (dish.galleryImageUrls.length) {
       <section class="gallery" aria-label="Bildergalerie">
         @for (url of dish.galleryImageUrls; track url) {
@@ -118,26 +151,26 @@
           <output>{{ selectedServings }}</output>
           <button type="button" aria-label="Eine Portion mehr" [disabled]="selectedServings >= 24" (click)="changeServings(1)">+</button>
         </div>
-        @if (pantryLoaded && dish.ingredients.length) {
-          <span class="availability-summary" [class.complete]="missingIngredients.length === 0">
-            {{ missingIngredients.length === 0 ? 'Alles vorhanden' : missingIngredients.length + ' fehlen' }}
+        @if (availability) {
+          <span class="availability-summary" [class.complete]="missingCount === 0">
+            {{ missingCount === 0 ? 'Alles vorhanden' : missingCount + ' fehlen' }}
           </span>
         }
       </div>
       <ul class="ingredient-list">
-        @for (ingredient of dish.ingredients; track ingredient) {
+        @for (ingredient of dish.ingredients; track ingredient; let index = $index) {
           <li>
             <span class="ingredient-quantity">{{ scaledQuantity(ingredient) | number:'1.0-2' }} {{ ingredient.unit }}</span>
             <strong>{{ ingredient.ingredientName }}</strong>
-            @if (pantryLoaded) {
-              @if (missingQuantity(ingredient) === 0) {
+            @if (stock(index); as state) {
+              @if (state.missing === 0) {
                 <span class="stock-state available">Vorhanden</span>
               } @else {
                 <span class="stock-state missing">
-                  @if (cartQuantity(ingredient) >= missingQuantity(ingredient)) {
+                  @if (state.uncovered === 0) {
                     Auf der Liste
                   } @else {
-                    {{ missingQuantity(ingredient) | number:'1.0-2' }} {{ ingredient.unit }} fehlen
+                    {{ state.missing | number:'1.0-2' }} {{ ingredient.unit }} fehlen
                   }
                 </span>
               }
@@ -148,7 +181,7 @@
           <li class="status">Noch keine Zutaten hinterlegt.</li>
         }
       </ul>
-      @if (pantryLoaded && ingredientsToAdd.length > 0) {
+      @if (uncoveredCount > 0) {
         <button
           type="button"
           class="missing-action"
@@ -156,14 +189,14 @@
           (click)="addMissingIngredientsToCart()">
           {{ addingMissingIngredients ? 'Wird ergänzt ...' : 'Fehlende Zutaten auf die Einkaufsliste' }}
         </button>
-      } @else if (pantryLoaded && missingIngredients.length > 0) {
+      } @else if (missingCount > 0) {
         <a class="cart-link" routerLink="/shopping-list">Fehlende Zutaten stehen auf der Einkaufsliste</a>
       }
       @if (successMessage) {
         <p class="success-message" role="status">{{ successMessage }}</p>
       }
       @if (dish.editable !== false) {
-      <details class="recipe-editor">
+      <details class="recipe-editor" (toggle)="loadIngredients()">
         <summary>Rezept bearbeiten</summary>
         <form [formGroup]="ingredientForm" (ngSubmit)="addIngredient()" novalidate>
           <label for="ingredientId">Zutat hinzufügen</label>
@@ -253,7 +286,9 @@
           @if (activeStepIndex < dish.steps.length - 1) {
             <button type="button" (click)="nextStep()">Weiter</button>
           } @else {
-            <button type="button" (click)="closeCookingMode()">Fertig</button>
+            <button type="button" [disabled]="cooking" (click)="cook()">
+              {{ cooking ? 'Wird gespeichert ...' : 'Fertig – gekocht' }}
+            </button>
           }
         </footer>
       </section>

@@ -1,12 +1,10 @@
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { forkJoin, switchMap } from 'rxjs';
 import { DishApiService } from '../../core/dish-api.service';
 import { AuthService, AuthenticatedUser } from '../../core/auth.service';
-import { PantryApiService } from '../../core/pantry-api.service';
-import { ShoppingListApiService } from '../../core/shopping-list-api.service';
-import { DishDetail, DishIngredientEntry, Ingredient, PantryItem, ShoppingListItem } from '../../core/models';
+import { MealPlanApiService } from '../../core/meal-plan-api.service';
+import { DishAvailability, DishDetail, DishIngredientEntry, Ingredient, IngredientAvailability, MealPlan } from '../../core/models';
 import { ShareService } from '../../core/share.service';
 import { GamificationService } from '../../core/gamification.service';
 import { StarRatingComponent } from '../../shared/star-rating.component';
@@ -47,9 +45,14 @@ export class DishDetailComponent implements OnInit, OnDestroy {
   dishId = 0;
   dish: DishDetail | null = null;
   ingredients: Ingredient[] = [];
-  pantryItems: PantryItem[] = [];
-  cartItems: ShoppingListItem[] = [];
-  pantryLoaded = false;
+  /** Stock check from the server; it matches ingredients regardless of spelling and unit. */
+  availability: DishAvailability | null = null;
+  plans: MealPlan[] = [];
+  planPickerOpen = false;
+  selectedPlanId: number | null = null;
+  addingToPlan = false;
+  cooking = false;
+  actionMessage = '';
   currentUser: AuthenticatedUser | null = null;
   loading = true;
   errorMessage = '';
@@ -64,13 +67,15 @@ export class DishDetailComponent implements OnInit, OnDestroy {
   activeTimerStepId: number | null = null;
   timerSecondsLeft = 0;
   private timerHandle: ReturnType<typeof setInterval> | null = null;
+  private availabilityTimer: ReturnType<typeof setTimeout> | null = null;
+  private startCookingWhenLoaded = false;
+  private ingredientsRequested = false;
 
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly route: ActivatedRoute,
     private readonly authService: AuthService,
-    private readonly pantryApi: PantryApiService,
-    private readonly shoppingListApi: ShoppingListApiService,
+    private readonly mealPlanApi: MealPlanApiService,
     private readonly shareService: ShareService,
     private readonly gamification: GamificationService,
     readonly dishApi: DishApiService,
@@ -78,40 +83,52 @@ export class DishDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.dishId = Number(this.route.snapshot.paramMap.get('dishId'));
-    this.dishApi.getIngredients().subscribe({
-      next: (ingredients) => (this.ingredients = ingredients),
-    });
+    const query = this.route.snapshot.queryParamMap;
+    // "Jetzt kochen" from the plan or a suggestion lands directly in the cooking mode.
+    this.startCookingWhenLoaded = query.has('cook');
+    const planId = Number(query.get('plan'));
+    if (planId > 0) {
+      this.selectedPlanId = planId;
+      this.planPickerOpen = true;
+      this.loadPlans();
+    }
     this.authService.getCurrentUser().subscribe({
       next: (user) => (this.currentUser = user),
       error: () => (this.currentUser = null),
-    });
-    this.pantryApi.getItems().subscribe({
-      next: (items) => {
-        this.pantryItems = items;
-        this.pantryLoaded = true;
-      },
-      error: () => (this.pantryLoaded = true),
-    });
-    this.shoppingListApi.getAllItems().subscribe({
-      next: (items) => (this.cartItems = items),
     });
     this.load();
   }
 
   ngOnDestroy(): void {
     this.stopTimer();
+    if (this.availabilityTimer) {
+      clearTimeout(this.availabilityTimer);
+    }
   }
 
-  availableQuantity(ingredient: DishIngredientEntry): number {
-    return this.pantryItems
-      .filter((item) =>
-        item.ingredientName.localeCompare(ingredient.ingredientName, undefined, { sensitivity: 'base' }) === 0
-        && item.unit.localeCompare(ingredient.unit, undefined, { sensitivity: 'base' }) === 0)
-      .reduce((total, item) => total + item.quantity, 0);
+  /** The ingredient catalog is only needed for editing the recipe. */
+  loadIngredients(): void {
+    if (this.ingredientsRequested) {
+      return;
+    }
+    this.ingredientsRequested = true;
+    this.dishApi.getIngredients().subscribe({
+      next: (ingredients) => (this.ingredients = ingredients),
+      error: () => (this.ingredientsRequested = false),
+    });
   }
 
-  missingQuantity(ingredient: DishIngredientEntry): number {
-    return Math.max(0, this.scaledQuantity(ingredient) - this.availableQuantity(ingredient));
+  stock(index: number): IngredientAvailability | null {
+    return this.availability?.ingredients[index] ?? null;
+  }
+
+  get missingCount(): number {
+    return this.availability?.ingredients.filter((ingredient) => ingredient.missing > 0).length ?? 0;
+  }
+
+  /** Ingredients that are neither at home nor on the shopping list yet. */
+  get uncoveredCount(): number {
+    return this.availability?.ingredients.filter((ingredient) => ingredient.uncovered > 0).length ?? 0;
   }
 
   scaledQuantity(ingredient: DishIngredientEntry): number {
@@ -123,55 +140,114 @@ export class DishDetailComponent implements OnInit, OnDestroy {
 
   changeServings(delta: number): void {
     this.selectedServings = Math.max(1, Math.min(24, this.selectedServings + delta));
-  }
-
-  cartQuantity(ingredient: DishIngredientEntry): number {
-    return this.cartItems
-      .filter((item) => !item.checked
-        && item.ingredientName.localeCompare(ingredient.ingredientName, undefined, { sensitivity: 'base' }) === 0
-        && item.unit.localeCompare(ingredient.unit, undefined, { sensitivity: 'base' }) === 0)
-      .reduce((total, item) => total + item.quantity, 0);
-  }
-
-  quantityToAdd(ingredient: DishIngredientEntry): number {
-    return Math.max(0, this.missingQuantity(ingredient) - this.cartQuantity(ingredient));
-  }
-
-  get missingIngredients(): DishIngredientEntry[] {
-    if (!this.pantryLoaded) {
-      return [];
+    // Several taps in a row only ask the server once.
+    if (this.availabilityTimer) {
+      clearTimeout(this.availabilityTimer);
     }
-    return this.dish?.ingredients.filter((ingredient) => this.missingQuantity(ingredient) > 0) ?? [];
+    this.availabilityTimer = setTimeout(() => this.loadAvailability(), 250);
   }
 
-  get ingredientsToAdd(): DishIngredientEntry[] {
-    return this.missingIngredients.filter((ingredient) => this.quantityToAdd(ingredient) > 0);
+  loadAvailability(): void {
+    if (!this.dish?.ingredients.length) {
+      this.availability = null;
+      return;
+    }
+    const servings = this.selectedServings;
+    this.dishApi.getAvailability(this.dishId, servings).subscribe({
+      next: (availability) => {
+        if (servings === this.selectedServings) {
+          this.availability = availability;
+        }
+      },
+      error: () => (this.availability = null),
+    });
   }
 
   addMissingIngredientsToCart(): void {
-    const missing = this.ingredientsToAdd;
-    if (missing.length === 0 || this.addingMissingIngredients) {
+    const missing = this.uncoveredCount;
+    if (missing === 0 || this.addingMissingIngredients) {
       return;
     }
-
     this.addingMissingIngredients = true;
     this.successMessage = '';
-    forkJoin(missing.map((ingredient) => this.shoppingListApi.addItem(
-      ingredient.ingredientName,
-      this.quantityToAdd(ingredient),
-      ingredient.unit,
-    ))).pipe(
-      switchMap(() => this.shoppingListApi.getAllItems()),
-    ).subscribe({
-      next: (items) => {
-        this.cartItems = items;
-        this.successMessage = `${missing.length} ${missing.length === 1 ? 'Zutat wurde' : 'Zutaten wurden'} ergänzt.`;
+    this.dishApi.addMissingToShoppingList(this.dishId, this.selectedServings).subscribe({
+      next: () => {
+        this.successMessage = `${missing} ${missing === 1 ? 'Zutat steht' : 'Zutaten stehen'} auf der Einkaufsliste.`;
         this.addingMissingIngredients = false;
+        this.loadAvailability();
       },
       error: () => {
         this.errorMessage = 'Die fehlenden Zutaten konnten nicht hinzugefügt werden.';
         this.addingMissingIngredients = false;
       },
+    });
+  }
+
+  /**
+   * Marks the dish as cooked from here: the pantry is reduced, and if the dish is coming up in the
+   * plan the rotation moves on, otherwise it counts as a spontaneous meal.
+   */
+  cook(): void {
+    if (!this.dish || this.cooking) {
+      return;
+    }
+    const name = this.dish.name;
+    this.cooking = true;
+    this.actionMessage = '';
+    this.errorMessage = '';
+    this.dishApi.cook(this.dishId, this.selectedServings).subscribe({
+      next: () => {
+        this.cooking = false;
+        this.closeCookingMode();
+        this.actionMessage = `${name} ist als gekocht gespeichert – der Vorrat wurde angepasst.`;
+        void this.gamification.record('COOK_DISH', String(this.dishId));
+        this.loadAvailability();
+      },
+      error: () => {
+        this.cooking = false;
+        this.errorMessage = 'Das Gericht konnte nicht als gekocht gespeichert werden.';
+      },
+    });
+  }
+
+  onPlanPickerToggle(event: Event): void {
+    this.planPickerOpen = (event.target as HTMLDetailsElement).open;
+    if (this.planPickerOpen) {
+      this.loadPlans();
+    }
+  }
+
+  addToPlan(): void {
+    const plan = this.plans.find((entry) => entry.id === Number(this.selectedPlanId));
+    if (!plan || this.addingToPlan) {
+      return;
+    }
+    this.addingToPlan = true;
+    this.actionMessage = '';
+    this.mealPlanApi.addEntry(plan.id, this.dishId).subscribe({
+      next: () => {
+        this.addingToPlan = false;
+        this.planPickerOpen = false;
+        this.actionMessage = `Zum Plan „${plan.name}“ hinzugefügt.`;
+      },
+      error: () => {
+        this.addingToPlan = false;
+        this.errorMessage = 'Das Gericht konnte nicht zum Plan hinzugefügt werden.';
+      },
+    });
+  }
+
+  private loadPlans(): void {
+    if (this.plans.length) {
+      return;
+    }
+    this.mealPlanApi.getPlans().subscribe({
+      next: (plans) => {
+        this.plans = plans;
+        const preselected = plans.find((plan) => plan.id === this.selectedPlanId);
+        this.selectedPlanId = (preselected ?? plans.find((plan) => plan.active) ?? plans[0])?.id ?? null;
+      },
+      error: () => (this.errorMessage = 'Die Pläne konnten nicht geladen werden.'),
     });
   }
 
@@ -194,6 +270,11 @@ export class DishDetailComponent implements OnInit, OnDestroy {
           folateMcg: dish.folateMcg,
         });
         this.loading = false;
+        this.loadAvailability();
+        if (this.startCookingWhenLoaded) {
+          this.startCookingWhenLoaded = false;
+          this.startCookingMode();
+        }
       },
       error: () => {
         this.errorMessage = 'Das Gericht konnte nicht geladen werden.';

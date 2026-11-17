@@ -42,11 +42,13 @@ export const test = base.extend<Fixtures>({
 
 export { expect };
 
-export function tabLink(page: Page, name: 'Heute' | 'Pläne' | 'Gerichte' | 'Einkauf') {
+export type TabName = 'Heute' | 'Pläne' | 'Gerichte' | 'Einkauf' | 'Vorrat';
+
+export function tabLink(page: Page, name: TabName) {
   return page.getByRole('navigation', { name: 'Hauptnavigation' }).getByRole('link', { name, exact: true });
 }
 
-export async function openTab(page: Page, name: 'Heute' | 'Pläne' | 'Gerichte' | 'Einkauf'): Promise<void> {
+export async function openTab(page: Page, name: TabName): Promise<void> {
   await tabLink(page, name).click();
 }
 

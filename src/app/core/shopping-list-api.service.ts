@@ -34,7 +34,12 @@ export class ShoppingListApiService {
     return this.http.delete<void>(`${this.apiUrl}/shopping-list/${itemId}`);
   }
 
-  checkout(): Observable<PantryItem[]> {
-    return this.http.post<PantryItem[]>(`${this.apiUrl}/shopping-list/checkout`, {});
+  /** Books exactly these items into the pantry with one request. */
+  checkout(itemIds: number[]): Observable<PantryItem[]> {
+    return this.http.post<PantryItem[]>(`${this.apiUrl}/shopping-list/checkout`, { itemIds });
+  }
+
+  clear(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/shopping-list`);
   }
 }

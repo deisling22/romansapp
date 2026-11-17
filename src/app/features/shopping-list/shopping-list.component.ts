@@ -1,59 +1,112 @@
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, NgZone } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, concatMap, finalize, forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ShoppingListApiService } from '../../core/shopping-list-api.service';
 import { ShoppingListItem } from '../../core/models';
 import { ConnectivityService } from '../../core/connectivity.service';
 import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.service';
-import { NotificationService } from '../../core/notification.service';
 import { GamificationService } from '../../core/gamification.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
+import { DishApiService } from '../../core/dish-api.service';
+import { SnapshotCacheService } from '../../core/snapshot-cache.service';
+import { parseQuickAdd } from '../../core/quick-add';
+import { SwipeToRemoveDirective } from '../../shared/swipe-to-remove.directive';
 import { FormsModule } from '@angular/forms';
 import { AsyncPipe, DecimalPipe } from '@angular/common';
 
-const CART_REMINDER_DELAY_MS = 60_000;
 const TOGGLE_SYNC_DELAY_MS = 300;
+const OTHER_CATEGORY = 'Sonstiges';
+/** Order of a typical walk through the supermarket. */
+const CATEGORY_ORDER = [
+  'Obst & Gemüse',
+  'Brot & Backwaren',
+  'Kühlregal',
+  'Fleisch & Fisch',
+  'Vorrat & Konserven',
+  'Tiefkühl',
+  'Getränke',
+  OTHER_CATEGORY,
+];
+
+export interface ShoppingListGroup {
+  category: string;
+  items: ShoppingListItem[];
+}
 
 @Component({
     selector: 'app-shopping-list',
     templateUrl: './shopping-list.component.html',
     styleUrls: ['./shopping-list.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [RouterLink, FormsModule, AsyncPipe, DecimalPipe]
+    imports: [RouterLink, FormsModule, AsyncPipe, DecimalPipe, SwipeToRemoveDirective]
 })
 export class ShoppingListComponent implements OnInit, OnDestroy {
   planId = 0;
   hasPlanContext = false;
-  items: ShoppingListItem[] = [];
   loading = true;
   generating = false;
+  checkingOut = false;
+  clearing = false;
   errorMessage = '';
   successMessage = '';
-  newIngredientName = '';
-  newQuantity = 1;
-  newUnit = 'Stk.';
-  adding = false;
-  deletingItemId: number | null = null;
-  finishingCheckout = false;
-  removingSelected = false;
-  private readonly reminderTimers = new Map<number, ReturnType<typeof setTimeout>>();
+  quickAddText = '';
+  ingredientNames: string[] = [];
+  /** Open items grouped by aisle. */
+  groups: ShoppingListGroup[] = [];
+  /** Ticked items: they are in the cart until the purchase is completed. */
+  cartItems: ShoppingListItem[] = [];
+
+  private allItems: ShoppingListItem[] = [];
+  private nextTemporaryId = -1;
+  private ingredientNamesRequested = false;
+  private refreshTimer: ReturnType<typeof setInterval> | undefined;
   private readonly pendingToggles = new Map<number, { checked: boolean; timer: ReturnType<typeof setTimeout> }>();
+  /** Purchases that are booked but not yet confirmed by the server must not reappear on refresh. */
+  private readonly checkedOutIds = new Set<number>();
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly shoppingListApi: ShoppingListApiService,
     readonly connectivity: ConnectivityService,
     private readonly outbox: ShoppingListOutboxService,
-    private readonly notifications: NotificationService,
     private readonly gamification: GamificationService,
     private readonly scheduleApi: ScheduleApiService,
+    private readonly dishApi: DishApiService,
+    private readonly snapshots: SnapshotCacheService,
     private readonly zone: NgZone,
   ) {}
+
+  get items(): ShoppingListItem[] {
+    return this.allItems;
+  }
+
+  set items(items: ShoppingListItem[]) {
+    this.allItems = items;
+    this.cartItems = items.filter((item) => item.checked);
+    const byCategory = new Map<string, ShoppingListItem[]>();
+    for (const item of items) {
+      if (!item.checked) {
+        const category = item.category ?? OTHER_CATEGORY;
+        byCategory.set(category, [...(byCategory.get(category) ?? []), item]);
+      }
+    }
+    this.groups = [...byCategory.entries()]
+      .map(([category, groupItems]) => ({ category, items: groupItems }))
+      .sort((a, b) => categoryRank(a.category) - categoryRank(b.category));
+  }
+
+  get openCount(): number {
+    return this.allItems.length - this.cartItems.length;
+  }
 
   ngOnInit(): void {
     const planId = this.route.snapshot.paramMap.get('planId');
     this.hasPlanContext = planId !== null;
     this.planId = Number(planId);
+    const snapshot = this.snapshots.read<ShoppingListItem[]>(this.snapshotKey);
+    if (snapshot) {
+      this.items = snapshot;
+      this.loading = false;
+    }
     this.load();
     // Household members share one list: pick up their changes while the list is open.
     this.zone.runOutsideAngular(() => {
@@ -62,46 +115,9 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     });
   }
 
-  private refreshTimer: ReturnType<typeof setInterval> | undefined;
-
-  private readonly onVisibilityChange = () => {
-    if (document.visibilityState === 'visible') {
-      this.refreshInBackground();
-    }
-  };
-
-  private refreshInBackground(): void {
-    const busy = this.loading || this.adding || this.generating || this.finishingCheckout || this.removingSelected
-      || this.deletingItemId !== null || this.pendingToggles.size > 0;
-    if (busy || document.visibilityState !== 'visible' || !navigator.onLine) {
-      return;
-    }
-    this.zone.run(() => {
-      const request = this.hasPlanContext
-        ? this.shoppingListApi.getItems(this.planId)
-        : this.shoppingListApi.getAllItems();
-      request.subscribe({
-        next: (items) => {
-          if (this.pendingToggles.size === 0 && this.listState(items) !== this.listState(this.items)) {
-            this.items = items;
-          }
-        },
-        error: () => undefined,
-      });
-    });
-  }
-
-  private listState(items: ShoppingListItem[]): string {
-    return items.map((item) => `${item.id}:${item.quantity}:${item.checked}`).join('|');
-  }
-
   ngOnDestroy(): void {
     clearInterval(this.refreshTimer);
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
-    for (const timer of this.reminderTimers.values()) {
-      clearTimeout(timer);
-    }
-    this.reminderTimers.clear();
     for (const [itemId, pending] of this.pendingToggles) {
       clearTimeout(pending.timer);
       this.syncToggle(itemId, pending.checked);
@@ -109,127 +125,69 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     this.pendingToggles.clear();
   }
 
-  get openItems(): ShoppingListItem[] {
-    return this.items.filter((item) => !item.checked);
+  load(): void {
+    this.fetch().subscribe({
+      next: (items) => {
+        this.applyServerItems(items);
+        this.loading = false;
+      },
+      error: () => {
+        if (this.loading) {
+          this.errorMessage = 'Die Einkaufsliste konnte nicht geladen werden.';
+        }
+        this.loading = false;
+      },
+    });
   }
 
-  get checkedItems(): ShoppingListItem[] {
-    return this.items.filter((item) => item.checked);
-  }
-
-  get allSelected(): boolean {
-    return this.items.length > 0 && this.checkedItems.length === this.items.length;
-  }
-
-  get bulkBusy(): boolean {
-    return this.removingSelected || this.finishingCheckout || this.deletingItemId !== null;
-  }
-
-  selectAll(): void {
-    if (this.bulkBusy) {
+  /** The ingredient catalog feeds the suggestions, so names match the recipes without typing them exactly. */
+  loadIngredientNames(): void {
+    if (this.ingredientNamesRequested) {
       return;
     }
-    const checked = !this.allSelected;
-    for (const item of this.items) {
-      if (item.checked !== checked) {
-        this.toggle(item);
-      }
-    }
-    this.successMessage = checked ? 'Alle Artikel sind ausgewählt.' : 'Die Auswahl wurde aufgehoben.';
+    this.ingredientNamesRequested = true;
+    this.dishApi.getIngredients().subscribe({
+      next: (ingredients) => {
+        this.ingredientNames = [...new Set(ingredients.map((ingredient) => ingredient.name))]
+          .sort((a, b) => a.localeCompare(b, 'de'));
+      },
+      error: () => (this.ingredientNamesRequested = false),
+    });
   }
 
-  removeSelected(): void {
-    if (this.bulkBusy || this.checkedItems.length === 0) {
+  addQuickItem(): void {
+    const parsed = parseQuickAdd(this.quickAddText);
+    if (!parsed) {
       return;
     }
-    if (!this.connectivity.isOnline) {
-      this.errorMessage = 'Zum Entfernen der ausgewählten Artikel ist eine Internetverbindung erforderlich.';
-      return;
-    }
-    const selected = this.checkedItems;
-    this.removingSelected = true;
+    // Shown immediately; the server answer replaces the placeholder (or merges it into an existing row).
+    const placeholder: ShoppingListItem = { id: this.nextTemporaryId--, checked: false, ...parsed };
+    this.items = [...this.items, placeholder];
+    this.quickAddText = '';
     this.errorMessage = '';
     this.successMessage = '';
-    for (const item of selected) {
-      this.cancelPendingToggle(item.id);
-    }
-    from(selected).pipe(
-      concatMap((item) => this.shoppingListApi.deleteItem(item.id).pipe(
-        tap(() => {
-          this.cancelReminder(item.id);
-          this.items = this.items.filter((entry) => entry.id !== item.id);
-        }),
-      )),
-      finalize(() => (this.removingSelected = false)),
-    ).subscribe({
-      complete: () => {
-        this.successMessage = `${selected.length} ${selected.length === 1 ? 'Artikel wurde' : 'Artikel wurden'} entfernt.`;
-      },
-      error: () => {
-        this.errorMessage = 'Nicht alle ausgewählten Artikel konnten entfernt werden. Bitte erneut versuchen.';
-      },
-    });
-  }
-
-  private cancelPendingToggle(itemId: number): void {
-    const pending = this.pendingToggles.get(itemId);
-    if (pending) {
-      clearTimeout(pending.timer);
-      this.pendingToggles.delete(itemId);
-    }
-  }
-
-  load(): void {
-    this.loading = true;
-    const request = this.hasPlanContext
-      ? this.shoppingListApi.getItems(this.planId)
-      : this.shoppingListApi.getAllItems();
-    request.subscribe({
-      next: (items) => {
-        this.items = items;
-        this.loading = false;
-      },
-      error: () => {
-        this.errorMessage = 'Die Einkaufsliste konnte nicht geladen werden.';
-        this.loading = false;
-      },
-    });
-  }
-
-  addItem(): void {
-    const name = this.newIngredientName.trim();
-    const unit = this.newUnit.trim();
-    if (!name || !unit || this.newQuantity <= 0 || this.adding || this.bulkBusy) {
-      return;
-    }
-    this.adding = true;
-    this.successMessage = '';
-    this.shoppingListApi.addItem(name, this.newQuantity, unit).subscribe({
+    this.shoppingListApi.addItem(parsed.ingredientName, parsed.quantity, parsed.unit).subscribe({
       next: (item) => {
-        const existingIndex = this.items.findIndex((entry) => entry.id === item.id);
-        this.items = existingIndex === -1
-          ? [...this.items, item]
-          : this.items.map((entry) => entry.id === item.id ? item : entry);
-        this.newIngredientName = '';
-        this.newQuantity = 1;
+        this.items = [...this.items.filter((entry) => entry.id !== placeholder.id && entry.id !== item.id), item];
+        this.saveSnapshot();
         this.successMessage = `${item.ingredientName} wurde hinzugefügt.`;
-        this.adding = false;
       },
       error: () => {
+        this.items = this.items.filter((entry) => entry.id !== placeholder.id);
+        this.quickAddText = this.quickAddText || `${parsed.quantity} ${parsed.unit} ${parsed.ingredientName}`;
         this.errorMessage = 'Der Artikel konnte nicht hinzugefügt werden.';
-        this.adding = false;
       },
     });
   }
 
   generate(): void {
-    if (this.generating || this.bulkBusy) {
+    if (this.generating) {
       return;
     }
     this.generating = true;
     this.shoppingListApi.generate(this.planId).subscribe({
       next: (items) => {
-        this.items = items;
+        this.applyServerItems(items);
         this.generating = false;
       },
       error: () => {
@@ -240,7 +198,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
   }
 
   generateUpcoming(): void {
-    if (this.generating || this.bulkBusy) {
+    if (this.generating) {
       return;
     }
     this.generating = true;
@@ -249,7 +207,7 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     const before = this.listSignature(this.items);
     this.scheduleApi.generateUpcomingShoppingList().subscribe({
       next: (items) => {
-        this.items = items;
+        this.applyServerItems(items);
         this.generating = false;
         this.successMessage = this.listSignature(items) === before
           ? 'Für die nächsten Tage ist alles im Vorrat oder schon auf der Liste.'
@@ -262,24 +220,15 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     });
   }
 
-  private listSignature(items: ShoppingListItem[]): string {
-    return items.map((item) => `${item.id}:${item.quantity}`).sort().join('|');
-  }
-
+  /** Ticking only means "in the cart"; nothing is booked before the purchase is completed. */
   toggle(item: ShoppingListItem): void {
-    if (this.bulkBusy) {
+    if (item.id < 0) {
       return;
     }
     const checked = !item.checked;
-    item.checked = checked;
-    this.successMessage = checked
-      ? `${item.ingredientName} liegt jetzt im Wagen.`
-      : `${item.ingredientName} steht wieder auf der Liste.`;
-    if (checked) {
-      this.scheduleReminder(item);
-    } else {
-      this.cancelReminder(item.id);
-    }
+    this.items = this.items.map((entry) => (entry.id === item.id ? { ...entry, checked } : entry));
+    this.successMessage = '';
+    this.saveSnapshot();
 
     // Rapid taps on the same row only send the final state.
     const pending = this.pendingToggles.get(item.id);
@@ -293,12 +242,155 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     this.pendingToggles.set(item.id, { checked, timer });
   }
 
+  remove(item: ShoppingListItem): void {
+    if (item.id < 0) {
+      return;
+    }
+    const previous = this.items;
+    this.cancelPendingToggle(item.id);
+    this.items = this.items.filter((entry) => entry.id !== item.id);
+    this.errorMessage = '';
+    this.successMessage = `${item.ingredientName} wurde entfernt.`;
+    this.shoppingListApi.deleteItem(item.id).subscribe({
+      next: () => this.saveSnapshot(),
+      error: () => {
+        this.items = previous;
+        this.successMessage = '';
+        this.errorMessage = `${item.ingredientName} konnte nicht entfernt werden.`;
+      },
+    });
+  }
+
+  clearList(): void {
+    if (this.clearing || this.items.length === 0 || !confirm('Die ganze Einkaufsliste leeren?')) {
+      return;
+    }
+    const previous = this.items;
+    this.clearing = true;
+    for (const item of previous) {
+      this.cancelPendingToggle(item.id);
+    }
+    this.items = [];
+    this.shoppingListApi.clear().subscribe({
+      next: () => {
+        this.clearing = false;
+        this.saveSnapshot();
+        this.successMessage = 'Die Einkaufsliste ist leer.';
+      },
+      error: () => {
+        this.clearing = false;
+        this.items = previous;
+        this.errorMessage = 'Die Liste konnte nicht geleert werden.';
+      },
+    });
+  }
+
+  /**
+   * The one explicit step that moves the cart into the pantry. It never depends on leaving the page,
+   * and without a connection the purchase is queued and booked automatically later.
+   */
+  finishShopping(): void {
+    const purchased = this.cartItems.filter((item) => item.id > 0);
+    if (this.checkingOut || purchased.length === 0) {
+      return;
+    }
+    const itemIds = purchased.map((item) => item.id);
+    for (const itemId of itemIds) {
+      this.cancelPendingToggle(itemId);
+      this.checkedOutIds.add(itemId);
+    }
+    this.items = this.items.filter((item) => !itemIds.includes(item.id));
+    this.saveSnapshot();
+    this.errorMessage = '';
+    const booked = `${purchased.length} ${purchased.length === 1 ? 'Artikel wurde' : 'Artikel wurden'}`;
+
+    if (!this.connectivity.isOnline) {
+      void this.outbox.queueCheckout(itemIds);
+      this.successMessage = `Offline gespeichert – ${booked} in den Vorratsschrank gebucht, sobald du wieder online bist.`;
+      return;
+    }
+    this.checkingOut = true;
+    this.successMessage = `${booked} in den Vorratsschrank gebucht.`;
+    this.shoppingListApi.checkout(itemIds).subscribe({
+      next: () => {
+        this.checkingOut = false;
+        itemIds.forEach((itemId) => this.checkedOutIds.delete(itemId));
+        this.outbox.notifyBooked();
+        void this.gamification.record('COMPLETE_SHOPPING', this.planId ? String(this.planId) : undefined);
+      },
+      error: () => {
+        this.checkingOut = false;
+        void this.outbox.queueCheckout(itemIds);
+        this.successMessage = 'Verbindung gestört – der Einkauf wird automatisch nachgebucht.';
+      },
+    });
+  }
+
+  /** "1 Packung à 250 g" when the pantry will receive more than the recipe needs. */
+  packHint(item: ShoppingListItem): string {
+    if (!item.packSize || !item.purchaseQuantity || item.purchaseQuantity <= item.quantity) {
+      return '';
+    }
+    const packs = Math.round(item.purchaseQuantity / item.packSize);
+    return `${packs} × ${formatQuantity(item.packSize)} ${item.unit}`;
+  }
+
+  private get snapshotKey(): string {
+    return this.hasPlanContext ? `shopping-list-plan-${this.planId}` : 'shopping-list';
+  }
+
+  private fetch() {
+    return this.hasPlanContext ? this.shoppingListApi.getItems(this.planId) : this.shoppingListApi.getAllItems();
+  }
+
+  private applyServerItems(items: ShoppingListItem[]): void {
+    const placeholders = this.items.filter((item) => item.id < 0);
+    this.items = [...items.filter((item) => !this.checkedOutIds.has(item.id)), ...placeholders];
+    this.saveSnapshot();
+  }
+
+  private saveSnapshot(): void {
+    this.snapshots.write(this.snapshotKey, this.items.filter((item) => item.id > 0));
+  }
+
+  private readonly onVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      this.refreshInBackground();
+    }
+  };
+
+  private refreshInBackground(): void {
+    const busy = this.loading || this.generating || this.checkingOut || this.clearing
+      || this.pendingToggles.size > 0 || this.items.some((item) => item.id < 0);
+    if (busy || document.visibilityState !== 'visible' || !navigator.onLine) {
+      return;
+    }
+    this.zone.run(() => {
+      this.fetch().subscribe({
+        next: (items) => {
+          const visible = items.filter((item) => !this.checkedOutIds.has(item.id));
+          if (this.pendingToggles.size === 0 && this.listState(visible) !== this.listState(this.items)) {
+            this.applyServerItems(items);
+          }
+        },
+        error: () => undefined,
+      });
+    });
+  }
+
+  private listState(items: ShoppingListItem[]): string {
+    return items.map((item) => `${item.id}:${item.quantity}:${item.checked}`).join('|');
+  }
+
+  private listSignature(items: ShoppingListItem[]): string {
+    return items.map((item) => `${item.id}:${item.quantity}`).sort().join('|');
+  }
+
   private syncToggle(itemId: number, checked: boolean): void {
     if (!this.connectivity.isOnline) {
       void this.outbox.queue(itemId, checked);
       return;
     }
-
     this.shoppingListApi.updateItem(itemId, checked).subscribe({
       error: () => {
         void this.outbox.queue(itemId, checked);
@@ -306,90 +398,21 @@ export class ShoppingListComponent implements OnInit, OnDestroy {
     });
   }
 
-  remove(item: ShoppingListItem): void {
-    if (this.bulkBusy) {
-      return;
-    }
-    this.deletingItemId = item.id;
-    this.shoppingListApi.deleteItem(item.id).subscribe({
-      next: () => {
-        this.cancelPendingToggle(item.id);
-        this.cancelReminder(item.id);
-        this.items = this.items.filter((entry) => entry.id !== item.id);
-        this.successMessage = `${item.ingredientName} wurde entfernt.`;
-        this.deletingItemId = null;
-      },
-      error: () => {
-        this.errorMessage = 'Der Artikel konnte nicht entfernt werden.';
-        this.deletingItemId = null;
-      },
-    });
-  }
-
-  private scheduleReminder(item: ShoppingListItem): void {
-    this.cancelReminder(item.id);
-    const timer = setTimeout(() => {
-      this.reminderTimers.delete(item.id);
-      if (this.items.some((entry) => entry.id === item.id && entry.checked)) {
-        this.notifications.show(`${item.ingredientName} liegt seit einer Minute im Warenkorb.`);
-      }
-    }, CART_REMINDER_DELAY_MS);
-    this.reminderTimers.set(item.id, timer);
-  }
-
-  private cancelReminder(itemId: number): void {
-    const timer = this.reminderTimers.get(itemId);
-    if (timer !== undefined) {
-      clearTimeout(timer);
-      this.reminderTimers.delete(itemId);
+  private cancelPendingToggle(itemId: number): void {
+    const pending = this.pendingToggles.get(itemId);
+    if (pending) {
+      clearTimeout(pending.timer);
+      this.pendingToggles.delete(itemId);
     }
   }
+}
 
-  prepareForExit(): Observable<boolean> {
-    if (this.removingSelected) {
-      this.errorMessage = 'Bitte warte, bis die ausgewählten Artikel entfernt wurden.';
-      return of(false);
-    }
-    const checkedItems = this.checkedItems;
-    if (checkedItems.length === 0 || !this.connectivity.isOnline) {
-      return of(true);
-    }
+function categoryRank(category: string): number {
+  const index = CATEGORY_ORDER.indexOf(category);
+  return index === -1 ? CATEGORY_ORDER.length : index;
+}
 
-    for (const item of checkedItems) {
-      this.cancelPendingToggle(item.id);
-    }
-    return forkJoin(checkedItems.map((item) => this.shoppingListApi.updateItem(item.id, true))).pipe(
-      switchMap(() => this.shoppingListApi.checkout()),
-      tap(() => checkedItems.forEach((item) => this.cancelReminder(item.id))),
-      tap(() => void this.gamification.record('COMPLETE_SHOPPING', this.planId ? String(this.planId) : undefined)),
-      map(() => true),
-      catchError(() => {
-        this.errorMessage = 'Die gekauften Artikel konnten noch nicht in den Vorrat übernommen werden.';
-        return of(false);
-      }),
-    );
-  }
-
-  finishShopping(): void {
-    if (this.bulkBusy || this.checkedItems.length === 0) {
-      return;
-    }
-    const movedCount = this.checkedItems.length;
-    const wasOnline = this.connectivity.isOnline;
-    this.finishingCheckout = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-    this.prepareForExit().subscribe((success) => {
-      this.finishingCheckout = false;
-      if (!success) {
-        return;
-      }
-      if (!wasOnline) {
-        this.successMessage = 'Offline gespeichert – wird automatisch in den Vorrat gebucht, sobald du wieder online bist.';
-        return;
-      }
-      this.successMessage = `${movedCount} ${movedCount === 1 ? 'Artikel wurde' : 'Artikel wurden'} in den Vorratsschrank gebucht.`;
-      this.load();
-    });
-  }
+/** Same plain format as the quantities in the list (no thousands separator). */
+function formatQuantity(value: number): string {
+  return String(Math.round(value * 100) / 100);
 }

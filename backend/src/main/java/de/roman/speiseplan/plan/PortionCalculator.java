@@ -12,8 +12,13 @@ public final class PortionCalculator {
     }
 
     public static double mealPortions(ProfileDto profile, MealPlan plan, MealSlot slot) {
-        double portions = Math.max(1, profile.householdSize()) * profile.defaultPortionSize();
+        double portions = householdPortions(profile);
         return cooksLeftovers(plan, slot) ? portions * 2 : portions;
+    }
+
+    /** Portions of one meal for the whole household, without leftovers. */
+    public static double householdPortions(ProfileDto profile) {
+        return Math.max(1, profile.householdSize()) * profile.defaultPortionSize();
     }
 
     /** Recipe quantities refer to {@code dish.servings}; scale them to the portions actually cooked. */

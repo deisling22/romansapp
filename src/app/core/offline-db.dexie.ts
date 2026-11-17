@@ -1,11 +1,18 @@
 import Dexie, { Table } from 'dexie';
-import type { LocalDish, LocalMealPlan, QueuedGamificationEvent, QueuedShoppingListUpdate } from './offline-db';
+import type {
+  LocalDish,
+  LocalMealPlan,
+  QueuedCheckout,
+  QueuedGamificationEvent,
+  QueuedShoppingListUpdate,
+} from './offline-db';
 
 export class OfflineDatabase extends Dexie {
   shoppingListOutbox!: Table<QueuedShoppingListUpdate, number>;
   mealPlans!: Table<LocalMealPlan, string>;
   dishes!: Table<LocalDish, string>;
   gamificationOutbox!: Table<QueuedGamificationEvent, string>;
+  checkoutOutbox!: Table<QueuedCheckout, number>;
 
   constructor() {
     super('speiseplan-offline');
@@ -22,6 +29,13 @@ export class OfflineDatabase extends Dexie {
       mealPlans: 'clientId, serverId, updatedAt',
       dishes: 'clientId, planClientId, serverId, updatedAt',
       gamificationOutbox: 'eventId, occurredAt, type',
+    });
+    this.version(4).stores({
+      shoppingListOutbox: 'itemId, queuedAt',
+      mealPlans: 'clientId, serverId, updatedAt',
+      dishes: 'clientId, planClientId, serverId, updatedAt',
+      gamificationOutbox: 'eventId, occurredAt, type',
+      checkoutOutbox: '++id, queuedAt',
     });
   }
 }

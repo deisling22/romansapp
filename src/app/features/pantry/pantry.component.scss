@@ -4,6 +4,29 @@
   display: block;
 }
 
+.quick-add {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.quick-add input {
+  flex: 1;
+  min-width: 0;
+  min-height: 50px;
+  border-radius: var(--radius-pill);
+  padding: 0 18px;
+}
+
+.quick-add button {
+  @include ios.button-filled;
+  flex: none;
+}
+
+.use-soon-card {
+  margin-bottom: 16px;
+}
+
 .inventory-summary {
   margin: 0 4px 8px;
   color: var(--label-2);
@@ -20,78 +43,68 @@
 }
 
 .item-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 44px;
-  padding: 10px 8px 10px 16px;
-  animation: item-reveal 180ms ease-out both;
+  display: grid;
+  gap: 6px;
+  padding: 12px 16px;
 }
 
 .item-list li + li {
   border-top: 0.5px solid var(--separator);
 }
 
-@keyframes item-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-}
-
-.item-main {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 2px 12px;
-  flex: 1;
-  min-width: 0;
-}
-
-.item-main strong {
-  grid-row: 1;
-  grid-column: 1;
-  overflow-wrap: anywhere;
-  font: var(--text-body);
-}
-
-.quantity {
-  grid-row: 1;
-  grid-column: 2;
-  color: var(--label-2);
-  font: var(--text-subhead);
-  white-space: nowrap;
-}
-
-.item-main time {
-  grid-column: 1 / -1;
-  color: var(--label-2);
-  font: var(--text-footnote);
-}
-
-.remove-button {
-  @include ios.button-plain;
-  color: var(--red);
-  font: var(--text-subhead);
-}
-
-.expiry {
-  grid-column: 1 / -1;
+.item-head,
+.item-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
+}
+
+.item-head strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font: var(--text-headline);
+}
+
+.quantity {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.quantity input {
+  width: 84px;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--fill);
+  font: var(--text-subhead-strong);
+  text-align: right;
+}
+
+.item-meta {
+  flex-wrap: wrap;
   color: var(--label-2);
   font: var(--text-footnote);
 }
 
+.expiry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .expiry input {
-  min-width: 0;
+  width: auto;
+  min-height: 32px;
   padding: 2px 6px;
   border: 0;
   border-radius: 6px;
-  background: var(--fill-strong);
+  background: var(--fill);
   color: var(--label);
   font: var(--text-footnote);
 }
@@ -106,66 +119,23 @@
   font-weight: 600;
 }
 
-.use-soon {
-  @include ios.card;
-  margin-bottom: 16px;
-  padding: 14px 16px;
-  border-left: 4px solid var(--orange);
-
-  h2 {
-    margin: 0 0 4px;
-    font: var(--text-headline);
-  }
-}
-
-.use-soon-items,
-.use-soon-hint {
-  margin: 0 0 6px;
-  color: var(--label-2);
-  font: var(--text-subhead);
-}
-
-.use-soon-items span {
-  color: var(--label);
-  font-weight: 600;
-}
-
-.use-soon-dishes {
-  display: grid;
+.item-actions {
+  display: flex;
   gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+}
 
-  a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--label);
-    text-decoration: none;
-  }
+.item-actions button {
+  @include ios.button-gray;
+  @include ios.button-small;
+  flex: 1;
+  min-height: 44px;
+}
 
-  img {
-    flex: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    object-fit: cover;
-  }
-
-  span {
-    display: grid;
-    min-width: 0;
-  }
-
-  small {
-    color: var(--label-2);
-    font: var(--text-caption);
-  }
+.item-actions .wasted {
+  color: var(--red);
 }
 
 .empty {
   display: block !important;
   color: var(--label-2);
-  animation: none !important;
 }

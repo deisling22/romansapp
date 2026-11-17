@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Dish, MealPlan } from './models';
+import { Dish, MealPlan, MealSlot } from './models';
 import { toAbsoluteImageUrl } from './image-url';
 
 @Injectable({ providedIn: 'root' })
@@ -33,6 +33,11 @@ export class MealPlanApiService {
 
   getDishes(planId: number): Observable<Dish[]> {
     return this.http.get<Dish[]>(`${this.apiUrl}/plans/${planId}/dishes`);
+  }
+
+  /** Adds an existing catalog dish to the end of the plan. */
+  addEntry(planId: number, dishId: number, mealSlot?: MealSlot): Observable<Dish> {
+    return this.http.post<Dish>(`${this.apiUrl}/plans/${planId}/entries`, { dishId, mealSlot });
   }
 
   createDish(planId: number, name: string, image: File): Observable<Dish> {

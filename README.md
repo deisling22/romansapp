@@ -39,10 +39,14 @@ and restores the previous state with an error message if saving fails.
 
 ## Development server
 
-In the shopping list, “Alles auswählen” checks all visible items. Checked items
-can be removed together or moved into the pantry with “In den Vorratsschrank”.
-As with individually checked items, leaving the page also checks out the cart.
-Bulk removal requires an internet connection.
+In the shopping list, ticking an item only means “in the cart”. Nothing is booked
+until “Einkauf abschließen” is tapped; that single request moves the cart into the
+pantry and is queued offline and replayed automatically. Leaving the page never
+books anything. Items are removed with a left swipe or the “×” button.
+
+Recipes, shopping list and pantry compare ingredients through a canonical key
+(`IngredientMatcher`), so spelling, plural and units (“Tomate 3 Stk.” vs.
+“Tomaten 300 g”) do not matter.
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 

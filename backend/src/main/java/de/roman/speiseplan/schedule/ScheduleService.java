@@ -3,6 +3,7 @@ package de.roman.speiseplan.schedule;
 import de.roman.speiseplan.dish.Dish;
 import de.roman.speiseplan.dish.DishIngredient;
 import de.roman.speiseplan.dish.DishIngredientRepository;
+import de.roman.speiseplan.ingredient.IngredientMatcher;
 import de.roman.speiseplan.pantry.PantryItem;
 import de.roman.speiseplan.pantry.PantryItemRepository;
 import de.roman.speiseplan.plan.CookLog;
@@ -30,7 +31,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -76,7 +76,13 @@ public class ScheduleService {
         LEFTOVERS
     }
 
-    public record IngredientNeed(String ingredientName, String unit, double required, double missing, double uncovered) {
+    /**
+     * Quantities are in the recipe's unit; {@code key} and {@code pantryUsedBase} use the canonical
+     * base unit of {@link IngredientMatcher} so needs can be compared with pantry stock.
+     */
+    public record IngredientNeed(
+            String ingredientName, String unit, double required, double missing, double uncovered,
+            String key, double pantryUsedBase) {
     }
 
     public record ScheduledMeal(
@@ -99,7 +105,11 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public ScheduleDto getSchedule(int days) {
-        Schedule schedule = compute(days);
+        return toDto(compute(days));
+    }
+
+    @Transactional(readOnly = true)
+    public ScheduleDto toDto(Schedule schedule) {
         int windowDays = shoppingWindowDays(profileService.getProfile());
         List<ScheduleDayDto> dayDtos = new ArrayList<>();
         for (int offset = 0; offset < schedule.days(); offset++) {
@@ -123,7 +133,8 @@ public class ScheduleService {
         Instant startOfToday = today.atStartOfDay(zone).toInstant();
         Instant startOfTomorrow = today.plusDays(1).atStartOfDay(zone).toInstant();
 
-        List<MealPlan> plans = activePlans();
+        List<MealPlan> ownPlans = mealPlanRepository.findAllByCreatorIsNullOrderByCreatedAtAsc();
+        List<MealPlan> plans = activePlans(ownPlans);
         List<PlanEntry> entries = plans.isEmpty()
                 ? List.of()
                 : planEntryRepository.findByPlanIdInOrderBySortOrderAsc(plans.stream().map(MealPlan::getId).toList());
@@ -148,17 +159,10 @@ public class ScheduleService {
                 todayLogs.computeIfAbsent(log.getMealSlot(), slot -> new ArrayList<>()).add(log);
             }
         }
-        Map<Long, MealPlan> plansById = mealPlanRepository.findAllByCreatorIsNullOrderByCreatedAtAsc().stream()
-                .collect(Collectors.toMap(MealPlan::getId, plan -> plan));
+        Map<Long, MealPlan> plansById = ownPlans.stream().collect(Collectors.toMap(MealPlan::getId, plan -> plan));
 
-        Map<String, Double> pantryLeft = new HashMap<>();
-        for (PantryItem item : pantryItemRepository.findAll()) {
-            pantryLeft.merge(key(item.getIngredientName(), item.getUnit()), item.getQuantity(), Double::sum);
-        }
-        Map<String, Double> listLeft = new HashMap<>();
-        for (ShoppingListItem item : shoppingListItemRepository.findAll()) {
-            listLeft.merge(key(item.getIngredientName(), item.getUnit()), item.getQuantity(), Double::sum);
-        }
+        Map<String, Double> pantryLeft = pantryStock(pantryItemRepository.findAll());
+        Map<String, Double> listLeft = listStock(shoppingListItemRepository.findAll());
 
         List<ScheduledMeal> meals = new ArrayList<>();
         for (int offset = 0; offset < days; offset++) {
@@ -208,7 +212,10 @@ public class ScheduleService {
     /** Without an explicitly active plan the oldest plan with dishes is used, matching the previous behaviour. */
     @Transactional(readOnly = true)
     public List<MealPlan> activePlans() {
-        List<MealPlan> plans = mealPlanRepository.findAllByCreatorIsNullOrderByCreatedAtAsc();
+        return activePlans(mealPlanRepository.findAllByCreatorIsNullOrderByCreatedAtAsc());
+    }
+
+    private List<MealPlan> activePlans(List<MealPlan> plans) {
         List<MealPlan> active = plans.stream().filter(MealPlan::isActive).toList();
         if (!active.isEmpty()) {
             return active;
@@ -225,12 +232,25 @@ public class ScheduleService {
         return (int) Math.ceil(7.0 / trips);
     }
 
-    public static String key(String ingredientName, String unit) {
-        return ingredientName.trim().toLowerCase(Locale.ROOT) + "|" + unit.trim().toLowerCase(Locale.ROOT);
+    /** Pantry stock per canonical ingredient key, in base units. */
+    public static Map<String, Double> pantryStock(List<PantryItem> items) {
+        Map<String, Double> stock = new HashMap<>();
+        for (PantryItem item : items) {
+            IngredientMatcher.Amount amount =
+                    IngredientMatcher.normalize(item.getIngredientName(), item.getUnit(), item.getQuantity());
+            stock.merge(amount.key(), amount.quantity(), Double::sum);
+        }
+        return stock;
     }
 
     private Map<MealSlot, SlotQueue> buildQueues(List<MealPlan> plans, List<PlanEntry> entries) {
         Map<MealSlot, SlotQueue> queues = new EnumMap<>(MealSlot.class);
+        Map<String, Instant> lastCookedByPlanAndSlot = new HashMap<>();
+        if (!plans.isEmpty()) {
+            for (Object[] row : cookLogRepository.findLastCookedByPlanAndSlot(plans.stream().map(MealPlan::getId).toList())) {
+                lastCookedByPlanAndSlot.put(row[0] + "|" + row[1], (Instant) row[2]);
+            }
+        }
         for (MealSlot slot : MealSlot.values()) {
             Map<Long, List<PlanEntry>> entriesByPlan = new LinkedHashMap<>();
             for (PlanEntry entry : entries) {
@@ -242,16 +262,11 @@ public class ScheduleService {
                 continue;
             }
             // The plan that waited longest in this slot goes first, then plans take turns.
-            Map<Long, Instant> lastCooked = new HashMap<>();
-            for (Long planId : entriesByPlan.keySet()) {
-                cookLogRepository.findTopByPlanIdAndMealSlotOrderByCookedAtDesc(planId, slot)
-                        .ifPresent(log -> lastCooked.put(planId, log.getCookedAt()));
-            }
             List<Long> planOrder = plans.stream()
                     .map(MealPlan::getId)
                     .filter(entriesByPlan::containsKey)
                     .sorted(Comparator.comparing(
-                            (Long planId) -> lastCooked.getOrDefault(planId, Instant.EPOCH)))
+                            (Long planId) -> lastCookedByPlanAndSlot.getOrDefault(planId + "|" + slot, Instant.EPOCH)))
                     .toList();
             List<List<PlanEntry>> rotations = new ArrayList<>();
             for (Long planId : planOrder) {
@@ -265,20 +280,47 @@ public class ScheduleService {
         return queues;
     }
 
-    private static List<IngredientNeed> allocate(
+    /** Shopping list quantities per canonical ingredient key, in base units. */
+    public static Map<String, Double> listStock(List<ShoppingListItem> items) {
+        Map<String, Double> stock = new HashMap<>();
+        for (ShoppingListItem item : items) {
+            IngredientMatcher.Amount amount =
+                    IngredientMatcher.normalize(item.getIngredientName(), item.getUnit(), item.getQuantity());
+            stock.merge(amount.key(), amount.quantity(), Double::sum);
+        }
+        return stock;
+    }
+
+    /** Number of ingredients the pantry cannot fully cover for the scaled recipe. */
+    public static int missingCount(List<DishIngredient> ingredients, double factor, Map<String, Double> pantry) {
+        return (int) ingredients.stream()
+                .filter(ingredient -> {
+                    String name = ingredient.getIngredient().getName();
+                    String unit = ingredient.getIngredient().getUnit();
+                    double available = pantry.getOrDefault(IngredientMatcher.key(name, unit), 0.0)
+                            / IngredientMatcher.baseFactor(name, unit);
+                    return available + EPSILON < ingredient.getQuantityGrams() * factor;
+                })
+                .count();
+    }
+
+    /** Serves the recipe from the pantry first, then from the shopping list, and reduces both stocks. */
+    public static List<IngredientNeed> allocate(
             List<DishIngredient> ingredients, double factor, Map<String, Double> pantryLeft, Map<String, Double> listLeft) {
         List<IngredientNeed> needs = new ArrayList<>();
         for (DishIngredient ingredient : ingredients) {
             String name = ingredient.getIngredient().getName();
             String unit = ingredient.getIngredient().getUnit();
-            String key = key(name, unit);
+            String key = IngredientMatcher.key(name, unit);
+            double toBase = IngredientMatcher.baseFactor(name, unit);
             double required = ingredient.getQuantityGrams() * factor;
-            double fromPantry = Math.min(required, pantryLeft.getOrDefault(key, 0.0));
-            pantryLeft.merge(key, -fromPantry, Double::sum);
+            double fromPantry = Math.min(required, Math.max(0, pantryLeft.getOrDefault(key, 0.0)) / toBase);
+            pantryLeft.merge(key, -fromPantry * toBase, Double::sum);
             double missing = clamp(required - fromPantry);
-            double fromList = Math.min(missing, listLeft.getOrDefault(key, 0.0));
-            listLeft.merge(key, -fromList, Double::sum);
-            needs.add(new IngredientNeed(name, unit, required, missing, clamp(missing - fromList)));
+            double fromList = Math.min(missing, Math.max(0, listLeft.getOrDefault(key, 0.0)) / toBase);
+            listLeft.merge(key, -fromList * toBase, Double::sum);
+            needs.add(new IngredientNeed(
+                    name, unit, required, missing, clamp(missing - fromList), key, fromPantry * toBase));
         }
         return needs;
     }

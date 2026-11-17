@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { authConfig } from '../auth.config';
 import { environment } from '../../environments/environment';
+import { SnapshotCacheService } from './snapshot-cache.service';
 
 export interface AuthenticatedUser {
   name: string;
@@ -18,7 +19,10 @@ const TOKEN_STORAGE_KEY = 'speiseplan_auth_token';
 export class AuthService {
   private readonly backendUrl = environment.apiUrl.replace(/\/api$/, '');
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly snapshots: SnapshotCacheService,
+  ) {}
 
   getCurrentUser(): Observable<AuthenticatedUser> {
     return this.http.get<AuthenticatedUser>(`${environment.apiUrl}/auth/me`, {
@@ -39,9 +43,12 @@ export class AuthService {
 
   setToken(token: string): void {
     localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    // Another account means another household: its snapshots must not show up.
+    this.snapshots.clear();
   }
 
   clearToken(): void {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
+    this.snapshots.clear();
   }
 }

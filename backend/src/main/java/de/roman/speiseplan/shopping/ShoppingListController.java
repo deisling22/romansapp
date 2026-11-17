@@ -57,8 +57,15 @@ public class ShoppingListController {
         shoppingListService.deleteItem(itemId);
     }
 
+    @DeleteMapping("/api/shopping-list")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clear() {
+        shoppingListService.clear();
+    }
+
+    /** One request books the whole purchase, so it can be queued offline and replayed safely. */
     @PostMapping("/api/shopping-list/checkout")
-    public List<PantryItemDto> checkout() {
-        return pantryService.checkoutCheckedItems();
+    public List<PantryItemDto> checkout(@RequestBody(required = false) CheckoutRequest request) {
+        return pantryService.checkout(request == null ? null : request.itemIds());
     }
 }

@@ -2,7 +2,7 @@ package de.roman.speiseplan.shopping;
 
 import de.roman.speiseplan.dish.DishIngredient;
 import de.roman.speiseplan.dish.DishIngredientRepository;
-import de.roman.speiseplan.pantry.PantryItem;
+import de.roman.speiseplan.ingredient.IngredientMatcher;
 import de.roman.speiseplan.pantry.PantryItemRepository;
 import de.roman.speiseplan.plan.MealPlan;
 import de.roman.speiseplan.plan.MealPlanRepository;
@@ -11,6 +11,7 @@ import de.roman.speiseplan.plan.PlanEntryRepository;
 import de.roman.speiseplan.plan.PortionCalculator;
 import de.roman.speiseplan.profile.ProfileDto;
 import de.roman.speiseplan.profile.ProfileService;
+import de.roman.speiseplan.schedule.ScheduleService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,7 +59,7 @@ public class ShoppingListService {
         List<ShoppingListItem> items = shoppingListItemRepository.findAllByOrderByCheckedAscIngredientNameAsc();
         Map<String, List<ShoppingListItem>> grouped = items.stream()
                 .collect(java.util.stream.Collectors.groupingBy(
-                        item -> normalizedKey(item.getIngredientName(), item.getUnit()),
+                        item -> IngredientMatcher.key(item.getIngredientName(), item.getUnit()),
                         LinkedHashMap::new,
                         java.util.stream.Collectors.toList()));
         for (List<ShoppingListItem> matches : grouped.values()) {
@@ -66,7 +67,7 @@ public class ShoppingListService {
                 continue;
             }
             ShoppingListItem target = matches.getFirst();
-            target.setQuantity(matches.stream().mapToDouble(item -> item.getQuantity()).sum());
+            target.setQuantity(quantityIn(target, matches));
             target.setChecked(matches.stream().allMatch(item -> item.isChecked()));
             shoppingListItemRepository.deleteAll(matches.subList(1, matches.size()));
         }
@@ -105,7 +106,7 @@ public class ShoppingListService {
                 String unit = dishIngredient.getIngredient().getUnit();
                 double quantity = dishIngredient.getQuantityGrams() * factor;
                 aggregated.merge(
-                        normalizedKey(name, unit),
+                        IngredientMatcher.key(name, unit) + "|" + unit,
                         new ShoppingListItem(plan, name, quantity, unit),
                         (existing, addition) -> new ShoppingListItem(
                                 plan, existing.getIngredientName(), existing.getQuantity() + addition.getQuantity(), unit));
@@ -113,16 +114,15 @@ public class ShoppingListService {
         }
 
         // Only top up items still missing after pantry stock is subtracted, so re-running generate() is idempotent.
+        Map<String, Double> pantryStock = ScheduleService.pantryStock(pantryItemRepository.findAll());
         List<ShoppingListItemDto> updated = new ArrayList<>();
         for (ShoppingListItem need : aggregated.values()) {
-            double pantryStock = pantryItemRepository
-                    .findByIngredientNameIgnoreCaseAndUnitIgnoreCaseOrderByPurchasedAtAsc(
-                            need.getIngredientName(), need.getUnit())
-                    .stream()
-                    .mapToDouble(PantryItem::getQuantity)
-                    .sum();
-            double stillNeeded = need.getQuantity() - pantryStock;
-            if (stillNeeded <= 0) {
+            String key = IngredientMatcher.key(need.getIngredientName(), need.getUnit());
+            double toBase = IngredientMatcher.baseFactor(need.getIngredientName(), need.getUnit());
+            double fromPantry = Math.min(need.getQuantity(), Math.max(0, pantryStock.getOrDefault(key, 0.0)) / toBase);
+            pantryStock.merge(key, -fromPantry * toBase, Double::sum);
+            double stillNeeded = need.getQuantity() - fromPantry;
+            if (stillNeeded <= 1e-6) {
                 continue;
             }
             updated.add(ShoppingListItemDto.from(
@@ -152,18 +152,20 @@ public class ShoppingListService {
         return shoppingListItemRepository.count();
     }
 
+    @Transactional
+    public void clear() {
+        shoppingListItemRepository.deleteAll(shoppingListItemRepository.findAll());
+    }
+
     private ShoppingListItem mergeItem(
             MealPlan plan, String ingredientName, double quantity, String unit) {
-        List<ShoppingListItem> matches = shoppingListItemRepository
-                .findByIngredientNameIgnoreCaseAndUnitIgnoreCaseOrderByIdAsc(ingredientName, unit);
+        List<ShoppingListItem> matches = matches(ingredientName, unit);
         if (matches.isEmpty()) {
             return shoppingListItemRepository.save(new ShoppingListItem(plan, ingredientName, quantity, unit));
         }
 
         ShoppingListItem target = matches.getFirst();
-        double combinedQuantity = quantity + matches.stream()
-                .mapToDouble(item -> item.getQuantity())
-                .sum();
+        double combinedQuantity = convert(ingredientName, unit, quantity, target) + quantityIn(target, matches);
         target.addQuantity(combinedQuantity - target.getQuantity());
         if (matches.size() > 1) {
             shoppingListItemRepository.deleteAll(matches.subList(1, matches.size()));
@@ -172,24 +174,41 @@ public class ShoppingListService {
     }
 
     private ShoppingListItem ensureQuantity(MealPlan plan, String ingredientName, String unit, double desiredQuantity) {
-        List<ShoppingListItem> matches = shoppingListItemRepository
-                .findByIngredientNameIgnoreCaseAndUnitIgnoreCaseOrderByIdAsc(ingredientName, unit);
+        List<ShoppingListItem> matches = matches(ingredientName, unit);
         if (matches.isEmpty()) {
             return shoppingListItemRepository.save(new ShoppingListItem(plan, ingredientName, desiredQuantity, unit));
         }
         ShoppingListItem target = matches.getFirst();
+        double existing = quantityIn(target, matches);
         if (matches.size() > 1) {
+            target.setQuantity(existing);
             shoppingListItemRepository.deleteAll(matches.subList(1, matches.size()));
         }
-        if (target.getQuantity() < desiredQuantity) {
-            target.addQuantity(desiredQuantity - target.getQuantity());
+        double desired = convert(ingredientName, unit, desiredQuantity, target);
+        if (existing < desired) {
+            target.addQuantity(desired - target.getQuantity());
         }
         return target;
     }
 
-    private String normalizedKey(String ingredientName, String unit) {
-        return ingredientName.toLowerCase(java.util.Locale.ROOT)
-                + "|" + unit.toLowerCase(java.util.Locale.ROOT);
+    /** Same ingredient regardless of spelling, plural or unit ("Tomate 3 Stk." matches "Tomaten 300 g"). */
+    private List<ShoppingListItem> matches(String ingredientName, String unit) {
+        String key = IngredientMatcher.key(ingredientName, unit);
+        return shoppingListItemRepository.findAll().stream()
+                .filter(item -> IngredientMatcher.key(item.getIngredientName(), item.getUnit()).equals(key))
+                .sorted(java.util.Comparator.comparing(ShoppingListItem::getId))
+                .toList();
+    }
+
+    private static double quantityIn(ShoppingListItem target, List<ShoppingListItem> items) {
+        return items.stream()
+                .mapToDouble(item -> convert(item.getIngredientName(), item.getUnit(), item.getQuantity(), target))
+                .sum();
+    }
+
+    private static double convert(String ingredientName, String unit, double quantity, ShoppingListItem target) {
+        return quantity * IngredientMatcher.baseFactor(ingredientName, unit)
+                / IngredientMatcher.baseFactor(target.getIngredientName(), target.getUnit());
     }
 
     private MealPlan requirePlan(Long planId) {

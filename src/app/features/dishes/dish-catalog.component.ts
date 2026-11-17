@@ -5,7 +5,7 @@ import { DishApiService } from '../../core/dish-api.service';
 import { DishCatalogEntry } from '../../core/models';
 import { AuthService, AuthenticatedUser } from '../../core/auth.service';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { StarRatingComponent } from '../../shared/star-rating.component';
 
 @Component({
@@ -23,6 +23,8 @@ export class DishCatalogComponent implements OnInit {
   currentUser: AuthenticatedUser | null = null;
   loading = true;
   errorMessage = '';
+  /** Set when the catalog was opened from a plan to pick a dish for it. */
+  readonly targetPlanId = Number(inject(ActivatedRoute).snapshot.queryParamMap.get('plan')) || null;
   private readonly filterChanges = new Subject<void>();
   private readonly destroyRef = inject(DestroyRef);
 

@@ -1,4 +1,4 @@
-<main class="screen">
+<main class="screen" [class.with-checkout]="cartItems.length > 0">
   @if (hasPlanContext) {
     <a class="back-link" [routerLink]="['/plans', planId]">‹ Zurück zum Plan</a>
   }
@@ -8,42 +8,37 @@
   </header>
 
   @if (hasPlanContext) {
-    <button type="button" class="generate" [disabled]="generating || bulkBusy" (click)="generate()">
+    <button type="button" class="generate" [disabled]="generating" (click)="generate()">
       {{ generating ? 'Wird erstellt ...' : 'Aus Plan neu erstellen' }}
     </button>
   } @else {
-    <button type="button" class="generate" [disabled]="generating || bulkBusy" (click)="generateUpcoming()">
+    <form class="quick-add" (ngSubmit)="addQuickItem()">
+      <label class="visually-hidden" for="quickAdd">Artikel hinzufügen</label>
+      <input
+        id="quickAdd"
+        name="quickAdd"
+        [(ngModel)]="quickAddText"
+        list="ingredient-names"
+        autocomplete="off"
+        autocapitalize="sentences"
+        enterkeyhint="done"
+        placeholder="z. B. 2 Zwiebeln oder 500 g Hackfleisch"
+        (focus)="loadIngredientNames()" />
+      <datalist id="ingredient-names">
+        @for (name of ingredientNames; track name) {
+          <option [value]="name"></option>
+        }
+      </datalist>
+      <button type="submit" [disabled]="!quickAddText.trim()">Hinzufügen</button>
+    </form>
+    <button type="button" class="generate" [disabled]="generating" (click)="generateUpcoming()">
       {{ generating ? 'Wird erstellt ...' : 'Für die nächsten Tage ergänzen' }}
     </button>
-    <form class="add-form" (ngSubmit)="addItem()">
-      <label>
-        <span>Zutat</span>
-        <input name="ingredientName" [(ngModel)]="newIngredientName" required placeholder="z. B. Haferflocken" />
-      </label>
-      <label class="quantity-field">
-        <span>Anzahl</span>
-        <input name="quantity" type="number" min="0.01" step="0.01" [(ngModel)]="newQuantity" required />
-      </label>
-      <label class="unit-field">
-        <span>Einheit</span>
-        <select name="unit" [(ngModel)]="newUnit">
-          <option>Stk.</option>
-          <option>g</option>
-          <option>kg</option>
-          <option>ml</option>
-          <option>l</option>
-          <option>Packung</option>
-        </select>
-      </label>
-      <button type="submit" [disabled]="adding || bulkBusy">
-        {{ adding ? 'Wird ergänzt ...' : 'Hinzufügen' }}
-      </button>
-    </form>
   }
 
   @if ((connectivity.online$ | async) === false) {
     <p class="status offline">
-      Offline – Änderungen werden gespeichert, sobald du wieder online bist.
+      Offline – Häkchen und der Einkaufsabschluss werden gespeichert und später übertragen.
     </p>
   }
 
@@ -58,77 +53,77 @@
   }
 
   @if (!loading) {
-    @if (items.length > 0) {
-      <section class="bulk-actions" aria-label="Artikel gemeinsam bearbeiten" [attr.aria-busy]="bulkBusy">
-        <label class="select-all">
-          <input
-            type="checkbox"
-            [checked]="allSelected"
-            [indeterminate]="checkedItems.length > 0 && !allSelected"
-            [disabled]="bulkBusy"
-            (change)="selectAll()" />
-          Alles auswählen
-        </label>
-        <span>{{ checkedItems.length }} ausgewählt</span>
-        <div class="bulk-buttons">
-          <button type="button" class="remove-selected" [disabled]="bulkBusy || checkedItems.length === 0" (click)="removeSelected()">
-            {{ removingSelected ? 'Wird entfernt ...' : 'Ausgewählte entfernen' }}
-          </button>
-          <button type="button" class="move-selected" [disabled]="bulkBusy || checkedItems.length === 0" (click)="finishShopping()">
-            {{ finishingCheckout ? 'Wird gebucht ...' : 'In den Vorratsschrank' }}
-          </button>
-        </div>
-      </section>
-    }
-    <section class="list-section" aria-labelledby="open-items-heading">
-      <div class="section-heading">
-        <h2 id="open-items-heading">Noch einzukaufen</h2>
-        <span>{{ openItems.length }}</span>
-      </div>
-      <ul class="item-list">
-        @for (item of openItems; track item.id) {
-          <li class="item-row">
-            <label>
-              <input type="checkbox" [checked]="item.checked" [disabled]="bulkBusy" (change)="toggle(item)" />
-              <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
-              <strong>{{ item.ingredientName }}</strong>
-            </label>
-            <button type="button" class="remove-button" [disabled]="bulkBusy" (click)="remove(item)">
-              Entfernen
-            </button>
-          </li>
-        }
-        @if (openItems.length === 0) {
-          <li class="status empty">Alles eingekauft.</li>
-        }
-      </ul>
-    </section>
-
-    @if (checkedItems.length > 0) {
-      <section class="list-section completed" aria-labelledby="checked-items-heading">
-        <div class="section-heading">
-          <h2 id="checked-items-heading">Bereits im Wagen</h2>
-          <span>{{ checkedItems.length }}</span>
-        </div>
+    <div class="section-heading list-heading">
+      <h2 id="open-items-heading">Noch einzukaufen</h2>
+      <span>{{ openCount }}</span>
+    </div>
+    @for (group of groups; track group.category) {
+      <section class="list-section" [attr.aria-label]="group.category">
+        <h3>{{ group.category }}</h3>
         <ul class="item-list">
-          @for (item of checkedItems; track item.id) {
-            <li class="item-row checked">
+          @for (item of group.items; track item.id) {
+            <li class="item-row" [class.saving]="item.id < 0" appSwipeToRemove (swipeRemove)="remove(item)">
               <label>
-                <input type="checkbox" [checked]="item.checked" [disabled]="bulkBusy" (change)="toggle(item)" />
-                <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
+                <input type="checkbox" [checked]="item.checked" [disabled]="item.id < 0" (change)="toggle(item)" />
                 <strong>{{ item.ingredientName }}</strong>
+                <span class="quantity">
+                  {{ item.quantity | number:'1.0-2' }} {{ item.unit }}
+                  @if (packHint(item); as hint) {
+                    <small>{{ hint }}</small>
+                  }
+                </span>
               </label>
-              <button type="button" class="remove-button" [disabled]="bulkBusy" (click)="remove(item)">
-                Entfernen
-              </button>
+              <button
+                type="button"
+                class="remove-button"
+                [disabled]="item.id < 0"
+                [attr.aria-label]="item.ingredientName + ' entfernen'"
+                (click)="remove(item)">×</button>
             </li>
           }
         </ul>
-        <p class="checkout-note">Beim Verlassen der Einkaufsliste wandern diese Artikel automatisch in den Vorratsschrank.</p>
-        <button type="button" class="finish-shopping" [disabled]="bulkBusy" (click)="finishShopping()">
-          {{ finishingCheckout ? 'Wird gebucht ...' : 'Einkauf abschließen' }}
-        </button>
       </section>
     }
+    @if (openCount === 0) {
+      <p class="status empty">{{ cartItems.length ? 'Alles im Wagen.' : 'Die Liste ist leer.' }}</p>
+    }
+
+    @if (cartItems.length > 0) {
+      <section class="list-section completed" aria-labelledby="checked-items-heading">
+        <div class="section-heading">
+          <h2 id="checked-items-heading">Im Wagen</h2>
+          <span>{{ cartItems.length }}</span>
+        </div>
+        <ul class="item-list">
+          @for (item of cartItems; track item.id) {
+            <li class="item-row checked" appSwipeToRemove (swipeRemove)="remove(item)">
+              <label>
+                <input type="checkbox" [checked]="item.checked" (change)="toggle(item)" />
+                <strong>{{ item.ingredientName }}</strong>
+                <span class="quantity">{{ item.quantity | number:'1.0-2' }} {{ item.unit }}</span>
+              </label>
+              <button
+                type="button"
+                class="remove-button"
+                [attr.aria-label]="item.ingredientName + ' entfernen'"
+                (click)="remove(item)">×</button>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (items.length > 0) {
+      <button type="button" class="clear-list" [disabled]="clearing" (click)="clearList()">Liste leeren</button>
+    }
+  }
+
+  @if (cartItems.length > 0) {
+    <div class="checkout-bar">
+      <button type="button" class="finish-shopping" [disabled]="checkingOut" (click)="finishShopping()">
+        Einkauf abschließen · {{ cartItems.length }} Artikel
+      </button>
+      <small>Bucht alles aus dem Wagen in den Vorratsschrank.</small>
+    </div>
   }
 </main>

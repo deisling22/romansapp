@@ -17,36 +17,35 @@
 .onboarding-card {
   position: relative;
   box-sizing: border-box;
-  width: min(100%, 400px);
+  display: grid;
+  gap: 14px;
+  width: min(100%, 420px);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
   border-radius: 32px;
   background: var(--surface);
   box-shadow: var(--shadow-float);
-  padding: 36px 24px 24px;
-  text-align: center;
+  padding: 20px 20px 20px;
 }
 
 .skip-link {
   @include ios.button-plain;
   position: absolute;
   top: 8px;
-  right: 12px;
+  right: 16px;
   font: var(--text-subhead);
 }
 
-.step-icon {
-  display: grid;
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 16px;
-  place-items: center;
-  border-radius: 20px;
-  background: var(--tint-soft);
-  font-size: 2.4rem;
-  line-height: 1;
+.step-count {
+  margin: 0;
+  min-height: 28px;
+  color: var(--label-2);
+  font: var(--text-subhead-strong);
+  line-height: 28px;
 }
 
 h1 {
-  margin: 0 0 8px;
+  margin: 0;
   color: var(--label);
   font: var(--text-title2);
 }
@@ -54,33 +53,135 @@ h1 {
 p {
   margin: 0;
   color: var(--label-2);
-  font: var(--text-body);
+  font: var(--text-subhead);
 }
 
-.step-dots {
-  display: flex;
-  justify-content: center;
+.error {
+  color: var(--red);
+}
+
+.field {
+  display: grid;
   gap: 8px;
-  margin: 22px 0 20px;
+  color: var(--label);
+  font: var(--text-subhead-strong);
 }
 
-.dot {
-  width: 8px;
-  height: 8px;
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--radius-m);
+  background: var(--fill);
+  padding: 4px;
+}
+
+.stepper button {
+  width: 52px;
+  height: 44px;
   border: 0;
-  border-radius: 50%;
-  background: var(--fill-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--tint-text);
   cursor: pointer;
-  padding: 0;
+  font: var(--text-title2);
 }
 
-.dot.active {
-  background: var(--label);
+.stepper button:disabled {
+  opacity: 0.35;
+}
+
+.stepper output {
+  font: var(--text-number);
+}
+
+.segments {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: 4px;
+  border-radius: var(--radius-m);
+  background: var(--fill);
+  padding: 4px;
+}
+
+.segments button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--label);
+  cursor: pointer;
+  font: var(--text-subhead-strong);
+}
+
+.segments button.selected {
+  background: var(--tint);
+  color: var(--on-tint);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chips button {
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--fill);
+  color: var(--label);
+  cursor: pointer;
+  font: var(--text-subhead-strong);
+  padding: 0 16px;
+  text-transform: capitalize;
+}
+
+.chips button.selected {
+  background: var(--tint);
+  color: var(--on-tint);
+}
+
+.plan-options {
+  display: grid;
+  gap: 8px;
+  /* Many plans scroll inside the list so the buttons below stay in view. */
+  max-height: 44vh;
+  overflow-y: auto;
+}
+
+.plan-options button {
+  display: grid;
+  gap: 2px;
+  min-height: 56px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-m);
+  background: var(--fill);
+  color: var(--label);
+  cursor: pointer;
+  padding: 8px 14px;
+  text-align: left;
+}
+
+.plan-options button.selected {
+  border-color: var(--tint);
+  background: var(--tint-soft);
+}
+
+.plan-options strong {
+  font: var(--text-headline);
+}
+
+.plan-options small {
+  color: var(--label-2);
+  font: var(--text-footnote);
 }
 
 .step-actions {
   display: flex;
   gap: 10px;
+  margin-top: 4px;
 }
 
 .step-actions .primary {

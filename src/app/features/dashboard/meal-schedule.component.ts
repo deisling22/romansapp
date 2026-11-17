@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { DashboardApiService } from '../../core/dashboard-api.service';
@@ -9,7 +9,6 @@ import { NotificationService } from '../../core/notification.service';
 import { ScheduleApiService } from '../../core/schedule-api.service';
 import { DatePipe } from '@angular/common';
 
-const PREVIEW_DAYS = 7;
 const REMINDER_STORAGE_KEY = 'mealSchedule.lastReminderDate';
 
 type Panel = { key: string; type: 'swap' | 'replace' };
@@ -24,17 +23,24 @@ type Panel = { key: string; type: 'swap' | 'replace' };
         DatePipe,
     ],
 })
-export class MealScheduleComponent implements OnInit {
+export class MealScheduleComponent implements OnChanges {
+  /** The start screen loads plan, figures and suggestions together and hands the plan in. */
+  @Input() schedule: Schedule | null = null;
+  @Input() loading = true;
+  /** A snapshot is on screen while the server answer is still on its way. */
+  @Input() refreshing = false;
+  @Input() loadError = '';
+  /** Something changed on the server; the parent reloads and passes the new plan in. */
   @Output() readonly changed = new EventEmitter<void>();
 
   readonly slotLabels = MEAL_SLOT_LABELS;
-  schedule: Schedule | null = null;
-  loading = true;
   errorMessage = '';
   successMessage = '';
   busyKey: string | null = null;
   generatingList = false;
   panel: Panel | null = null;
+  /** Meal card whose secondary actions are open. */
+  menuKey: string | null = null;
   suggestions: ReplacementSuggestion[] = [];
   suggestionsLoading = false;
 
@@ -46,8 +52,10 @@ export class MealScheduleComponent implements OnInit {
     private readonly router: Router,
   ) {}
 
-  ngOnInit(): void {
-    this.load();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['schedule'] && this.schedule && !this.refreshing) {
+      this.remindOncePerDay(this.schedule);
+    }
   }
 
   get focusDays(): ScheduleDay[] {
@@ -60,20 +68,6 @@ export class MealScheduleComponent implements OnInit {
 
   get hasMeals(): boolean {
     return this.schedule?.days.some((day) => day.meals.length > 0) ?? false;
-  }
-
-  load(): void {
-    this.scheduleApi.getSchedule(PREVIEW_DAYS).subscribe({
-      next: (schedule) => {
-        this.schedule = schedule;
-        this.loading = false;
-        this.remindOncePerDay(schedule);
-      },
-      error: () => {
-        this.errorMessage = 'Die nächsten Gerichte konnten nicht geladen werden.';
-        this.loading = false;
-      },
-    });
   }
 
   dayLabel(day: ScheduleDay): string {
@@ -149,6 +143,11 @@ export class MealScheduleComponent implements OnInit {
     return `${day ? this.dayLabel(day) : ''} · ${this.slotLabels[option.mealSlot]}: ${option.dishName}`;
   }
 
+  toggleMenu(key: string): void {
+    this.menuKey = this.menuKey === key ? null : key;
+    this.panel = null;
+  }
+
   togglePanel(key: string, type: Panel['type'], meal: ScheduledMeal): void {
     if (this.panel?.key === key && this.panel.type === type) {
       this.panel = null;
@@ -175,8 +174,18 @@ export class MealScheduleComponent implements OnInit {
     if (meal.planEntryId === null) {
       return;
     }
-    this.run(key, this.dashboardApi.markCooked(meal.planEntryId), `${meal.dishName} ist als gekocht gespeichert.`, () =>
-      void this.gamification.record('COOK_DISH', String(meal.dishId)),
+    if (this.busyKey) {
+      return;
+    }
+    // Shown as cooked immediately; the reload after the server answer brings the shifted plan.
+    const previousStatus = meal.status;
+    meal.status = 'COOKED';
+    this.run(
+      key,
+      this.dashboardApi.markCooked(meal.planEntryId),
+      `${meal.dishName} ist als gekocht gespeichert.`,
+      () => void this.gamification.record('COOK_DISH', String(meal.dishId)),
+      () => (meal.status = previousStatus),
     );
   }
 
@@ -230,7 +239,13 @@ export class MealScheduleComponent implements OnInit {
     });
   }
 
-  private run(key: string, request: Observable<unknown>, success: string, afterSuccess?: () => void): void {
+  private run(
+    key: string,
+    request: Observable<unknown>,
+    success: string,
+    afterSuccess?: () => void,
+    rollback?: () => void,
+  ): void {
     if (this.busyKey) {
       return;
     }
@@ -242,11 +257,12 @@ export class MealScheduleComponent implements OnInit {
         afterSuccess?.();
         this.busyKey = null;
         this.panel = null;
+        this.menuKey = null;
         this.successMessage = success;
-        this.load();
         this.changed.emit();
       },
       error: () => {
+        rollback?.();
         this.busyKey = null;
         this.errorMessage = 'Die Änderung konnte nicht gespeichert werden.';
       },

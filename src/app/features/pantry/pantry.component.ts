@@ -1,10 +1,16 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { PantryApiService } from '../../core/pantry-api.service';
-import { PantryItem, UseSoon } from '../../core/models';
-import { RouterLink } from '@angular/router';
-import { DecimalPipe, DatePipe } from '@angular/common';
+import { PantryItem, PantryRemovalReason, UseSoon } from '../../core/models';
+import { parseQuickAdd } from '../../core/quick-add';
+import { ShoppingListOutboxService } from '../../core/shopping-list-outbox.service';
+import { SnapshotCacheService } from '../../core/snapshot-cache.service';
 import { ExpiryInfo, expiryInfo } from './expiry';
-import { toAbsoluteImageUrl } from '../../core/image-url';
+import { UseSoonCardComponent } from './use-soon-card.component';
+
+const SNAPSHOT_KEY = 'pantry';
 
 @Component({
     selector: 'app-pantry',
@@ -12,9 +18,9 @@ import { toAbsoluteImageUrl } from '../../core/image-url';
     styleUrls: ['./pantry.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
-        RouterLink,
-        DecimalPipe,
+        FormsModule,
         DatePipe,
+        UseSoonCardComponent,
     ],
 })
 export class PantryComponent implements OnInit {
@@ -22,18 +28,99 @@ export class PantryComponent implements OnInit {
   loading = true;
   errorMessage = '';
   successMessage = '';
-  deletingItemId: number | null = null;
-  savingExpiryId: number | null = null;
+  quickAddText = '';
+  adding = false;
+  savingItemId: number | null = null;
   useSoon: UseSoon | null = null;
 
-  constructor(private readonly pantryApi: PantryApiService) {}
+  constructor(
+    private readonly pantryApi: PantryApiService,
+    private readonly snapshots: SnapshotCacheService,
+    private readonly outbox: ShoppingListOutboxService,
+    private readonly destroyRef: DestroyRef,
+  ) {}
 
   expiry(item: PantryItem): ExpiryInfo | null {
     return expiryInfo(item.expiresOn);
   }
 
-  imageUrl(path: string): string {
-    return toAbsoluteImageUrl(path);
+  ngOnInit(): void {
+    const snapshot = this.snapshots.read<PantryItem[]>(SNAPSHOT_KEY);
+    if (snapshot) {
+      this.items = snapshot;
+      this.loading = false;
+    }
+    this.load();
+    // A purchase may still be on its way when the user switches here right after shopping.
+    this.outbox.booked$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.load());
+  }
+
+  load(): void {
+    this.pantryApi.getItems().subscribe({
+      next: (items) => {
+        this.setItems(items);
+        this.loading = false;
+      },
+      error: () => {
+        if (this.loading) {
+          this.errorMessage = 'Der Vorratsschrank konnte nicht geladen werden.';
+        }
+        this.loading = false;
+      },
+    });
+    this.loadUseSoon();
+  }
+
+  loadUseSoon(): void {
+    this.pantryApi.getUseSoon().subscribe({
+      next: (useSoon) => (this.useSoon = useSoon),
+      error: () => (this.useSoon = null),
+    });
+  }
+
+  /** Manual entry for everything that did not come through the shopping list ("2 Zwiebeln", "Reis 1 kg"). */
+  addItem(): void {
+    const parsed = parseQuickAdd(this.quickAddText);
+    if (!parsed || this.adding) {
+      return;
+    }
+    this.adding = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.pantryApi.addBatch([parsed]).subscribe({
+      next: (created) => {
+        this.adding = false;
+        this.quickAddText = '';
+        this.setItems([...this.items, ...created]);
+        this.successMessage = `${parsed.ingredientName} liegt jetzt im Vorrat.`;
+        this.loadUseSoon();
+      },
+      error: () => {
+        this.adding = false;
+        this.errorMessage = 'Der Artikel konnte nicht gespeichert werden.';
+      },
+    });
+  }
+
+  setQuantity(item: PantryItem, value: string): void {
+    const quantity = Number(value.replace(',', '.'));
+    if (!(quantity > 0) || quantity === item.quantity) {
+      return;
+    }
+    this.savingItemId = item.id;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.pantryApi.updateQuantity(item.id, quantity).subscribe({
+      next: (updated) => {
+        this.setItems(this.items.map((entry) => (entry.id === updated.id ? updated : entry)));
+        this.savingItemId = null;
+        this.loadUseSoon();
+      },
+      error: () => {
+        this.errorMessage = 'Die Menge konnte nicht gespeichert werden.';
+        this.savingItemId = null;
+      },
+    });
   }
 
   setExpiry(item: PantryItem, value: string): void {
@@ -41,19 +128,17 @@ export class PantryComponent implements OnInit {
     if (expiresOn === (item.expiresOn ?? null)) {
       return;
     }
-    this.savingExpiryId = item.id;
+    this.savingItemId = item.id;
     this.successMessage = '';
     this.pantryApi.updateExpiry(item.id, expiresOn).subscribe({
       next: (updated) => {
-        this.items = this.items
-          .map((entry) => (entry.id === updated.id ? updated : entry))
-          .sort((a, b) => (a.expiresOn ?? '9999').localeCompare(b.expiresOn ?? '9999'));
-        this.savingExpiryId = null;
+        this.setItems(this.items.map((entry) => (entry.id === updated.id ? updated : entry)));
+        this.savingItemId = null;
         this.loadUseSoon();
       },
       error: () => {
         this.errorMessage = 'Das Ablaufdatum konnte nicht gespeichert werden.';
-        this.savingExpiryId = null;
+        this.savingItemId = null;
       },
     });
   }
@@ -73,49 +158,26 @@ export class PantryComponent implements OnInit {
     return `Vor ${days} Tagen gekauft`;
   }
 
-  ngOnInit(): void {
-    this.load();
-  }
-
-  load(): void {
-    this.loading = true;
-    this.pantryApi.getItems().subscribe({
-      next: (items) => {
-        this.items = items;
-        this.loading = false;
-      },
+  /** "Used up" and "thrown away" both empty the shelf, but only the latter counts as food waste. */
+  remove(item: PantryItem, reason: PantryRemovalReason): void {
+    const previous = this.items;
+    this.setItems(this.items.filter((entry) => entry.id !== item.id));
+    this.errorMessage = '';
+    this.successMessage = reason === 'WASTED'
+      ? `${item.ingredientName} als weggeworfen vermerkt.`
+      : `${item.ingredientName} ist aufgebraucht.`;
+    this.pantryApi.deleteItem(item.id, reason).subscribe({
+      next: () => this.loadUseSoon(),
       error: () => {
-        this.errorMessage = 'Der Vorratsschrank konnte nicht geladen werden.';
-        this.loading = false;
+        this.setItems(previous);
+        this.successMessage = '';
+        this.errorMessage = `${item.ingredientName} konnte nicht entfernt werden.`;
       },
-    });
-    this.loadUseSoon();
-  }
-
-  private loadUseSoon(): void {
-    this.pantryApi.getUseSoon().subscribe({
-      next: (useSoon) => (this.useSoon = useSoon),
-      error: () => (this.useSoon = null),
     });
   }
 
-  remove(item: PantryItem): void {
-    if (this.deletingItemId !== null) {
-      return;
-    }
-    this.deletingItemId = item.id;
-    this.successMessage = '';
-    this.pantryApi.deleteItem(item.id).subscribe({
-      next: () => {
-        this.items = this.items.filter((entry) => entry.id !== item.id);
-        this.successMessage = `${item.ingredientName} wurde aus dem Vorrat entfernt.`;
-        this.deletingItemId = null;
-        this.loadUseSoon();
-      },
-      error: () => {
-        this.errorMessage = 'Der Artikel konnte nicht entfernt werden.';
-        this.deletingItemId = null;
-      },
-    });
+  private setItems(items: PantryItem[]): void {
+    this.items = [...items].sort((a, b) => (a.expiresOn ?? '9999').localeCompare(b.expiresOn ?? '9999'));
+    this.snapshots.write(SNAPSHOT_KEY, this.items);
   }
 }

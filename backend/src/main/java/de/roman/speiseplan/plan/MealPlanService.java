@@ -101,6 +101,22 @@ public class MealPlanService {
         return toDto(entry);
     }
 
+    /** Puts an existing catalog dish at the end of the plan. */
+    @Transactional
+    public DishDto addEntry(Long planId, Long dishId, MealSlot mealSlot) {
+        MealPlan plan = requireOwnPlan(planId);
+        Dish dish = dishRepository.findById(dishId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Gericht wurde nicht gefunden."));
+        int nextSortOrder = planEntryRepository.findTopByPlanIdOrderBySortOrderDesc(planId)
+                .map(entry -> entry.getSortOrder() + 1)
+                .orElse(0);
+        PlanEntry entry = new PlanEntry(plan, dish, nextSortOrder);
+        if (mealSlot != null) {
+            entry.setMealSlot(mealSlot);
+        }
+        return toDto(planEntryRepository.save(entry));
+    }
+
     private MealPlan requirePlan(Long planId) {
         return mealPlanRepository.findById(planId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan wurde nicht gefunden."));

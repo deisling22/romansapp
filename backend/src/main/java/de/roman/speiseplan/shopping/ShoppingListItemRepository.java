@@ -10,8 +10,5 @@ public interface ShoppingListItemRepository extends JpaRepository<ShoppingListIt
 
     List<ShoppingListItem> findByCheckedTrue();
 
-        List<ShoppingListItem> findByIngredientNameIgnoreCaseAndUnitIgnoreCaseOrderByIdAsc(
-            String ingredientName, String unit);
-
     void deleteByPlanId(Long planId);
 }

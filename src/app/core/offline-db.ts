@@ -6,6 +6,13 @@ export interface QueuedShoppingListUpdate {
   queuedAt: number;
 }
 
+/** A completed purchase made offline; replayed as one checkout request once the connection is back. */
+export interface QueuedCheckout {
+  id?: number;
+  itemIds: number[];
+  queuedAt: number;
+}
+
 export interface LocalMealPlan {
   clientId: string;
   serverId?: number;

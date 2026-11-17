@@ -26,7 +26,7 @@ Der Minimal-Use-Case soll nach jedem Commit automatisch aktualisiert werden:
 
 ## Wichtige Umgebungswerte
 
-- Frontend-API-URL: `https://speiseplan-backend.onrender.com/api`
+- Frontend-API-URL: `https://speiseplan-backend-ye17.onrender.com/api`
 - Backend-Origin fuer CORS: `https://deisling22.github.io/romansapp`
 - Upload-Verzeichnis im Render-Container: `/opt/render/project/src/uploads`
 

@@ -2,7 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DishCatalogEntry, DishDetail, DishIngredientEntry, DishRatingSummary, Ingredient, PrepStep } from './models';
+import {
+  DishAvailability,
+  DishCatalogEntry,
+  DishDetail,
+  DishIngredientEntry,
+  DishRatingSummary,
+  Ingredient,
+  PrepStep,
+  ShoppingListItem,
+} from './models';
 import { toAbsoluteImageUrl } from './image-url';
 
 export interface NutritionUpdate {
@@ -45,6 +54,28 @@ export class DishApiService {
 
   getDish(dishId: number): Observable<DishDetail> {
     return this.http.get<DishDetail>(`${this.apiUrl}/dishes/${dishId}`);
+  }
+
+  /** Stock check against pantry and shopping list, independent of spelling and units. */
+  getAvailability(dishId: number, servings: number): Observable<DishAvailability> {
+    return this.http.get<DishAvailability>(`${this.apiUrl}/dishes/${dishId}/availability`, {
+      params: new HttpParams().set('servings', servings),
+    });
+  }
+
+  /** Without servings the household's usual portions are used. */
+  addMissingToShoppingList(dishId: number, servings?: number): Observable<ShoppingListItem[]> {
+    return this.http.post<ShoppingListItem[]>(`${this.apiUrl}/dishes/${dishId}/missing-to-shopping-list`, {}, {
+      params: servings ? new HttpParams().set('servings', servings) : undefined,
+    });
+  }
+
+  /** Cooks the dish: ticks off today's plan entry if it is due, otherwise logs a spontaneous meal. */
+  cook(dishId: number, servings?: number): Observable<{ dishId: number; planEntryId: number | null }> {
+    return this.http.post<{ dishId: number; planEntryId: number | null }>(
+      `${this.apiUrl}/dishes/${dishId}/cook`,
+      servings ? { servings } : {},
+    );
   }
 
   rateDish(dishId: number, stars: number): Observable<DishRatingSummary> {
