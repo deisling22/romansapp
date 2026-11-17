@@ -30,6 +30,27 @@ Der Minimal-Use-Case soll nach jedem Commit automatisch aktualisiert werden:
 - Backend-Origin fuer CORS: `https://deisling22.github.io/romansapp`
 - Upload-Verzeichnis im Render-Container: `/opt/render/project/src/uploads`
 
+## Kaltstart und Antwortzeiten (Messung 17.11.2026)
+
+Die Free-Instanz hat 0,1 CPU, schlaeft nach 15 Minuten ohne Anfragen ein und verliert dabei
+die H2-Daten (Neustart = frisch geseedete Datenbank).
+
+- **Aufwachen:** gemessen 215-221 s bis zur ersten Antwort vor der Docker-Optimierung,
+  danach ca. 100 s. Die App ueberbrueckt das: letzter Stand nach ca. 1 s sichtbar, lesende
+  Requests werden wiederholt, Hinweis "Der Server startet gerade ..." nach 5 s, keine
+  Fehlermeldung (siehe `03-frontend-angular.md`).
+- **Docker-Image:** entpacktes Jar-Layout (`-Djarmode=tools ... extract`) statt Fat-Jar und
+  `-XX:TieredStopAtLevel=1`. Lokal als CPU-Sekunden bis zur ersten Antwort gemessen:
+  12,9 s -> 5,5 s; CPU je Request in den ersten Minuten 12,5 ms -> 5,4 ms. Diese
+  Einstellungen nicht ohne neue Messung aendern.
+- **Netzwerk:** jeder Roundtrip kostet ca. 0,28 s, auch fuer `/` ohne Datenbank (Render
+  legt Free-Services standardmaessig in Oregon an). `region: frankfurt` in `render.yaml`
+  wirkt nur beim Neuanlegen des Services und wuerde diesen Sockel fast entfernen.
+- **CORS:** `Access-Control-Max-Age: 7200`, sonst schickt der Browser vor fast jedem
+  schreibenden Request einen Preflight (ein zusaetzlicher Roundtrip).
+- **Antwortzeiten warm (Browser, inkl. Netzwerk):** `GET /api/home` 0,4-0,8 s, einfache
+  Listen 0,3 s, Schreibzugriffe 0,5-0,8 s.
+
 ## Manuelle Einrichtungs-Schritte ausserhalb des Repos
 
 1. In GitHub Pages die Quelle auf GitHub Actions setzen.

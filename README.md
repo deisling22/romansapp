@@ -31,11 +31,21 @@ This project uses [Angular CLI](https://angular.dev) version 22.
 
 ## Production responsiveness
 
-The Render free backend can take over a minute to wake after inactivity.
-API requests allow up to 90 seconds for a response; an always-on Render instance
-is needed to avoid this infrastructure delay. Plan activation shows the requested
-state immediately with a saving indicator, blocks duplicate clicks for that plan,
-and restores the previous state with an error message if saving fails.
+The Render free backend sleeps after 15 minutes without requests; waking it takes
+about 100 seconds (measured; 3.6 minutes before the Docker image was optimized).
+An always-on instance is needed to avoid this infrastructure delay; until then
+the app bridges it:
+
+- every screen paints its last known state from local storage first and
+  refreshes in the background ("Wird aktualisiert ...");
+- reads are repeated after a timeout (90 s) or gateway error, writes never;
+- a banner explains the wait once a request takes longer than five seconds;
+- list actions (add, tick, remove, complete purchase, mark as cooked) take
+  effect immediately and are rolled back or queued if the server fails.
+
+The start screen needs two requests (`GET /api/home`, `GET /api/recommendations`).
+Measurements and the reasons for the JVM/Docker settings are documented in
+`ki-anleitungen/05-deployment.md`.
 
 ## Development server
 

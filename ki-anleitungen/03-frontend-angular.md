@@ -85,9 +85,10 @@ Massgeblich sind die "Leitlinien fuer den Kreislauf" in `00-projekt-uebersicht.m
   bekommt den neuen Zustand direkt mit der Antwort (`?view=home`), also ein Roundtrip.
 - Planliste, Gerichtkatalog (ungefiltert), Einkaufsliste, Vorrat und Zutatenvorschlaege
   haben ebenfalls einen Snapshot; die Anmeldung wird pro Sitzung nur einmal abgefragt.
-- Aufwachendes Backend: `ResilienceInterceptor` wiederholt lesende Requests nach Timeout
-  (90 s) oder Gateway-Fehler bis zu dreimal, schreibende nie. Wartet ein Request laenger als
-  5 s, zeigt die App "Der Server startet gerade ..." (`BackendStatusService`).
+- Aufwachendes Backend (ca. 100 s, siehe `05-deployment.md`): `ResilienceInterceptor`
+  wiederholt lesende Requests nach Timeout (90 s) oder Gateway-Fehler bis zu dreimal,
+  schreibende nie. Wartet ein Request laenger als 5 s, zeigt die App "Der Server startet
+  gerade ..." (`BackendStatusService`).
 
 ## UX-Vorgaben
 
