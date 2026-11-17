@@ -75,6 +75,8 @@ Abfrage aus den nächsten zehn unterschiedlichen Gerichten ihrer aktiven
 ewigen Speisepläne erstellen. Sind weniger vorhanden, werden alle angeboten
 (mindestens zwei). Die Gerichte werden als unveränderliche Momentaufnahme
 gespeichert; spätere Planänderungen ändern die öffentliche Abfrage nicht.
+Fehlt ein Plan, ein aktiver Plan oder fehlen darin Gerichte, zeigt die
+Abfrageseite einen passenden Einrichtungshinweis mit direktem Link zu den Plänen.
 
 Der öffentliche Link kann über WhatsApp, das Teilen-Menü oder die Zwischenablage
 weitergegeben werden. Teilnehmer benötigen kein Konto: Sie sortieren alle

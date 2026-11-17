@@ -4,6 +4,15 @@
     <h1>Familienabfrage</h1>
     <p>Die nächsten 10 unterschiedlichen Gerichte aus deinem ewigen Speiseplan. Deine Familie sortiert ihre Favoriten nach oben – ganz ohne Anmeldung.</p>
   </header>
+  @if (planHint()) {
+    <aside class="card" aria-label="Voraussetzungen für eine Familienabfrage" role="status">
+      <p>{{ planHint() }}</p>
+      <a routerLink="/plans">Zu meinen Plänen</a>
+    </aside>
+  }
+  @if (plansError()) {
+    <p class="field-error" role="alert">{{ plansError() }} <a routerLink="/plans">Zu meinen Plänen</a></p>
+  }
   <div class="actions">
     <button type="button" [disabled]="loading() || busy()" (click)="create()">Neue Abfrage erstellen</button>
     <button type="button" class="secondary" [disabled]="loading() || busy()" (click)="load()">Ergebnisse aktualisieren</button>

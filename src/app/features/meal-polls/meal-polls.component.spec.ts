@@ -1,7 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { of, throwError } from 'rxjs';
 import { ManagedMealPoll, MealPollApiService } from '../../core/meal-poll-api.service';
+import { MealPlanApiService } from '../../core/meal-plan-api.service';
 import { ShareService } from '../../core/share.service';
 import { MealPollsComponent } from './meal-polls.component';
 
@@ -10,6 +13,7 @@ describe('MealPollsComponent', () => {
   let sharing: jasmine.SpyObj<ShareService>;
   let component: MealPollsComponent;
   let managed: ManagedMealPoll;
+  let planApi: jasmine.SpyObj<MealPlanApiService>;
   beforeEach(() => {
     managed = {
       poll: {
@@ -24,7 +28,82 @@ describe('MealPollsComponent', () => {
     api.list.and.returnValue(of([managed]));
     api.create.and.returnValue(of(managed));
     api.apply.and.returnValue(of({ ...managed, poll: { ...managed.poll, closed: true } }));
-    component = new MealPollsComponent(api, sharing);
+    planApi = jasmine.createSpyObj('MealPlanApiService', ['getPlans']);
+    planApi.getPlans.and.returnValue(of([{ id: 1, name: 'Woche', active: true, dishCount: 3 }]));
+    component = new MealPollsComponent(api, sharing, planApi);
+  });
+
+  it('explains that a plan must be created when none exists', async () => {
+    planApi.getPlans.and.returnValue(of([]));
+    await component.load();
+    expect(component.planHint()).toContain('Erstelle zuerst einen Plan');
+  });
+
+  it('asks users to add dishes when their plans are empty', async () => {
+    planApi.getPlans.and.returnValue(of([{ id: 1, name: 'Leer', active: true, dishCount: 0 }]));
+    await component.load();
+    expect(component.planHint()).toContain('mindestens zwei unterschiedliche Gerichte');
+  });
+
+  it('asks users to activate a plan even when an inactive plan has dishes', async () => {
+    planApi.getPlans.and.returnValue(of([{ id: 1, name: 'Woche', active: false, dishCount: 3 }]));
+    await component.load();
+    expect(component.planHint()).toContain('noch keinen aktiven Speiseplan');
+  });
+
+  it('explains when only inactive plans contain dishes', async () => {
+    planApi.getPlans.and.returnValue(of([
+      { id: 1, name: 'Leer', active: true, dishCount: 0 },
+      { id: 2, name: 'Woche', active: false, dishCount: 3 },
+    ]));
+    await component.load();
+    expect(component.planHint()).toContain('Deine aktiven Pläne enthalten noch keine Gerichte');
+  });
+
+  it('does not show a setup hint for an active plan with dishes', async () => {
+    await component.load();
+    expect(component.planHint()).toBe('');
+  });
+
+  it('reports plan loading errors without hiding existing polls or assuming an empty plan', async () => {
+    planApi.getPlans.and.returnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+    await component.load();
+    expect(component.plansError()).toContain('nicht geprüft');
+    expect(component.planHint()).toBe('');
+    expect(component.selected()).toBe(managed);
+  });
+
+  it('refreshes the hint after a plan has been activated and populated', async () => {
+    planApi.getPlans.and.returnValue(of([]));
+    await component.load();
+    expect(component.planHint()).not.toBe('');
+    planApi.getPlans.and.returnValue(of([{ id: 1, name: 'Woche', active: true, dishCount: 3 }]));
+    await component.load();
+    expect(component.planHint()).toBe('');
+  });
+
+  it('renders the setup hint and links directly to the plans page', async () => {
+    planApi.getPlans.and.returnValue(of([]));
+    TestBed.configureTestingModule({
+      imports: [MealPollsComponent],
+      providers: [
+        provideRouter([]),
+        { provide: MealPollApiService, useValue: api },
+        { provide: ShareService, useValue: sharing },
+        { provide: MealPlanApiService, useValue: planApi },
+      ],
+    });
+    const fixture = TestBed.createComponent(MealPollsComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const hint = element.querySelector('aside');
+    expect(hint?.textContent).toContain('Erstelle zuerst einen Plan');
+    expect(hint?.querySelector('a')?.getAttribute('href')).toBe('/plans');
+    fixture.componentInstance.plans.set([{ id: 1, name: 'Woche', active: true, dishCount: 3 }]);
+    fixture.detectChanges();
+    expect(element.querySelector('aside')).toBeNull();
   });
 
   it('loads existing polls and limits the default top count to the number of options', async () => {

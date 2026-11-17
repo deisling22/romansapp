@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -6,7 +6,8 @@ import { firstValueFrom } from 'rxjs';
 import { Capacitor } from '@capacitor/core';
 import { environment } from '../../../environments/environment';
 import { ManagedMealPoll, MealPollApiService } from '../../core/meal-poll-api.service';
-import { MEAL_SLOT_LABELS } from '../../core/models';
+import { MealPlanApiService } from '../../core/meal-plan-api.service';
+import { MealPlan, MEAL_SLOT_LABELS } from '../../core/models';
 import { ShareService } from '../../core/share.service';
 import { toAbsoluteImageUrl } from '../../core/image-url';
 import { pollError } from './poll-errors';
@@ -25,11 +26,36 @@ export class MealPollsComponent implements OnInit {
   readonly busy = signal(false);
   readonly error = signal('');
   readonly message = signal('');
+  readonly plans = signal<MealPlan[] | null>(null);
+  readonly plansError = signal('');
+  readonly planHint = computed(() => {
+    const plans = this.plans();
+    if (plans === null) {
+      return '';
+    }
+    if (!plans.length) {
+      return 'Du hast noch keinen Speiseplan. Erstelle zuerst einen Plan, füge Gerichte hinzu und aktiviere ihn, um eine Familienabfrage zu erstellen.';
+    }
+    if (!plans.some((plan) => plan.dishCount > 0)) {
+      return 'Deine Pläne enthalten noch keine Gerichte. Füge zuerst mindestens zwei unterschiedliche Gerichte zu einem Plan hinzu und aktiviere ihn.';
+    }
+    if (!plans.some((plan) => plan.active)) {
+      return 'Du hast noch keinen aktiven Speiseplan. Aktiviere unter „Pläne“ einen Plan mit Gerichten, damit deine Familie darüber abstimmen kann.';
+    }
+    if (!plans.some((plan) => plan.active && plan.dishCount > 0)) {
+      return 'Deine aktiven Pläne enthalten noch keine Gerichte. Füge dort Gerichte hinzu oder aktiviere einen Plan, der bereits Gerichte enthält.';
+    }
+    return '';
+  });
   readonly slotLabels = MEAL_SLOT_LABELS;
   count = 3;
   readonly imageUrl = toAbsoluteImageUrl;
 
-  constructor(private readonly api: MealPollApiService, private readonly shareService: ShareService) {}
+  constructor(
+    private readonly api: MealPollApiService,
+    private readonly shareService: ShareService,
+    private readonly planApi: MealPlanApiService,
+  ) {}
 
   ngOnInit(): void {
     void this.load();
@@ -41,6 +67,7 @@ export class MealPollsComponent implements OnInit {
     }
     this.loading.set(true);
     this.error.set('');
+    void this.loadPlans();
     try {
       const polls = await firstValueFrom(this.api.list());
       const id = this.selected()?.poll.id;
@@ -50,6 +77,16 @@ export class MealPollsComponent implements OnInit {
       this.error.set(pollError(error, 'Deine Abfragen konnten nicht geladen werden.'));
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  private async loadPlans(): Promise<void> {
+    this.plansError.set('');
+    try {
+      this.plans.set(await firstValueFrom(this.planApi.getPlans()));
+    } catch (error: unknown) {
+      this.plans.set(null);
+      this.plansError.set(pollError(error, 'Deine Pläne konnten nicht geprüft werden. Bitte aktualisiere die Seite oder prüfe sie unter „Pläne“.'));
     }
   }
 
