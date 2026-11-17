@@ -91,4 +91,34 @@ describe('PlanListComponent activation', () => {
     expect(component.plans[0].active).toBeTrue();
     expect(component.errorMessage).toContain('nicht pausiert');
   });
+
+  it('links to creators when neither server nor local plans exist', () => {
+    const fixture = TestBed.createComponent(PlanListComponent);
+    fixture.detectChanges();
+    fixture.componentInstance.plans = [];
+    fixture.componentInstance.localPlans = [];
+    fixture.detectChanges();
+    const element: HTMLElement = fixture.nativeElement;
+    const link = element.querySelector<HTMLAnchorElement>('.empty-plans a');
+    expect(link?.textContent).toBe('Pläne importieren');
+    expect(link?.getAttribute('href')).toBe('/creators');
+  });
+
+  it('does not show the empty-plan import action when a server or local plan exists or while loading', () => {
+    const fixture = TestBed.createComponent(PlanListComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.querySelector('.empty-plans')).toBeNull();
+
+    component.plans = [];
+    component.localPlans = [{ clientId: 'local-plan', name: 'Mein Plan', updatedAt: 1 }];
+    fixture.detectChanges();
+    expect(element.querySelector('.empty-plans')).toBeNull();
+
+    component.localPlans = [];
+    component.loading = true;
+    fixture.detectChanges();
+    expect(element.querySelector('.empty-plans')).toBeNull();
+  });
 });

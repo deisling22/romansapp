@@ -201,6 +201,18 @@
   @include ios.button-tinted;
 }
 
+.empty-plans {
+  display: grid;
+  gap: 16px;
+  padding: 20px 16px;
+}
+
+.empty-plans p {
+  margin: 0;
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
 .scan-recipe-link {
   @include ios.button-gray;
 }

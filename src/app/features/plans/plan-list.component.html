@@ -80,7 +80,10 @@
         </a>
       }
       @if (plans.length === 0 && localPlans.length === 0) {
-        <p class="status">Noch keine Pläne vorhanden.</p>
+        <div class="empty-plans">
+          <p>Noch keine Pläne vorhanden. Entdecke fertige Speisepläne von Creatorn und übernimm sie in deine eigenen Pläne.</p>
+          <a class="secondary-action" routerLink="/creators">Pläne importieren</a>
+        </div>
       }
     </section>
   }
